@@ -1,17 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Leaf,
-  Heart,
-  ShoppingBag,
-  ShieldCheck,
-  Star,
-  MapPin,
-  ChevronRight,
   Phone,
   MessageSquare,
-  Sparkles,
+  Menu,
+  X,
 } from 'lucide-react';
 
 interface HubHeroProps {
@@ -19,144 +14,152 @@ interface HubHeroProps {
 }
 
 export default function HubHero({ onSelectSection }: HubHeroProps) {
-  const HUB_CARDS = [
-    {
-      id: 'about',
-      title: 'Our 9-Yr Story',
-      subtitle: 'See how our organic journey began in 2017',
-      icon: Heart,
-      iconBg: 'bg-[#E8F5E9] text-[#1B4D2E]',
-      badge: 'Est. 2017',
-    },
-    {
-      id: 'products',
-      title: 'A2 Products',
-      subtitle: 'Explore raw A2 milk, Vedic Bilona ghee & fresh paneer',
-      icon: ShoppingBag,
-      iconBg: 'bg-[#FEF3C7] text-[#7A5230]',
-      badge: 'Fresh Daily',
-    },
-    {
-      id: 'process',
-      title: 'Hygiene Process',
-      subtitle: '4-step cold-chain purity & 4°C instant chilling',
-      icon: ShieldCheck,
-      iconBg: 'bg-[#E0F2FE] text-[#0369A1]',
-      badge: 'Zero Adulteration',
-    },
-    {
-      id: 'reviews',
-      title: 'Customer Reviews',
-      subtitle: 'Justdial 3.6★ rating & verified family reviews',
-      icon: Star,
-      iconBg: 'bg-[#FEF9C3] text-[#A16207]',
-      badge: '3.6★ Justdial',
-    },
-    {
-      id: 'contact',
-      title: 'Farm Location & Order',
-      subtitle: 'Visit us in Shoolagiri, Hosur or send an inquiry',
-      icon: MapPin,
-      iconBg: 'bg-[#F3E8FF] text-[#6B21A8]',
-      badge: 'Shoolagiri, Hosur',
-    },
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+  const NAV_ITEMS = [
+    { id: 'about', label: 'Our 9-Yr Story' },
+    { id: 'products', label: 'A2 Products' },
+    { id: 'process', label: 'Hygiene Process' },
+    { id: 'reviews', label: 'Reviews' },
+    { id: 'contact', label: 'Farm Location' },
   ];
 
   return (
-    <div className="min-h-[85vh] lg:min-h-screen bg-[#FAF7F2] flex flex-col justify-between relative overflow-hidden w-full">
-      {/* Hero Visual Banner with Dark Forest Overlay */}
-      <section className="relative bg-[#1B4D2E] text-white py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden shadow-lg">
+    <div className="min-h-screen bg-[#FAF7F2] flex flex-col justify-between relative overflow-hidden w-full">
+      {/* Top Header / Clean Nav Bar */}
+      <header className="relative z-30 bg-[#1B4D2E] text-white border-b border-white/10 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto flex items-center justify-between h-16 sm:h-20">
+          {/* Logo & Brand Name */}
+          <a href="#" className="flex items-center gap-2.5 group">
+            <div className="w-9 h-9 rounded-full bg-[#E5A93C] flex items-center justify-center text-[#4A3525] shrink-0">
+              <Leaf className="w-5 h-5 fill-current" />
+            </div>
+            <div>
+              <span className="font-serif text-lg sm:text-xl font-bold tracking-tight text-white block leading-none">
+                ARANYA
+              </span>
+              <span className="text-[10px] tracking-wider uppercase font-semibold text-[#D1E8D5] block mt-0.5">
+                Organic Dairy Farm
+              </span>
+            </div>
+          </a>
+
+          {/* Simple Desktop Nav Links (Plain Text, No Badges, No Boxes) */}
+          <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-sm font-medium text-[#FAF7F2]">
+            {NAV_ITEMS.map((item, idx) => (
+              <React.Fragment key={item.id}>
+                {idx > 0 && <span className="text-white/30 text-xs">|</span>}
+                <button
+                  onClick={() => onSelectSection(item.id)}
+                  className="hover:text-[#E5A93C] transition-colors py-2 relative group focus:outline-none"
+                >
+                  <span>{item.label}</span>
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#E5A93C] transition-all group-hover:w-full" />
+                </button>
+              </React.Fragment>
+            ))}
+          </nav>
+
+          {/* Right Action - Direct Phone */}
+          <div className="hidden md:flex items-center">
+            <a
+              href="tel:+919876543210"
+              className="text-xs font-semibold text-[#D1E8D5] hover:text-white flex items-center gap-1.5 transition-colors"
+            >
+              <Phone className="w-3.5 h-3.5" />
+              <span>+91 98765 43210</span>
+            </a>
+          </div>
+
+          {/* Mobile Hamburger Toggle */}
+          <div className="md:hidden flex items-center">
+            <button
+              onClick={() => setMobileNavOpen(!mobileNavOpen)}
+              className="w-10 h-10 rounded-lg text-white hover:bg-white/10 flex items-center justify-center touch-manipulation"
+              aria-label="Toggle Navigation"
+            >
+              {mobileNavOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Dropdown Nav Links */}
+        {mobileNavOpen && (
+          <div className="md:hidden bg-[#163E25] border-t border-white/10 py-4 px-4 space-y-1 animate-fade-in">
+            {NAV_ITEMS.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => {
+                  setMobileNavOpen(false);
+                  onSelectSection(item.id);
+                }}
+                className="w-full text-left px-4 py-3 text-sm font-medium text-white hover:bg-white/10 hover:text-[#E5A93C] rounded-lg transition-colors min-h-[44px] flex items-center"
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </header>
+
+      {/* Hero Visual Section */}
+      <section className="relative bg-[#1B4D2E] text-white py-14 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 flex-1 flex items-center justify-center overflow-hidden">
         {/* Background Visual Overlay Gradient */}
         <div className="absolute inset-0 bg-gradient-to-r from-[#1B4D2E]/95 via-[#1B4D2E]/90 to-[#25663E]/85 z-10" />
         <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-[#E5A93C]/15 blur-3xl pointer-events-none z-0" />
         <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-96 h-96 rounded-full bg-[#E8F5E9]/10 blur-3xl pointer-events-none z-0" />
 
-        <div className="max-w-5xl mx-auto relative z-20 text-center space-y-4 animate-fade-in-up">
-          {/* Logo & Brand Name */}
-          <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 shadow-sm">
-            <div className="w-9 h-9 rounded-full bg-[#E5A93C] flex items-center justify-center text-[#4A3525] shrink-0">
-              <Leaf className="w-5 h-5 fill-current" />
-            </div>
-            <span className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-white">
-              ARANYA ORGANIC DAIRY FARM
-            </span>
-          </div>
+        <div className="max-w-4xl mx-auto relative z-20 text-center space-y-5 animate-fade-in-up">
+          {/* Tagline */}
+          <span className="text-xs sm:text-sm font-semibold tracking-widest text-[#E5A93C] uppercase block">
+            Established 2017 • Shoolagiri, Hosur
+          </span>
 
-          {/* 1-Line Tagline Specification */}
-          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-serif font-bold tracking-tight text-[#FAF7F2] leading-snug">
+          {/* Main Title */}
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-bold tracking-tight text-[#FAF7F2] leading-tight">
             9 Years of Pure, Organic Dairy in Shoolagiri
           </h1>
 
-          <p className="text-xs sm:text-base text-[#D1E8D5] max-w-xl mx-auto leading-relaxed">
-            100% natural, grass-fed A2 milk & Vedic Bilona Ghee from free-roaming native cows. Select a topic below to explore details.
+          {/* Subtitle */}
+          <p className="text-xs sm:text-lg text-[#D1E8D5] max-w-2xl mx-auto leading-relaxed px-2">
+            Experience the unadulterated taste of 100% natural, grass-fed A2 milk and Vedic Bilona Ghee straight from our chemical-free pastures.
           </p>
 
-          {/* Direct Actions */}
-          <div className="pt-2 flex items-center justify-center gap-3 flex-wrap">
+          {/* Minimal Inline Top Nav (Alternative In-Hero Placement) */}
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-x-4 sm:gap-x-6 gap-y-2 text-xs sm:text-sm font-medium text-[#FAF7F2]">
+            {NAV_ITEMS.map((item, idx) => (
+              <React.Fragment key={item.id}>
+                {idx > 0 && <span className="text-white/30 hidden sm:inline">|</span>}
+                <button
+                  onClick={() => onSelectSection(item.id)}
+                  className="hover:text-[#E5A93C] transition-colors py-1 relative group focus:outline-none underline sm:no-underline"
+                >
+                  <span>{item.label}</span>
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#E5A93C] transition-all group-hover:w-full" />
+                </button>
+              </React.Fragment>
+            ))}
+          </div>
+
+          {/* Hero CTAs (Kept Unchanged) */}
+          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 max-w-md mx-auto">
             <a
               href="https://wa.me/919876543210?text=Hello%20Aranya%20Dairy%20Farm,%20I'd%20like%20to%20order%20fresh%20A2%20milk!"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-[#E5A93C] hover:bg-[#D49626] text-[#4A3525] font-bold text-xs sm:text-sm px-5 py-3 rounded-xl flex items-center gap-2 shadow-md transition-all min-h-[44px]"
+              className="btn-secondary w-full sm:w-auto px-6 py-3.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-lg min-h-[48px]"
             >
               <MessageSquare className="w-4 h-4 fill-current shrink-0" />
-              <span>Quick WhatsApp Order</span>
+              <span>Quick Order on WhatsApp</span>
             </a>
             <a
               href="tel:+919876543210"
-              className="bg-white/15 hover:bg-white/25 text-white font-semibold text-xs sm:text-sm px-4 py-3 rounded-xl flex items-center gap-2 border border-white/20 transition-all min-h-[44px]"
+              className="bg-white/15 hover:bg-white/25 text-white font-semibold text-xs sm:text-sm px-6 py-3.5 rounded-xl flex items-center justify-center gap-2 border border-white/20 transition-all w-full sm:w-auto min-h-[48px]"
             >
               <Phone className="w-4 h-4 shrink-0" />
               <span>Call Farm</span>
             </a>
           </div>
-        </div>
-      </section>
-
-      {/* 5 Clean Entry Cards Hub Section */}
-      <section className="py-8 sm:py-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto w-full flex-1 flex flex-col justify-center">
-        <div className="text-center mb-6">
-          <span className="text-[11px] font-bold uppercase tracking-widest text-[#7A5230]">
-            Hub Directory • Select a Section
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 w-full">
-          {HUB_CARDS.map((card, idx) => {
-            const IconComponent = card.icon;
-            return (
-              <button
-                key={card.id}
-                onClick={() => onSelectSection(card.id)}
-                className={`group bg-white rounded-2xl p-5 border border-[#1B4D2E]/10 shadow-xs hover:shadow-lg hover:border-[#1B4D2E]/40 transition-all duration-300 text-left flex flex-col justify-between min-h-[140px] touch-manipulation relative overflow-hidden ${
-                  idx === 4 ? 'sm:col-span-2 lg:col-span-1' : ''
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className={`w-10 h-10 rounded-xl ${card.iconBg} flex items-center justify-center shrink-0`}>
-                    <IconComponent className="w-5 h-5" />
-                  </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#7A5230] bg-[#FAF7F2] px-2.5 py-1 rounded-md border border-[#7A5230]/15">
-                    {card.badge}
-                  </span>
-                </div>
-
-                <div className="mt-4 flex items-end justify-between gap-2">
-                  <div>
-                    <h3 className="font-serif font-bold text-base sm:text-lg text-[#1E293B] group-hover:text-[#1B4D2E] transition-colors">
-                      {card.title}
-                    </h3>
-                    <p className="text-xs text-[#64748B] mt-0.5 line-clamp-1">
-                      {card.subtitle}
-                    </p>
-                  </div>
-                  <div className="w-8 h-8 rounded-full bg-[#FAF7F2] group-hover:bg-[#1B4D2E] group-hover:text-white text-[#1B4D2E] flex items-center justify-center shrink-0 transition-colors">
-                    <ChevronRight className="w-4 h-4" />
-                  </div>
-                </div>
-              </button>
-            );
-          })}
         </div>
       </section>
 
