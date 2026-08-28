@@ -45,25 +45,61 @@ body {
   width: 100%;
 }
 
+/* Entrance Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up,
+  .animate-fade-in,
+  .animate-bounce,
+  .animate-pulse-subtle {
+    animation: none !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
 /* Custom Touch Target & Mobile Utilities */
 .touch-target {
   min-height: 44px;
   min-width: 44px;
   display: inline-flex;
-  items-center: center;
+  align-items: center;
   justify-content: center;
 }
 
-/* Custom Glassmorphism & Micro-animations */
+/* Glassmorphism & Micro-interactions */
 .glass-card {
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(27, 77, 46, 0.12);
 }
 
 .glass-header {
-  background: rgba(250, 247, 242, 0.94);
+  background: rgba(250, 247, 242, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
@@ -116,13 +152,4 @@ body {
   background: var(--color-primary);
   color: #ffffff;
   transform: translateY(-2px);
-}
-
-@keyframes pulse-subtle {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.04); }
-}
-
-.animate-pulse-subtle {
-  animation: pulse-subtle 3.5s infinite ease-in-out;
 }
