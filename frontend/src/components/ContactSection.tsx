@@ -1,14 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import { MapPin, Phone, Mail, Clock, Send, MessageSquare, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, CheckCircle2 } from 'lucide-react';
 
 export default function ContactSection() {
   const [submitted, setSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
-    product: 'A2 Raw Milk (1L)',
     location: '',
     notes: '',
   });
@@ -19,146 +18,86 @@ export default function ContactSection() {
   };
 
   return (
-    <section id="contact" className="py-12 sm:py-20 bg-white relative w-full overflow-hidden">
+    <section id="contact" className="py-20 sm:py-28 bg-[#FCFAF7] w-full overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Section Title */}
-        <div className="text-center max-w-3xl mx-auto space-y-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full badge-organic text-xs font-bold uppercase tracking-wider">
-            <MapPin className="w-4 h-4 text-[#1B4D2E] shrink-0" />
-            <span>Visit Or Contact Our Farm</span>
-          </div>
-
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-serif font-bold text-[#1B4D2E] tracking-tight">
-            Get Fresh Dairy Delivered
-          </h2>
-
-          <p className="text-sm sm:text-base text-[#64748B]">
-            Have questions about daily delivery, farm visits, or bulk orders? Connect with us directly!
-          </p>
-        </div>
-
-        <div className="mt-10 sm:mt-14 grid lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           
-          {/* Left Column: Farm Address & Info */}
-          <div className="lg:col-span-5 space-y-6 w-full">
-            <div className="bg-[#FAF7F2] rounded-3xl p-6 sm:p-8 border border-[#1B4D2E]/10 space-y-6 shadow-xs">
-              <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#1B4D2E]">
-                Aranya Organic Dairy Farm
-              </h3>
+          {/* Left Column: Farm Address & Contact Info */}
+          <div className="lg:col-span-5 space-y-8">
+            <div className="space-y-4">
+              <span className="text-xs font-sans uppercase font-bold tracking-widest text-[#6B472B]">
+                Visit Or Contact
+              </span>
+              <h2 className="text-3xl sm:text-5xl font-serif font-bold text-[#1C241E] leading-tight">
+                Our farm in Shoolagiri.
+              </h2>
+              <p className="text-sm text-[#57655B] leading-relaxed">
+                Located conveniently off the Hosur Highway. Open for weekend farm visits by prior appointment.
+              </p>
+            </div>
 
-              <div className="space-y-4 text-xs sm:text-sm text-[#1E293B]">
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-[#E8F5E9] text-[#1B4D2E] flex items-center justify-center shrink-0 mt-0.5">
-                    <MapPin className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <strong className="block text-[#1B4D2E] font-serif text-sm sm:text-base">Farm Address</strong>
-                    <span className="text-[#64748B] leading-relaxed block mt-0.5">
-                      Shoolagiri, Hosur Krishnagiri Highway, <br />
-                      Krishnagiri District, Tamil Nadu — 635117
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-[#E8F5E9] text-[#1B4D2E] flex items-center justify-center shrink-0 mt-0.5">
-                    <Phone className="w-5 h-5" />
-                  </div>
-                  <div className="min-h-[44px] flex flex-col justify-center">
-                    <strong className="block text-[#1B4D2E] font-serif text-sm sm:text-base">Direct Phone / WhatsApp</strong>
-                    <a href="tel:+919876543210" className="text-[#7A5230] font-semibold hover:underline block mt-0.5">
-                      +91 98765 43210
-                    </a>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-[#E8F5E9] text-[#1B4D2E] flex items-center justify-center shrink-0 mt-0.5">
-                    <Mail className="w-5 h-5" />
-                  </div>
-                  <div className="min-h-[44px] flex flex-col justify-center">
-                    <strong className="block text-[#1B4D2E] font-serif text-sm sm:text-base">Email Inquiries</strong>
-                    <a href="mailto:info@aranyadairyfarm.com" className="text-[#64748B] hover:underline block mt-0.5">
-                      info@aranyadairyfarm.com
-                    </a>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-[#E8F5E9] text-[#1B4D2E] flex items-center justify-center shrink-0 mt-0.5">
-                    <Clock className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <strong className="block text-[#1B4D2E] font-serif text-sm sm:text-base">Delivery Timings</strong>
-                    <span className="text-[#64748B] block mt-0.5">
-                      Morning: 6:00 AM – 8:30 AM <br />
-                      Evening: 5:00 PM – 7:00 PM
-                    </span>
-                  </div>
-                </div>
+            <div className="space-y-6 text-sm text-[#1C241E] border-t border-[#1B4D2E]/10 pt-6">
+              <div>
+                <strong className="block font-serif text-lg font-bold text-[#1B4D2E]">Farm Address</strong>
+                <span className="text-[#57655B] text-xs leading-relaxed block mt-1">
+                  Shoolagiri, Hosur Krishnagiri Highway, <br />
+                  Krishnagiri District, Tamil Nadu — 635117
+                </span>
               </div>
 
-              {/* Direct WhatsApp Action */}
-              <div className="pt-4 border-t border-[#1B4D2E]/10">
+              <div>
+                <strong className="block font-serif text-lg font-bold text-[#1B4D2E]">Direct Contact</strong>
+                <a href="tel:+919876543210" className="text-[#6B472B] text-xs font-semibold hover:underline block mt-1">
+                  Phone / WhatsApp: +91 98765 43210
+                </a>
+                <a href="mailto:info@aranyadairyfarm.com" className="text-[#57655B] text-xs hover:underline block mt-0.5">
+                  info@aranyadairyfarm.com
+                </a>
+              </div>
+
+              <div>
                 <a
-                  href="https://wa.me/919876543210?text=Hello%20Aranya%20Dairy%20Farm,%20I'd%20like%20to%20know%20more%20about%20your%20products."
+                  href="https://maps.google.com/?q=Shoolagiri+Tamil+Nadu"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn-secondary w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-xs min-h-[48px]"
+                  className="link-editorial"
                 >
-                  <MessageSquare className="w-5 h-5 text-[#4A3525] shrink-0" />
-                  <span>Chat Directly on WhatsApp</span>
+                  <span>Open Location in Google Maps</span>
+                  <ArrowRight className="w-4 h-4" />
                 </a>
               </div>
             </div>
-
-            {/* Location Map Placeholder Card */}
-            <div className="bg-[#FCFAF7] rounded-3xl p-6 border border-[#1B4D2E]/10 text-center space-y-2.5">
-              <div className="text-3xl">📍</div>
-              <h4 className="font-serif font-bold text-[#1B4D2E]">Shoolagiri Farm Location</h4>
-              <p className="text-xs text-[#64748B]">
-                Conveniently located off the Hosur Highway. Open for weekend visitor tours by prior appointment.
-              </p>
-              <a
-                href="https://maps.google.com/?q=Shoolagiri+Tamil+Nadu"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center min-h-[44px] px-4 text-xs font-bold text-[#7A5230] hover:text-[#1B4D2E] underline"
-              >
-                Open in Google Maps →
-              </a>
-            </div>
           </div>
 
-          {/* Right Column: Interactive Order / Inquiry Form */}
-          <div className="lg:col-span-7 bg-[#FAF7F2] rounded-3xl p-6 sm:p-10 border border-[#1B4D2E]/10 shadow-xs w-full">
-            <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#1B4D2E] mb-2">
-              Request Delivery / Sample Pack
+          {/* Right Column: Clean Editorial Form */}
+          <div className="lg:col-span-7 bg-white p-8 sm:p-12 rounded-3xl border border-[#1B4D2E]/10 shadow-xs">
+            <h3 className="text-2xl font-serif font-bold text-[#1C241E] mb-2">
+              Send a Delivery Inquiry
             </h3>
-            <p className="text-xs text-[#64748B] mb-6">
-              Fill out your details and our team will get in touch with you within 2 hours to confirm your delivery schedule.
+            <p className="text-xs text-[#57655B] mb-6">
+              Fill in your details below and our farm coordinator will get in touch with you.
             </p>
 
             {submitted ? (
-              <div className="bg-[#E8F5E9] p-6 sm:p-8 rounded-2xl border border-[#1B4D2E]/20 text-center space-y-3">
-                <CheckCircle2 className="w-12 h-12 text-[#1B4D2E] mx-auto" />
-                <h4 className="text-xl font-serif font-bold text-[#1B4D2E]">Thank You!</h4>
-                <p className="text-xs text-[#1E293B]">
-                  Your request has been received. Our farm coordinator will contact you shortly at <span className="font-bold text-[#7A5230]">{formData.phone}</span>.
+              <div className="bg-[#F4F8F5] p-8 rounded-2xl border border-[#1B4D2E]/20 text-center space-y-3">
+                <CheckCircle2 className="w-10 h-10 text-[#1B4D2E] mx-auto" />
+                <h4 className="text-xl font-serif font-bold text-[#1C241E]">Inquiry Received</h4>
+                <p className="text-xs text-[#57655B]">
+                  Thank you! We will reach out to <span className="font-bold text-[#1B4D2E]">{formData.phone}</span> shortly.
                 </p>
                 <button
                   onClick={() => setSubmitted(false)}
-                  className="btn-outline px-6 py-2.5 rounded-lg text-xs font-bold mt-2 min-h-[44px]"
+                  className="link-editorial mt-2"
                 >
-                  Submit Another Inquiry
+                  <span>Submit Another Inquiry →</span>
                 </button>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#1E293B] mb-1">
-                    Your Full Name *
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#1C241E] mb-1">
+                    Your Name *
                   </label>
                   <input
                     type="text"
@@ -166,13 +105,13 @@ export default function ContactSection() {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="e.g. Adithya Kumar"
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-base sm:text-sm focus:outline-none focus:border-[#1B4D2E] transition-colors min-h-[44px]"
+                    className="w-full px-4 py-3 rounded-xl border border-[#E8ECE9] bg-[#FCFAF7] text-base sm:text-sm focus:outline-none focus:border-[#1B4D2E] min-h-[44px]"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-[#1E293B] mb-1">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-[#1C241E] mb-1">
                       Phone Number / WhatsApp *
                     </label>
                     <input
@@ -181,13 +120,13 @@ export default function ContactSection() {
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       placeholder="e.g. 9876543210"
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-base sm:text-sm focus:outline-none focus:border-[#1B4D2E] transition-colors min-h-[44px]"
+                      className="w-full px-4 py-3 rounded-xl border border-[#E8ECE9] bg-[#FCFAF7] text-base sm:text-sm focus:outline-none focus:border-[#1B4D2E] min-h-[44px]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-[#1E293B] mb-1">
-                      Delivery Location *
+                    <label className="block text-xs font-bold uppercase tracking-wider text-[#1C241E] mb-1">
+                      Delivery Area *
                     </label>
                     <input
                       type="text"
@@ -195,47 +134,30 @@ export default function ContactSection() {
                       value={formData.location}
                       onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                       placeholder="e.g. Hosur Town / Shoolagiri"
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-base sm:text-sm focus:outline-none focus:border-[#1B4D2E] transition-colors min-h-[44px]"
+                      className="w-full px-4 py-3 rounded-xl border border-[#E8ECE9] bg-[#FCFAF7] text-base sm:text-sm focus:outline-none focus:border-[#1B4D2E] min-h-[44px]"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#1E293B] mb-1">
-                    Interested Product *
-                  </label>
-                  <select
-                    value={formData.product}
-                    onChange={(e) => setFormData({ ...formData, product: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-base sm:text-sm focus:outline-none focus:border-[#1B4D2E] transition-colors min-h-[44px]"
-                  >
-                    <option value="A2 Raw Milk (1L)">Raw A2 Whole Cow Milk (1L)</option>
-                    <option value="Traditional Bilona Ghee (500ml)">Traditional Bilona Cow Ghee (500ml)</option>
-                    <option value="Fresh Farm Paneer (200g)">Fresh Farm Cottage Cheese / Paneer (200g)</option>
-                    <option value="Set Curd (500g)">Organic Set Thick Curd (500g)</option>
-                    <option value="Pure Desi White Butter (250g)">Pure Desi White Butter (250g)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#1E293B] mb-1">
-                    Special Notes / Delivery Preferences
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#1C241E] mb-1">
+                    Notes or Special Requests
                   </label>
                   <textarea
                     rows={3}
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    placeholder="Tell us if you want morning delivery or weekend sample pack..."
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-base sm:text-sm focus:outline-none focus:border-[#1B4D2E] transition-colors"
+                    placeholder="Tell us if you want morning delivery or weekend farm visit..."
+                    className="w-full px-4 py-3 rounded-xl border border-[#E8ECE9] bg-[#FCFAF7] text-base sm:text-sm focus:outline-none focus:border-[#1B4D2E]"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="btn-primary w-full py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2 shadow-md hover:shadow-lg mt-2 min-h-[48px]"
+                  className="btn-primary-single w-full font-bold text-sm mt-2 min-h-[48px]"
                 >
-                  <Send className="w-4 h-4 text-[#E5A93C] shrink-0" />
-                  <span>Send Order Request</span>
+                  <span>Submit Order Inquiry</span>
+                  <ArrowRight className="w-4 h-4 text-[#D99B26]" />
                 </button>
               </form>
             )}
