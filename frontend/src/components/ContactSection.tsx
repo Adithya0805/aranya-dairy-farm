@@ -19,41 +19,41 @@ export default function ContactSection() {
   };
 
   return (
-    <section id="contact" className="py-20 bg-white relative">
+    <section id="contact" className="py-12 sm:py-20 bg-white relative w-full overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Title */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full badge-organic text-xs font-bold uppercase tracking-wider">
-            <MapPin className="w-4 h-4 text-[#1B4D2E]" />
+            <MapPin className="w-4 h-4 text-[#1B4D2E] shrink-0" />
             <span>Visit Or Contact Our Farm</span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-[#1B4D2E] tracking-tight">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-serif font-bold text-[#1B4D2E] tracking-tight">
             Get Fresh Dairy Delivered
           </h2>
 
-          <p className="text-base text-[#64748B]">
+          <p className="text-sm sm:text-base text-[#64748B]">
             Have questions about daily delivery, farm visits, or bulk orders? Connect with us directly!
           </p>
         </div>
 
-        <div className="mt-14 grid lg:grid-cols-12 gap-12 items-start">
+        <div className="mt-10 sm:mt-14 grid lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           
           {/* Left Column: Farm Address & Info */}
-          <div className="lg:col-span-5 space-y-6">
-            <div className="bg-[#FAF7F2] rounded-3xl p-8 border border-[#1B4D2E]/10 space-y-6 shadow-sm">
-              <h3 className="text-2xl font-serif font-bold text-[#1B4D2E]">
+          <div className="lg:col-span-5 space-y-6 w-full">
+            <div className="bg-[#FAF7F2] rounded-3xl p-6 sm:p-8 border border-[#1B4D2E]/10 space-y-6 shadow-xs">
+              <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#1B4D2E]">
                 Aranya Organic Dairy Farm
               </h3>
 
-              <div className="space-y-4 text-sm text-[#1E293B]">
+              <div className="space-y-4 text-xs sm:text-sm text-[#1E293B]">
                 <div className="flex items-start gap-3">
                   <div className="w-9 h-9 rounded-lg bg-[#E8F5E9] text-[#1B4D2E] flex items-center justify-center shrink-0 mt-0.5">
                     <MapPin className="w-5 h-5" />
                   </div>
                   <div>
-                    <strong className="block text-[#1B4D2E] font-serif text-base">Farm Address</strong>
+                    <strong className="block text-[#1B4D2E] font-serif text-sm sm:text-base">Farm Address</strong>
                     <span className="text-[#64748B] leading-relaxed block mt-0.5">
                       Shoolagiri, Hosur Krishnagiri Highway, <br />
                       Krishnagiri District, Tamil Nadu — 635117
@@ -65,8 +65,8 @@ export default function ContactSection() {
                   <div className="w-9 h-9 rounded-lg bg-[#E8F5E9] text-[#1B4D2E] flex items-center justify-center shrink-0 mt-0.5">
                     <Phone className="w-5 h-5" />
                   </div>
-                  <div>
-                    <strong className="block text-[#1B4D2E] font-serif text-base">Direct Phone / WhatsApp</strong>
+                  <div className="min-h-[44px] flex flex-col justify-center">
+                    <strong className="block text-[#1B4D2E] font-serif text-sm sm:text-base">Direct Phone / WhatsApp</strong>
                     <a href="tel:+919876543210" className="text-[#7A5230] font-semibold hover:underline block mt-0.5">
                       +91 98765 43210
                     </a>
@@ -77,8 +77,8 @@ export default function ContactSection() {
                   <div className="w-9 h-9 rounded-lg bg-[#E8F5E9] text-[#1B4D2E] flex items-center justify-center shrink-0 mt-0.5">
                     <Mail className="w-5 h-5" />
                   </div>
-                  <div>
-                    <strong className="block text-[#1B4D2E] font-serif text-base">Email Inquiries</strong>
+                  <div className="min-h-[44px] flex flex-col justify-center">
+                    <strong className="block text-[#1B4D2E] font-serif text-sm sm:text-base">Email Inquiries</strong>
                     <a href="mailto:info@aranyadairyfarm.com" className="text-[#64748B] hover:underline block mt-0.5">
                       info@aranyadairyfarm.com
                     </a>
@@ -90,7 +90,7 @@ export default function ContactSection() {
                     <Clock className="w-5 h-5" />
                   </div>
                   <div>
-                    <strong className="block text-[#1B4D2E] font-serif text-base">Delivery Timings</strong>
+                    <strong className="block text-[#1B4D2E] font-serif text-sm sm:text-base">Delivery Timings</strong>
                     <span className="text-[#64748B] block mt-0.5">
                       Morning: 6:00 AM – 8:30 AM <br />
                       Evening: 5:00 PM – 7:00 PM
@@ -105,16 +105,16 @@ export default function ContactSection() {
                   href="https://wa.me/919876543210?text=Hello%20Aranya%20Dairy%20Farm,%20I'd%20like%20to%20know%20more%20about%20your%20products."
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn-secondary w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-xs"
+                  className="btn-secondary w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-xs min-h-[48px]"
                 >
-                  <MessageSquare className="w-5 h-5 text-[#4A3525]" />
+                  <MessageSquare className="w-5 h-5 text-[#4A3525] shrink-0" />
                   <span>Chat Directly on WhatsApp</span>
                 </a>
               </div>
             </div>
 
             {/* Location Map Placeholder Card */}
-            <div className="bg-[#FCFAF7] rounded-3xl p-6 border border-[#1B4D2E]/10 text-center space-y-3">
+            <div className="bg-[#FCFAF7] rounded-3xl p-6 border border-[#1B4D2E]/10 text-center space-y-2.5">
               <div className="text-3xl">📍</div>
               <h4 className="font-serif font-bold text-[#1B4D2E]">Shoolagiri Farm Location</h4>
               <p className="text-xs text-[#64748B]">
@@ -124,7 +124,7 @@ export default function ContactSection() {
                 href="https://maps.google.com/?q=Shoolagiri+Tamil+Nadu"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block text-xs font-bold text-[#7A5230] hover:text-[#1B4D2E] underline"
+                className="inline-flex items-center justify-center min-h-[44px] px-4 text-xs font-bold text-[#7A5230] hover:text-[#1B4D2E] underline"
               >
                 Open in Google Maps →
               </a>
@@ -132,8 +132,8 @@ export default function ContactSection() {
           </div>
 
           {/* Right Column: Interactive Order / Inquiry Form */}
-          <div className="lg:col-span-7 bg-[#FAF7F2] rounded-3xl p-8 sm:p-10 border border-[#1B4D2E]/10 shadow-sm">
-            <h3 className="text-2xl font-serif font-bold text-[#1B4D2E] mb-2">
+          <div className="lg:col-span-7 bg-[#FAF7F2] rounded-3xl p-6 sm:p-10 border border-[#1B4D2E]/10 shadow-xs w-full">
+            <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#1B4D2E] mb-2">
               Request Delivery / Sample Pack
             </h3>
             <p className="text-xs text-[#64748B] mb-6">
@@ -141,7 +141,7 @@ export default function ContactSection() {
             </p>
 
             {submitted ? (
-              <div className="bg-[#E8F5E9] p-8 rounded-2xl border border-[#1B4D2E]/20 text-center space-y-3">
+              <div className="bg-[#E8F5E9] p-6 sm:p-8 rounded-2xl border border-[#1B4D2E]/20 text-center space-y-3">
                 <CheckCircle2 className="w-12 h-12 text-[#1B4D2E] mx-auto" />
                 <h4 className="text-xl font-serif font-bold text-[#1B4D2E]">Thank You!</h4>
                 <p className="text-xs text-[#1E293B]">
@@ -149,7 +149,7 @@ export default function ContactSection() {
                 </p>
                 <button
                   onClick={() => setSubmitted(false)}
-                  className="btn-outline px-6 py-2 rounded-lg text-xs font-bold mt-2"
+                  className="btn-outline px-6 py-2.5 rounded-lg text-xs font-bold mt-2 min-h-[44px]"
                 >
                   Submit Another Inquiry
                 </button>
@@ -166,11 +166,11 @@ export default function ContactSection() {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="e.g. Adithya Kumar"
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:border-[#1B4D2E] transition-colors"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-base sm:text-sm focus:outline-none focus:border-[#1B4D2E] transition-colors min-h-[44px]"
                   />
                 </div>
 
-                <div className="grid sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-[#1E293B] mb-1">
                       Phone Number / WhatsApp *
@@ -181,7 +181,7 @@ export default function ContactSection() {
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       placeholder="e.g. 9876543210"
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:border-[#1B4D2E] transition-colors"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-base sm:text-sm focus:outline-none focus:border-[#1B4D2E] transition-colors min-h-[44px]"
                     />
                   </div>
 
@@ -195,7 +195,7 @@ export default function ContactSection() {
                       value={formData.location}
                       onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                       placeholder="e.g. Hosur Town / Shoolagiri"
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:border-[#1B4D2E] transition-colors"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-base sm:text-sm focus:outline-none focus:border-[#1B4D2E] transition-colors min-h-[44px]"
                     />
                   </div>
                 </div>
@@ -207,7 +207,7 @@ export default function ContactSection() {
                   <select
                     value={formData.product}
                     onChange={(e) => setFormData({ ...formData, product: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:border-[#1B4D2E] transition-colors"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-base sm:text-sm focus:outline-none focus:border-[#1B4D2E] transition-colors min-h-[44px]"
                   >
                     <option value="A2 Raw Milk (1L)">Raw A2 Whole Cow Milk (1L)</option>
                     <option value="Traditional Bilona Ghee (500ml)">Traditional Bilona Cow Ghee (500ml)</option>
@@ -226,15 +226,15 @@ export default function ContactSection() {
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                     placeholder="Tell us if you want morning delivery or weekend sample pack..."
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:border-[#1B4D2E] transition-colors"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-base sm:text-sm focus:outline-none focus:border-[#1B4D2E] transition-colors"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="btn-primary w-full py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2 shadow-md hover:shadow-lg mt-2"
+                  className="btn-primary w-full py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2 shadow-md hover:shadow-lg mt-2 min-h-[48px]"
                 >
-                  <Send className="w-4 h-4 text-[#E5A93C]" />
+                  <Send className="w-4 h-4 text-[#E5A93C] shrink-0" />
                   <span>Send Order Request</span>
                 </button>
               </form>
