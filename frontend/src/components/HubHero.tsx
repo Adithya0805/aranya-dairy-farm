@@ -8,6 +8,8 @@ import {
   Menu,
   X,
 } from 'lucide-react';
+import { WHATSAPP_TEL, WHATSAPP_DISPLAY, WA_GENERAL_ORDER } from '@/lib/whatsapp';
+
 
 interface HubHeroProps {
   onSelectSection: (sectionId: string) => void;
@@ -63,11 +65,11 @@ export default function HubHero({ onSelectSection }: HubHeroProps) {
           {/* Right Action - Direct Phone */}
           <div className="hidden md:flex items-center">
             <a
-              href="tel:+919876543210"
+              href={WHATSAPP_TEL}
               className="text-xs font-semibold text-[#D1E8D5] hover:text-white flex items-center gap-1.5 transition-colors"
             >
               <Phone className="w-3.5 h-3.5" />
-              <span>+91 98765 43210</span>
+              <span>{WHATSAPP_DISPLAY}</span>
             </a>
           </div>
 
@@ -144,7 +146,7 @@ export default function HubHero({ onSelectSection }: HubHeroProps) {
           {/* Hero CTAs (Kept Unchanged) */}
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 max-w-md mx-auto">
             <a
-              href="https://wa.me/919876543210?text=Hello%20Aranya%20Dairy%20Farm,%20I'd%20like%20to%20order%20fresh%20A2%20milk!"
+              href={WA_GENERAL_ORDER}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-secondary w-full sm:w-auto px-6 py-3.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-lg min-h-[48px]"
@@ -153,7 +155,7 @@ export default function HubHero({ onSelectSection }: HubHeroProps) {
               <span>Quick Order on WhatsApp</span>
             </a>
             <a
-              href="tel:+919876543210"
+              href={WHATSAPP_TEL}
               className="bg-white/15 hover:bg-white/25 text-white font-semibold text-xs sm:text-sm px-6 py-3.5 rounded-xl flex items-center justify-center gap-2 border border-white/20 transition-all w-full sm:w-auto min-h-[48px]"
             >
               <Phone className="w-4 h-4 shrink-0" />

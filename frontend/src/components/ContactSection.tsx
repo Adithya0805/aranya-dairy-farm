@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { WHATSAPP_TEL, WHATSAPP_DISPLAY } from '@/lib/whatsapp';
+
 
 export default function ContactSection() {
   const [submitted, setSubmitted] = useState(false);
@@ -48,8 +50,8 @@ export default function ContactSection() {
 
               <div>
                 <strong className="block font-serif text-lg font-bold text-[#1B4D2E]">Direct Contact</strong>
-                <a href="tel:+919876543210" className="text-[#6B472B] text-xs font-semibold hover:underline block mt-1">
-                  Phone / WhatsApp: +91 98765 43210
+                <a href={WHATSAPP_TEL} className="text-[#6B472B] text-xs font-semibold hover:underline block mt-1">
+                  Phone / WhatsApp: {WHATSAPP_DISPLAY}
                 </a>
                 <a href="mailto:info@aranyadairyfarm.com" className="text-[#57655B] text-xs hover:underline block mt-0.5">
                   info@aranyadairyfarm.com

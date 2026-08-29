@@ -5,6 +5,8 @@ import { Plus, Minus, ShoppingBag } from 'lucide-react';
 import { PRODUCTS, Product } from '@/lib/products';
 import { useCart } from '@/context/CartContext';
 import Toast from '@/components/Toast';
+import { WA_CATALOG_INQUIRY } from '@/lib/whatsapp';
+
 
 interface ProductsSectionProps {
   onSelectProduct?: (product: Product) => void;
@@ -66,7 +68,7 @@ export default function ProductsSection({ onSelectProduct }: ProductsSectionProp
 
             <div className="lg:col-span-5 lg:text-right">
               <a
-                href="https://wa.me/919876543210?text=Hello%20Aranya%20Dairy%20Farm,%20I%27d%20like%20to%20view%20your%20full%20A2%20catalog."
+                href={WA_CATALOG_INQUIRY}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block bg-[#1C241E] hover:bg-[#1B4D2E] text-white font-sans text-xs uppercase font-semibold tracking-widest px-8 py-4 transition-colors"

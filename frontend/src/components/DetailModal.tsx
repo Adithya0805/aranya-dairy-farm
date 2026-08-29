@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { X, CheckCircle, MessageSquare } from 'lucide-react';
+import { WHATSAPP_NUMBER } from '@/lib/whatsapp';
+
 
 export interface ModalContent {
   title: string;
@@ -110,7 +112,7 @@ export default function DetailModal({ isOpen, onClose, content }: DetailModalPro
         {/* Drawer Footer CTA */}
         <div className="p-6 border-t border-[#1B4D2E]/10 bg-[#F4EFEC]/50 space-y-3">
           <a
-            href={`https://wa.me/919876543210?text=${finalWhatsappMsg}`}
+            href={`https://wa.me/${WHATSAPP_NUMBER}?text=${finalWhatsappMsg}`}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full bg-[#1C241E] hover:bg-[#1B4D2E] text-white font-sans text-xs uppercase font-semibold tracking-wider py-4 px-6 rounded-none flex items-center justify-center gap-2 transition-all"

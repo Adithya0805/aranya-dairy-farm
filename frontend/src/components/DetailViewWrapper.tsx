@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { ArrowLeft, MessageSquare, Leaf } from 'lucide-react';
+import { WA_GENERAL_ORDER } from '@/lib/whatsapp';
+
 
 interface DetailViewWrapperProps {
   title: string;
@@ -41,7 +43,7 @@ export default function DetailViewWrapper({
 
             {/* Quick Order CTA */}
             <a
-              href="https://wa.me/919876543210?text=Hello%20Aranya%20Dairy%20Farm,%20I'd%20like%20to%20order%20fresh%20A2%20milk!"
+              href={WA_GENERAL_ORDER}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-secondary text-xs sm:text-sm px-4 py-2 sm:py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-xs min-h-[44px]"

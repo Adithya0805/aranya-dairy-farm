@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { MapPin, Phone, Mail } from 'lucide-react';
+import { WHATSAPP_TEL, WHATSAPP_DISPLAY } from '@/lib/whatsapp';
+
 
 interface FooterProps {
   onOpenStory?: () => void;
@@ -61,7 +63,7 @@ export default function Footer({ onOpenStory, onOpenContact }: FooterProps) {
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="w-3.5 h-3.5 text-[#D99B26] shrink-0" />
-                <a href="tel:+919876543210" className="hover:underline">+91 98765 43210</a>
+                <a href={WHATSAPP_TEL} className="hover:underline">{WHATSAPP_DISPLAY}</a>
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="w-3.5 h-3.5 text-[#D99B26] shrink-0" />

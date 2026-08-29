@@ -3,13 +3,12 @@
 import React, { useState } from 'react';
 import { X, Plus, Minus, Trash2, ShoppingBag, MessageSquare, CheckCircle } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { WHATSAPP_NUMBER } from '@/lib/whatsapp';
 
 interface CartDrawerProps {
   isOpen: boolean;
   onClose: () => void;
 }
-
-const WHATSAPP_NUMBER = '919876543210'; // replace with real number
 
 export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   const { items, totalItems, totalPriceLabel, removeItem, updateQuantity, clearCart, buildWhatsAppMessage } =
