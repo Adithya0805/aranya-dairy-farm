@@ -2,91 +2,77 @@
 
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
+import { ModalContent } from './DetailModal';
 
-export default function AboutSection() {
+interface AboutSectionProps {
+  onOpenColdChain?: (content: ModalContent) => void;
+}
+
+export default function AboutSection({ onOpenColdChain }: AboutSectionProps) {
+  const handleColdChainClick = () => {
+    if (!onOpenColdChain) return;
+    onOpenColdChain({
+      title: 'Our 4-Step Cold-Chain Standard',
+      subtitle: 'From Shoolagiri Pastures to Eco Glass Bottle',
+      category: 'Hygiene & Quality',
+      image: '/images/nature_hero_pasture.jpg',
+      bodyParagraphs: [
+        'At Aranya Dairy Farm, temperature control is paramount. Raw milk is vulnerable to microbial growth if left at room temperature.',
+        'Within 30 minutes of hands-free mechanical milking, our milk passes into an automated stainless-steel rapid chiller that cools it down to precisely 4°C.',
+        'It is packaged immediately into sterilized glass bottles and transported inside refrigerated vehicles directly to customer doorsteps in Chennai and Hosur every morning before 7:00 AM.'
+      ],
+      bulletPoints: [
+        'Instant 4°C chilling within 30 minutes of milking',
+        'Zero plastic contact; 100% eco-friendly glass bottles',
+        'Strict daily batch laboratory testing for purity & bacterial count',
+        'Zero pasteurization warmth to preserve raw natural digestive enzymes'
+      ],
+      ctaLabel: 'Inquire About Subscription Delivery',
+      whatsappMessage: 'Hello Aranya Dairy Farm, I would like to subscribe to daily 4°C cold-chain A2 milk delivery.'
+    });
+  };
+
   return (
-    <section id="about" className="py-20 sm:py-28 bg-[#FCFAF7] border-b border-[#1B4D2E]/10 w-full overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-24 sm:space-y-32">
+    <section id="about" className="py-16 sm:py-24 bg-[#EBF0ED] border-b border-[#1B4D2E]/10 w-full overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Block 1: Our 9-Year Legacy (Photo Left, Text Right) */}
-        <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+        {/* Split Feature Layout matching Image 3 screenshot */}
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-16 items-center">
           
-          {/* Editorial Visual Container */}
+          {/* Left Side Visual matching Image 3 tall visual */}
           <div className="lg:col-span-6">
-            <div className="relative rounded-2xl overflow-hidden bg-[#1B4D2E] aspect-[4/3] flex items-center justify-center p-8 text-center text-white shadow-sm">
-              <div className="space-y-3 relative z-10">
-                <div className="text-6xl sm:text-7xl">🐄</div>
-                <div className="font-serif text-xl sm:text-2xl font-bold text-[#FCFAF7]">
-                  Free-Roaming Pastures
-                </div>
-                <p className="text-xs text-[#D1E8D5] max-w-xs mx-auto">
-                  Shoolagiri, Hosur, Tamil Nadu
-                </p>
-              </div>
+            <div className="w-full aspect-[4/5] sm:aspect-[1/1] overflow-hidden bg-[#D8E3DB] relative shadow-md">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/a2_milk_bottle.jpg"
+                alt="Aranya Pure Organic A2 Milk Bottle"
+                className="w-full h-full object-cover"
+              />
             </div>
           </div>
 
-          {/* Editorial Text Block */}
-          <div className="lg:col-span-6 space-y-6">
+          {/* Right Side Big Typography matching Image 3 ("Shop Holidays & Occasions") */}
+          <div className="lg:col-span-6 space-y-6 sm:pl-6">
             <span className="text-xs font-sans uppercase font-bold tracking-widest text-[#6B472B]">
-              Established 2017 in Shoolagiri
+              Natural Purity • 4°C Chilled
             </span>
 
-            <h2 className="text-3xl sm:text-5xl font-serif font-bold text-[#1C241E] leading-tight">
-              Nine years of uncompromised organic pureness.
+            <h2 className="text-4xl sm:text-6xl font-serif text-[#1C241E] leading-[1.15] tracking-tight">
+              Pure Heritage & Cold-Chain
             </h2>
 
-            <p className="text-sm sm:text-base text-[#57655B] leading-relaxed">
-              At Aranya Organic Dairy Farm, true health begins with how cows are nurtured. For nearly a decade, we have stayed committed to traditional farming — zero synthetic hormones, zero antibiotics, and zero dilution.
+            <p className="text-base text-[#4A574E] font-sans leading-relaxed max-w-md">
+              Chilled to 4°C within 30 minutes of hands-free milking. Zero plastic, zero chemical additives, and zero pasteurization heat.
             </p>
 
-            <div>
-              <a href="#contact" className="link-editorial">
-                <span>Read Our Full Story</span>
-                <ArrowRight className="w-4 h-4" />
-              </a>
-            </div>
-          </div>
-
-        </div>
-
-        {/* Block 2: Cold-Chain Hygiene Process (Text Left, Photo Right) */}
-        <div id="process" className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-center">
-          
-          {/* Editorial Text Block */}
-          <div className="lg:col-span-6 lg:order-1 space-y-6">
-            <span className="text-xs font-sans uppercase font-bold tracking-widest text-[#6B472B]">
-              4-Step Cold-Chain Guarantee
-            </span>
-
-            <h2 className="text-3xl sm:text-5xl font-serif font-bold text-[#1C241E] leading-tight">
-              Chilled to 4°C within 30 minutes of milking.
-            </h2>
-
-            <p className="text-sm sm:text-base text-[#57655B] leading-relaxed">
-              Our milk is never stored in plastic. From hands-free sanitized milking to instant chilling and eco glass bottle packaging, every step protects raw enzymes and natural vitamins.
-            </p>
-
-            <div>
-              <a href="#contact" className="link-editorial">
-                <span>Discover Cold-Chain Process</span>
-                <ArrowRight className="w-4 h-4" />
-              </a>
-            </div>
-          </div>
-
-          {/* Editorial Visual Container */}
-          <div className="lg:col-span-6 lg:order-2">
-            <div className="relative rounded-2xl overflow-hidden bg-[#3A271C] aspect-[4/3] flex items-center justify-center p-8 text-center text-white shadow-sm">
-              <div className="space-y-3 relative z-10">
-                <div className="text-6xl sm:text-7xl">🥛</div>
-                <div className="font-serif text-xl sm:text-2xl font-bold text-[#FCFAF7]">
-                  Eco Glass Bottling
-                </div>
-                <p className="text-xs text-[#E8ECE9]/80 max-w-xs mx-auto">
-                  Zero Plastic • Daily Morning Delivery
-                </p>
-              </div>
+            <div className="pt-2">
+              <button
+                onClick={handleColdChainClick}
+                className="group text-sm font-sans font-semibold text-[#1C241E] hover:text-[#1B4D2E] underline underline-offset-8 flex items-center gap-2 transition-colors cursor-pointer"
+              >
+                <span>Discover cold-chain standards</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </button>
             </div>
           </div>
 

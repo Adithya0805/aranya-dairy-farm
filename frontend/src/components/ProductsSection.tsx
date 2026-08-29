@@ -2,88 +2,91 @@
 
 import React from 'react';
 import { PRODUCTS, Product } from '@/data/products';
-import { ArrowRight, MessageSquare } from 'lucide-react';
+import { ModalContent } from './DetailModal';
 
-export default function ProductsSection() {
-  const hasProducts = PRODUCTS && PRODUCTS.length > 0;
+interface ProductsSectionProps {
+  onSelectProduct?: (modalContent: ModalContent) => void;
+}
+
+export default function ProductsSection({ onSelectProduct }: ProductsSectionProps) {
+  const handleProductClick = (product: Product) => {
+    if (!onSelectProduct) return;
+    onSelectProduct({
+      title: product.name,
+      subtitle: product.category + ' • ' + product.unit + ' • ' + product.price,
+      category: 'Product Details',
+      image: product.image,
+      bodyParagraphs: [
+        product.description,
+        'Processed with zero chemical additives, preservatives, or artificial colors at our Shoolagiri farm.',
+        'Orders placed before 8:00 PM are delivered fresh to your doorstep by 7:00 AM the next morning.'
+      ],
+      bulletPoints: product.details,
+      ctaLabel: `Order ${product.name} on WhatsApp`,
+      whatsappMessage: `Hello Aranya Dairy Farm, I would like to order ${product.name} (${product.price} / ${product.unit}).`
+    });
+  };
 
   return (
-    <section id="products" className="py-20 sm:py-28 bg-white border-b border-[#1B4D2E]/10 w-full overflow-hidden">
+    <section id="products" className="py-20 sm:py-28 bg-[#FCFAF7] border-b border-[#1B4D2E]/10 w-full">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Section Title */}
-        <div className="max-w-3xl space-y-4">
-          <span className="text-xs font-sans uppercase font-bold tracking-widest text-[#6B472B]">
-            Our Farm Catalog
-          </span>
-
-          <h2 className="text-3xl sm:text-5xl font-serif font-bold text-[#1C241E] leading-tight">
-            Pure A2 Offerings
-          </h2>
-
-          <p className="text-sm sm:text-base text-[#57655B] leading-relaxed">
-            Freshly processed daily at our Shoolagiri farm without artificial colors, thickeners, or chemical preservatives.
-          </p>
+        {/* Section Header matching Image 2 ("Best sellers") */}
+        <div className="grid lg:grid-cols-12 gap-8 items-end mb-16">
+          <div className="lg:col-span-7 space-y-4">
+            <h2 className="text-4xl sm:text-6xl font-serif text-[#1C241E] tracking-tight">
+              Best sellers
+            </h2>
+            <p className="text-sm sm:text-base text-[#57655B] max-w-lg font-sans leading-relaxed">
+              Transform your daily family nutrition with our best selling A2 whole milk and hand-churned Bilona ghee.
+            </p>
+          </div>
+          
+          <div className="lg:col-span-5 lg:text-right">
+            <a
+              href="https://wa.me/919876543210?text=Hello%20Aranya%20Dairy%20Farm,%20I'd%20like%20to%20view%20your%20full%20A2%20catalog."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block bg-[#1C241E] hover:bg-[#1B4D2E] text-white font-sans text-xs uppercase font-semibold tracking-widest px-8 py-4 transition-all"
+            >
+              Shop Best Sellers
+            </a>
+          </div>
         </div>
 
-        {/* Dynamic Data Content / Coming Soon Layout */}
-        <div className="mt-12">
-          {hasProducts ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {PRODUCTS.map((product: Product) => (
-                <div
-                  key={product.id}
-                  className="bg-[#FCFAF7] rounded-2xl p-8 border border-[#1B4D2E]/10 flex flex-col justify-between"
-                >
-                  <div>
-                    <span className="text-xs font-bold uppercase text-[#6B472B]">{product.category}</span>
-                    <h3 className="text-2xl font-serif font-bold text-[#1C241E] mt-2">{product.name}</h3>
-                    <p className="text-xs text-[#57655B] mt-2">{product.description}</p>
-                  </div>
-                  <div className="mt-6 pt-4 border-t border-[#1B4D2E]/10 flex items-center justify-between">
-                    <span className="text-xs font-semibold text-[#1B4D2E]">{product.unit}</span>
-                    <a
-                      href="https://wa.me/919876543210"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="link-editorial"
-                    >
-                      <span>Inquire</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </a>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            /* Editorial Coming Soon Placeholder State */
-            <div className="bg-[#FCFAF7] rounded-3xl p-8 sm:p-14 border border-[#1B4D2E]/10 text-center max-w-3xl mx-auto space-y-6 shadow-xs">
-              <div className="w-16 h-16 rounded-full bg-[#1B4D2E] text-white flex items-center justify-center text-3xl mx-auto">
-                🏺
+        {/* Product Cards Grid matching Image 2 vertical card layout */}
+        <div className="grid md:grid-cols-3 gap-8 sm:gap-10">
+          {PRODUCTS.map((product: Product) => (
+            <div
+              key={product.id}
+              onClick={() => handleProductClick(product)}
+              className="group cursor-pointer flex flex-col justify-between"
+            >
+              {/* Product Visual Container */}
+              <div className="w-full aspect-[3/4] bg-[#EAE6DF] overflow-hidden mb-4 relative">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
               </div>
 
-              <div className="space-y-2">
-                <h3 className="text-2xl sm:text-3xl font-serif font-bold text-[#1C241E]">
-                  Online Catalog Launching Soon
+              {/* Product Details matching Image 2 */}
+              <div className="space-y-1">
+                <h3 className="font-serif text-lg sm:text-xl text-[#1C241E] group-hover:text-[#1B4D2E] transition-colors">
+                  {product.name}
                 </h3>
-                <p className="text-xs sm:text-sm text-[#57655B] max-w-lg mx-auto leading-relaxed">
-                  We are currently onboarding our full range of Raw A2 Whole Milk, Traditional Bilona Cow Ghee, Paneer, and Set Curd onto our digital catalog.
+                <p className="text-sm font-sans font-medium text-[#57655B]">
+                  {product.price}
+                </p>
+                <p className="text-xs text-[#8A7B6E] line-clamp-1 pt-1 font-sans">
+                  {product.unit} • {product.description}
                 </p>
               </div>
-
-              <div className="pt-2 flex justify-center">
-                <a
-                  href="https://wa.me/919876543210?text=Hello%20Aranya%20Dairy%20Farm,%20I'd%20like%20to%20inquire%20about%20your%20A2%20milk%20and%20ghee."
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-primary-single"
-                >
-                  <MessageSquare className="w-4 h-4 fill-current shrink-0" />
-                  <span>Inquire Product Availability on WhatsApp</span>
-                </a>
-              </div>
             </div>
-          )}
+          ))}
         </div>
 
       </div>
