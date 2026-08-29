@@ -25,7 +25,6 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   };
 
   const handleClose = () => {
-    // Reset order-sent state when drawer is closed so next visit is clean
     setOrderSent(false);
     onClose();
   };
@@ -34,11 +33,14 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   React.useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none'; // prevent background scroll on iOS
     } else {
       document.body.style.overflow = '';
+      document.body.style.touchAction = '';
     }
     return () => {
       document.body.style.overflow = '';
+      document.body.style.touchAction = '';
     };
   }, [isOpen]);
 
@@ -46,32 +48,47 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     <>
       {/* ── Backdrop ── */}
       <div
-        className={`fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px] transition-opacity duration-300
-          ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        className={`
+          fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px]
+          transition-opacity duration-300
+          ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}
+        `}
         onClick={handleClose}
         aria-hidden="true"
       />
 
-      {/* ── Drawer Panel ── */}
-      {/* On mobile: full-width bottom sheet; on sm+: right sidebar */}
+      {/* ── Drawer Panel ──
+          Mobile:  full-width bottom sheet, slides up from bottom, 92dvh tall
+          sm+:     right sidebar, slides in from right, full height
+          300ms ease-in-out on transform — GPU-accelerated, no jank            */}
       <div
         role="dialog"
         aria-label="Shopping cart"
         aria-modal="true"
         className={`
-          fixed z-50 bg-[#FCFAF7] flex flex-col
+          fixed z-50 bg-[#FCFAF7] flex flex-col shadow-2xl
+          /* Mobile bottom sheet */
+          bottom-0 left-0 right-0
+          h-[92dvh]
+          rounded-t-2xl
+          /* Desktop right sidebar */
+          sm:bottom-auto sm:top-0 sm:left-auto sm:right-0
+          sm:h-full sm:w-[440px] sm:max-w-[95vw]
+          sm:rounded-none
+          /* Transition — transform only (GPU) */
           transition-transform duration-300 ease-in-out
-          /* Mobile: bottom sheet, full width */
-          bottom-0 left-0 right-0 h-[92dvh] rounded-t-2xl
-          /* sm+: right sidebar */
-          sm:bottom-auto sm:top-0 sm:left-auto sm:right-0 sm:h-full sm:w-[420px] sm:max-w-[90vw] sm:rounded-none
-          shadow-2xl
           ${isOpen
             ? 'translate-y-0 sm:translate-x-0'
             : 'translate-y-full sm:translate-y-0 sm:translate-x-full'
           }
         `}
       >
+
+        {/* Mobile drag handle indicator */}
+        <div className="sm:hidden flex justify-center pt-3 pb-1 shrink-0">
+          <div className="w-10 h-1 rounded-full bg-[#1B4D2E]/20" />
+        </div>
+
         {/* ── Header ── */}
         <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-[#1B4D2E]/10 bg-[#FCFAF7] shrink-0">
           <div className="flex items-center gap-2.5">
@@ -79,13 +96,16 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
             <h2 className="font-serif text-xl text-[#1C241E]">
               Your Cart
               {totalItems > 0 && (
-                <span className="ml-2 text-sm font-sans text-[#6B472B]">({totalItems} {totalItems === 1 ? 'item' : 'items'})</span>
+                <span className="ml-2 text-sm font-sans text-[#6B472B]">
+                  ({totalItems} {totalItems === 1 ? 'item' : 'items'})
+                </span>
               )}
             </h2>
           </div>
+          {/* Close — min 44×44 */}
           <button
             onClick={handleClose}
-            className="p-2 rounded-full text-[#1C241E] hover:bg-[#1B4D2E]/8 transition-colors"
+            className="w-11 h-11 flex items-center justify-center rounded-full text-[#1C241E] hover:bg-[#1B4D2E]/8 transition-colors touch-manipulation"
             aria-label="Close cart"
           >
             <X className="w-5 h-5" />
@@ -93,9 +113,9 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
         </div>
 
         {/* ── Body ── */}
-        <div className="flex-1 overflow-y-auto overscroll-contain">
+        <div className="flex-1 overflow-y-auto overscroll-contain -webkit-overflow-scrolling-touch">
 
-          {/* Order Sent Confirmation State */}
+          {/* Order Sent Confirmation */}
           {orderSent ? (
             <div className="flex flex-col items-center justify-center h-full px-8 text-center space-y-5">
               <div className="w-16 h-16 rounded-full bg-[#E8F5EE] flex items-center justify-center">
@@ -109,11 +129,12 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               </div>
               <button
                 onClick={handleClose}
-                className="mt-2 bg-[#1C241E] hover:bg-[#1B4D2E] text-white text-xs uppercase font-semibold tracking-widest px-8 py-3.5 transition-colors"
+                className="mt-2 bg-[#1C241E] hover:bg-[#1B4D2E] text-white text-xs uppercase font-semibold tracking-widest px-8 py-4 min-h-[48px] transition-colors touch-manipulation"
               >
                 Continue Shopping
               </button>
             </div>
+
           ) : items.length === 0 ? (
             /* Empty State */
             <div className="flex flex-col items-center justify-center h-full px-8 text-center space-y-5">
@@ -122,26 +143,26 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               </div>
               <div className="space-y-2">
                 <h3 className="font-serif text-2xl text-[#1C241E]">Your cart is empty</h3>
-                <p className="text-sm text-[#57655B]">
-                  Add some fresh A2 dairy products to get started.
-                </p>
+                <p className="text-sm text-[#57655B]">Add some fresh A2 dairy products to get started.</p>
               </div>
               <button
                 onClick={handleClose}
-                className="mt-2 border border-[#1C241E] text-[#1C241E] hover:bg-[#1C241E] hover:text-white text-xs uppercase font-semibold tracking-widest px-8 py-3.5 transition-colors"
+                className="mt-2 border border-[#1C241E] text-[#1C241E] hover:bg-[#1C241E] hover:text-white text-xs uppercase font-semibold tracking-widest px-8 py-4 min-h-[48px] transition-colors touch-manipulation"
               >
                 Continue Shopping
               </button>
             </div>
+
           ) : (
             /* Cart Items List */
-            <ul className="divide-y divide-[#1B4D2E]/8 px-4 sm:px-5 pt-2 pb-4">
+            <ul className="divide-y divide-[#1B4D2E]/8 px-4 sm:px-5 pt-1 pb-4">
               {items.map(({ product, quantity }) => {
                 const lineTotal = `₹${(product.price * quantity).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
                 return (
                   <li key={product.id} className="py-4 flex gap-3 sm:gap-4">
-                    {/* Product Image */}
-                    <div className="w-[72px] h-[72px] sm:w-20 sm:h-20 shrink-0 overflow-hidden bg-[#EAE6DF]">
+
+                    {/* Product image — fixed square */}
+                    <div className="w-[72px] h-[72px] sm:w-20 sm:h-20 shrink-0 overflow-hidden bg-[#EAE6DF] rounded-sm">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={product.image}
@@ -150,17 +171,17 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       />
                     </div>
 
-                    {/* Product Info + Controls */}
-                    <div className="flex-1 min-w-0 space-y-1.5">
+                    {/* Info + controls */}
+                    <div className="flex-1 min-w-0 space-y-2">
                       <div className="flex items-start justify-between gap-2">
-                        <div>
+                        <div className="min-w-0">
                           <p className="font-serif text-base text-[#1C241E] leading-snug">{product.name}</p>
-                          <p className="text-[11px] text-[#8A7B6E] font-sans">{product.unit}</p>
+                          <p className="text-[11px] text-[#8A7B6E] font-sans truncate">{product.unit}</p>
                         </div>
-                        {/* Remove */}
+                        {/* Remove — min 44×44 */}
                         <button
                           onClick={() => removeItem(product.id)}
-                          className="p-1.5 text-[#8A7B6E] hover:text-red-500 transition-colors shrink-0 -mt-0.5"
+                          className="w-10 h-10 flex items-center justify-center text-[#8A7B6E] hover:text-red-500 transition-colors shrink-0 touch-manipulation rounded-full"
                           aria-label={`Remove ${product.name}`}
                         >
                           <Trash2 className="w-4 h-4" />
@@ -168,11 +189,11 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       </div>
 
                       <div className="flex items-center justify-between">
-                        {/* Quantity Stepper */}
+                        {/* Quantity Stepper — min 44px height */}
                         <div className="flex items-center border border-[#1B4D2E]/20 rounded-full overflow-hidden">
                           <button
                             onClick={() => updateQuantity(product.id, quantity - 1)}
-                            className="w-9 h-9 flex items-center justify-center text-[#1C241E] hover:bg-[#1B4D2E]/8 transition-colors touch-manipulation"
+                            className="w-11 h-11 flex items-center justify-center text-[#1C241E] hover:bg-[#1B4D2E]/8 transition-colors touch-manipulation"
                             aria-label="Decrease quantity"
                           >
                             <Minus className="w-3.5 h-3.5" />
@@ -182,7 +203,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                           </span>
                           <button
                             onClick={() => updateQuantity(product.id, quantity + 1)}
-                            className="w-9 h-9 flex items-center justify-center text-[#1C241E] hover:bg-[#1B4D2E]/8 transition-colors touch-manipulation"
+                            className="w-11 h-11 flex items-center justify-center text-[#1C241E] hover:bg-[#1B4D2E]/8 transition-colors touch-manipulation"
                             aria-label="Increase quantity"
                           >
                             <Plus className="w-3.5 h-3.5" />
@@ -201,20 +222,24 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
         {/* ── Footer: Total + WhatsApp CTA ── */}
         {!orderSent && items.length > 0 && (
-          <div className="shrink-0 border-t border-[#1B4D2E]/10 bg-[#FCFAF7] px-5 sm:px-6 pt-4 pb-6 space-y-4">
+          <div className="shrink-0 border-t border-[#1B4D2E]/10 bg-[#FCFAF7] px-5 sm:px-6 pt-4 pb-safe-4 space-y-4"
+            style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
+          >
             {/* Running Total */}
-            <div className="flex items-center justify-between text-sm">
-              <span className="font-sans text-[#57655B] uppercase tracking-wider text-xs font-semibold">Order Total</span>
+            <div className="flex items-center justify-between">
+              <span className="font-sans text-[#57655B] uppercase tracking-wider text-xs font-semibold">
+                Order Total
+              </span>
               <span className="font-serif text-xl text-[#1C241E] font-bold">{totalPriceLabel}</span>
             </div>
-            <p className="text-[11px] text-[#8A7B6E] font-sans -mt-1">
+            <p className="text-[11px] text-[#8A7B6E] font-sans -mt-2">
               Delivery charges calculated at confirmation.
             </p>
 
-            {/* WhatsApp Checkout Button */}
+            {/* WhatsApp Checkout — full width, min 52px tall for comfort */}
             <button
               onClick={handleWhatsAppCheckout}
-              className="w-full flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#1FB055] text-white font-sans text-sm font-bold py-4 rounded-none transition-colors touch-manipulation"
+              className="w-full flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#1FB055] active:bg-[#18943E] text-white font-sans text-sm font-bold py-4 min-h-[52px] transition-colors touch-manipulation active:scale-[0.98]"
             >
               <MessageSquare className="w-4 h-4 fill-white shrink-0" />
               <span>Order via WhatsApp</span>
@@ -225,6 +250,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
             </p>
           </div>
         )}
+
       </div>
     </>
   );

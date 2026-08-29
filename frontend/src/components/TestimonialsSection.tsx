@@ -2,8 +2,11 @@
 
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 export default function TestimonialsSection() {
+  const sectionRef = useScrollReveal<HTMLElement>();
+
   const SPOTLIGHT_QUOTES = [
     {
       name: 'Ramesh Sundaram',
@@ -18,7 +21,11 @@ export default function TestimonialsSection() {
   ];
 
   return (
-    <section id="reviews" className="py-20 sm:py-28 bg-white border-b border-[#1B4D2E]/10 w-full overflow-hidden">
+    <section
+      id="reviews"
+      ref={sectionRef}
+      className="reveal-section py-20 sm:py-28 bg-white border-b border-[#1B4D2E]/10 w-full overflow-hidden"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         
         {/* Editorial Section Header */}
@@ -27,14 +34,18 @@ export default function TestimonialsSection() {
             Verified Local Feedback
           </span>
           <h2 className="text-3xl sm:text-5xl font-serif font-bold text-[#1C241E]">
-            Trusted by families across Hosur & Shoolagiri.
+            Trusted by families across Hosur &amp; Shoolagiri.
           </h2>
         </div>
 
         {/* Full-Width Alternating Spotlight Quote Blocks */}
-        <div className="grid lg:grid-cols-2 gap-12 sm:gap-16">
+        <div className="grid lg:grid-cols-2 gap-8 sm:gap-16">
           {SPOTLIGHT_QUOTES.map((item, idx) => (
-            <div key={idx} className="space-y-6 bg-[#FCFAF7] p-8 sm:p-10 rounded-3xl border border-[#1B4D2E]/10">
+            <div
+              key={idx}
+              className="space-y-6 bg-[#FCFAF7] p-6 sm:p-10 rounded-3xl border border-[#1B4D2E]/10 animate-card-reveal"
+              style={{ animationDelay: `${idx * 150}ms` }}
+            >
               <div className="text-4xl text-[#1B4D2E] font-serif font-bold">
                 &ldquo;
               </div>
@@ -46,7 +57,7 @@ export default function TestimonialsSection() {
                   <div className="font-sans font-bold text-sm text-[#1B4D2E]">{item.name}</div>
                   <div className="text-xs text-[#57655B]">{item.location}</div>
                 </div>
-                <a href="#contact" className="link-editorial">
+                <a href="#contact" className="link-editorial min-h-[44px] inline-flex items-center touch-manipulation">
                   <span>Contact Farm</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </a>

@@ -3,12 +3,15 @@
 import React from 'react';
 import { Milk, Sparkles, HeartHandshake } from 'lucide-react';
 import { ModalContent } from './DetailModal';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 interface CategoryGridSectionProps {
   onOpenStory?: (content: ModalContent) => void;
 }
 
 export default function CategoryGridSection({ onOpenStory }: CategoryGridSectionProps) {
+  const sectionRef = useScrollReveal<HTMLElement>();
+
   const handleStoryClick = () => {
     if (!onOpenStory) return;
     onOpenStory({
@@ -57,7 +60,10 @@ export default function CategoryGridSection({ onOpenStory }: CategoryGridSection
   ];
 
   return (
-    <section className="py-20 sm:py-28 bg-[#FCFAF7] border-b border-[#1B4D2E]/10 w-full">
+    <section
+      ref={sectionRef}
+      className="reveal-section py-20 sm:py-28 bg-[#FCFAF7] border-b border-[#1B4D2E]/10 w-full"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         
         {/* Header Block matching Image 4 ("What we do") */}
@@ -71,7 +77,7 @@ export default function CategoryGridSection({ onOpenStory }: CategoryGridSection
           <div className="pt-2">
             <button
               onClick={handleStoryClick}
-              className="inline-block bg-[#1C241E] hover:bg-[#1B4D2E] text-white font-sans text-xs uppercase font-semibold tracking-widest px-8 py-4 transition-all cursor-pointer"
+              className="inline-block bg-[#1C241E] hover:bg-[#1B4D2E] text-white font-sans text-xs uppercase font-semibold tracking-widest px-8 py-4 transition-all cursor-pointer min-h-[44px] touch-manipulation"
             >
               Our Story
             </button>
@@ -80,10 +86,14 @@ export default function CategoryGridSection({ onOpenStory }: CategoryGridSection
 
         {/* 3 Grid Images with Line Art Icons underneath matching Image 5 */}
         <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
-          {categories.map((cat) => {
+          {categories.map((cat, index) => {
             const IconComponent = cat.icon;
             return (
-              <div key={cat.id} className="text-center group space-y-5">
+              <div
+                key={cat.id}
+                className="text-center group space-y-5 animate-card-reveal"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
                 
                 {/* Visual Container */}
                 <div className="w-full aspect-[4/5] bg-[#EAE6DF] overflow-hidden">

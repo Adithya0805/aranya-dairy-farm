@@ -3,9 +3,11 @@
 import React, { useState } from 'react';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import { WHATSAPP_TEL, WHATSAPP_DISPLAY } from '@/lib/whatsapp';
-
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 export default function ContactSection() {
+  const sectionRef = useScrollReveal<HTMLElement>();
+
   const [submitted, setSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -20,7 +22,11 @@ export default function ContactSection() {
   };
 
   return (
-    <section id="contact" className="py-20 sm:py-28 bg-[#FCFAF7] w-full overflow-hidden">
+    <section
+      id="contact"
+      ref={sectionRef}
+      className="reveal-section py-20 sm:py-28 bg-[#FCFAF7] w-full overflow-hidden"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
@@ -50,10 +56,10 @@ export default function ContactSection() {
 
               <div>
                 <strong className="block font-serif text-lg font-bold text-[#1B4D2E]">Direct Contact</strong>
-                <a href={WHATSAPP_TEL} className="text-[#6B472B] text-xs font-semibold hover:underline block mt-1">
+                <a href={WHATSAPP_TEL} className="text-[#6B472B] text-xs font-semibold hover:underline block mt-1 py-1 min-h-[44px] inline-flex items-center touch-manipulation">
                   Phone / WhatsApp: {WHATSAPP_DISPLAY}
                 </a>
-                <a href="mailto:info@aranyadairyfarm.com" className="text-[#57655B] text-xs hover:underline block mt-0.5">
+                <a href="mailto:info@aranyadairyfarm.com" className="text-[#57655B] text-xs hover:underline block mt-0.5 py-1 min-h-[44px] inline-flex items-center touch-manipulation">
                   info@aranyadairyfarm.com
                 </a>
               </div>
@@ -63,7 +69,7 @@ export default function ContactSection() {
                   href="https://maps.google.com/?q=Shoolagiri+Tamil+Nadu"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="link-editorial"
+                  className="link-editorial min-h-[44px] inline-flex items-center touch-manipulation"
                 >
                   <span>Open Location in Google Maps</span>
                   <ArrowRight className="w-4 h-4" />
@@ -73,7 +79,7 @@ export default function ContactSection() {
           </div>
 
           {/* Right Column: Clean Editorial Form */}
-          <div className="lg:col-span-7 bg-white p-8 sm:p-12 rounded-3xl border border-[#1B4D2E]/10 shadow-xs">
+          <div className="lg:col-span-7 bg-white p-6 sm:p-12 rounded-3xl border border-[#1B4D2E]/10 shadow-xs">
             <h3 className="text-2xl font-serif font-bold text-[#1C241E] mb-2">
               Send a Delivery Inquiry
             </h3>
@@ -90,7 +96,7 @@ export default function ContactSection() {
                 </p>
                 <button
                   onClick={() => setSubmitted(false)}
-                  className="link-editorial mt-2"
+                  className="link-editorial mt-2 min-h-[44px] inline-flex items-center touch-manipulation"
                 >
                   <span>Submit Another Inquiry →</span>
                 </button>

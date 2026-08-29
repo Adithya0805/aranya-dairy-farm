@@ -3,12 +3,15 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import { ModalContent } from './DetailModal';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 interface AboutSectionProps {
   onOpenColdChain?: (content: ModalContent) => void;
 }
 
 export default function AboutSection({ onOpenColdChain }: AboutSectionProps) {
+  const sectionRef = useScrollReveal<HTMLElement>();
+
   const handleColdChainClick = () => {
     if (!onOpenColdChain) return;
     onOpenColdChain({
@@ -33,7 +36,11 @@ export default function AboutSection({ onOpenColdChain }: AboutSectionProps) {
   };
 
   return (
-    <section id="about" className="py-16 sm:py-24 bg-[#EBF0ED] border-b border-[#1B4D2E]/10 w-full overflow-hidden">
+    <section
+      id="about"
+      ref={sectionRef}
+      className="reveal-section py-16 sm:py-24 bg-[#EBF0ED] border-b border-[#1B4D2E]/10 w-full overflow-hidden"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Split Feature Layout matching Image 3 screenshot */}
@@ -68,7 +75,7 @@ export default function AboutSection({ onOpenColdChain }: AboutSectionProps) {
             <div className="pt-2">
               <button
                 onClick={handleColdChainClick}
-                className="group text-sm font-sans font-semibold text-[#1C241E] hover:text-[#1B4D2E] underline underline-offset-8 flex items-center gap-2 transition-colors cursor-pointer"
+                className="group text-sm font-sans font-semibold text-[#1C241E] hover:text-[#1B4D2E] underline underline-offset-8 inline-flex items-center gap-2 transition-colors cursor-pointer min-h-[44px] touch-manipulation"
               >
                 <span>Discover cold-chain standards</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

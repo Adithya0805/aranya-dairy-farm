@@ -1,8 +1,11 @@
 'use client';
 
 import React from 'react';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 export default function GallerySection() {
+  const sectionRef = useScrollReveal<HTMLElement>();
+
   const ESSAY_ITEMS = [
     {
       title: 'Free Pasture Grazing',
@@ -25,7 +28,11 @@ export default function GallerySection() {
   ];
 
   return (
-    <section className="py-20 bg-[#FCFAF7] border-b border-[#1B4D2E]/10 w-full overflow-hidden">
+    <section
+      id="gallery"
+      ref={sectionRef}
+      className="reveal-section py-20 bg-[#FCFAF7] border-b border-[#1B4D2E]/10 w-full overflow-hidden"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         
         {/* Editorial Section Header */}
@@ -41,7 +48,11 @@ export default function GallerySection() {
         {/* Editorial Photo Essay Layout */}
         <div className="grid md:grid-cols-3 gap-8">
           {ESSAY_ITEMS.map((item, idx) => (
-            <div key={idx} className="space-y-4 group">
+            <div
+              key={idx}
+              className="space-y-4 group animate-card-reveal"
+              style={{ animationDelay: `${idx * 100}ms` }}
+            >
               <div className={`rounded-2xl ${item.bg} text-white aspect-[4/3] flex flex-col items-center justify-center p-6 text-center shadow-xs overflow-hidden`}>
                 <div className="text-6xl group-hover:scale-105 transition-transform duration-300">
                   {item.emoji}
