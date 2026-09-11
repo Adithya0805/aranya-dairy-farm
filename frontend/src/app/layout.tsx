@@ -20,6 +20,19 @@ export const metadata: Metadata = {
     locale: "en_IN",
     type: "website",
   },
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Aranya Dairy",
+  },
+};
+
+export const viewport = {
+  themeColor: "#1B4D2E",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

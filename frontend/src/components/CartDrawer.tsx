@@ -157,7 +157,9 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
             /* Cart Items List */
             <ul className="divide-y divide-[#1B4D2E]/8 px-4 sm:px-5 pt-1 pb-4">
               {items.map(({ product, quantity }) => {
-                const lineTotal = `₹${(product.price * quantity).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+                const lineTotal = product.price !== null
+                  ? `₹${(product.price * quantity).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`
+                  : 'Price updating soon';
                 return (
                   <li key={product.id} className="py-4 flex gap-3 sm:gap-4">
 
@@ -176,6 +178,9 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
                           <p className="font-serif text-base text-[#1C241E] leading-snug">{product.name}</p>
+                          {product.nameTamil && (
+                            <p className="text-[12px] text-[#1B4D2E] font-medium font-sans">{product.nameTamil}</p>
+                          )}
                           <p className="text-[11px] text-[#8A7B6E] font-sans truncate">{product.unit}</p>
                         </div>
                         {/* Remove — min 44×44 */}

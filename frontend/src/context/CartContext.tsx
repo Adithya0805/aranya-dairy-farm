@@ -8,7 +8,7 @@ import React, {
   useCallback,
   ReactNode,
 } from 'react';
-import { Product, formatPrice } from '@/lib/products';
+import { Product, formatPrice, getProductPriceLabel } from '@/lib/products';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -136,10 +136,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const totalItems = state.items.reduce((sum, i) => sum + i.quantity, 0);
   const totalPrice = state.items.reduce(
-    (sum, i) => sum + i.product.price * i.quantity,
+    (sum, i) => sum + (i.product.price ?? 0) * i.quantity,
     0
   );
-  const totalPriceLabel = formatPrice(totalPrice);
+  const hasPendingPrices = state.items.some((i) => i.product.price === null);
+  const totalPriceLabel = hasPendingPrices && totalPrice === 0
+    ? 'Price updating soon'
+    : formatPrice(totalPrice);
 
   const addItem = useCallback((product: Product) => {
     dispatch({ type: 'ADD_ITEM', product });
@@ -159,23 +162,30 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   /**
    * Builds a human-readable WhatsApp order message listing each item,
-   * quantity, per-item price, and the grand total.
+   * quantity, per-item price (or updating status), and the grand total.
    */
   const buildWhatsAppMessage = useCallback((): string => {
     const lines: string[] = [
-      '🛒 *New Order — Aranya Organic Dairy Farm*',
+      '🛒 *New Order / Inquiry — Aranya Organic Dairy Farm*',
       '─────────────────────',
     ];
     state.items.forEach((item) => {
-      const lineTotal = formatPrice(item.product.price * item.quantity);
+      const priceStr = getProductPriceLabel(item.product);
+      const lineTotal = item.product.price !== null
+        ? formatPrice(item.product.price * item.quantity)
+        : 'Pricing to be confirmed';
       lines.push(
-        `• ${item.product.name}\n  Qty: ${item.quantity} × ${item.product.priceLabel} = ${lineTotal}`
+        `• ${item.product.name} (${item.product.nameTamil})\n  Qty: ${item.quantity} × ${priceStr} = ${lineTotal}`
       );
     });
     lines.push('─────────────────────');
-    lines.push(`*Total: ${formatPrice(totalPrice)}*`);
+    if (totalPrice > 0) {
+      lines.push(`*Total: ${formatPrice(totalPrice)}*`);
+    } else {
+      lines.push('*Total: Final pricing to be shared on WhatsApp*');
+    }
     lines.push('');
-    lines.push('Please confirm my order and share delivery details. Thank you! 🙏');
+    lines.push('Please confirm item availability and delivery schedule. Thank you! 🙏');
     return lines.join('\n');
   }, [state.items, totalPrice]);
 

@@ -6,7 +6,7 @@ import { WA_GENERAL_ORDER, WHATSAPP_DISPLAY } from '@/lib/whatsapp';
 
 export default function WhatsAppCTA() {
   return (
-    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 animate-bounce">
+    <div className="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-40 animate-bounce">
       <a
         href={WA_GENERAL_ORDER}
         target="_blank"

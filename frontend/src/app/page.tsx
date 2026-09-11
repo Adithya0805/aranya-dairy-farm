@@ -14,7 +14,8 @@ import Footer from '@/components/Footer';
 import WhatsAppCTA from '@/components/WhatsAppCTA';
 import DetailModal, { ModalContent } from '@/components/DetailModal';
 import CartDrawer from '@/components/CartDrawer';
-import { Product } from '@/lib/products';
+import MobileBottomNav from '@/components/MobileBottomNav';
+import { Product, getProductPriceLabel } from '@/lib/products';
 
 export default function Home() {
   // ── Detail Drawer (Our Story, Cold-Chain, Product details) ─────────────────
@@ -31,24 +32,26 @@ export default function Home() {
 
   /** Map a Product to a ModalContent for the detail drawer */
   const handleSelectProduct = (product: Product) => {
+    const priceDisplay = getProductPriceLabel(product);
     openModal({
-      title: product.name,
-      subtitle: `${product.category} • ${product.unit} • ${product.priceLabel}`,
-      category: 'Product Details',
+      title: `${product.name} (${product.nameTamil})`,
+      subtitle: `${product.category} • ${product.unit} • ${priceDisplay}`,
+      category: product.category,
       image: product.image,
       bodyParagraphs: [
-        product.description,
+        product.description ||
+          `100% pure, farm-fresh ${product.name} (${product.nameTamil}) sourced directly from Aranya Organic Dairy Farm, Shoolagiri.`,
         'Processed with zero chemical additives, preservatives, or artificial colors at our Shoolagiri farm.',
         'Orders placed before 8:00 PM are delivered fresh to your doorstep by 7:00 AM the next morning.',
       ],
       bulletPoints: [
-        'Sourced from free-roaming, grass-fed native Gir & Sahiwal cows',
-        'Zero synthetic hormones or preventative antibiotics',
-        'Chilled to 4°C within 30 minutes of hands-free milking',
-        'Packaged in sanitized eco glass bottles — zero plastic contact',
+        `Local Grocery: ${product.nameTamil}`,
+        `Packaging Unit: ${product.unit}`,
+        `Current Status: ${priceDisplay}`,
+        'Direct from Aranya Organic Dairy Farm, Shoolagiri',
       ],
-      ctaLabel: `Order ${product.name} on WhatsApp`,
-      whatsappMessage: `Hello Aranya Dairy Farm, I would like to order ${product.name} (${product.priceLabel} / ${product.unit}).`,
+      ctaLabel: `Inquire about ${product.name} on WhatsApp`,
+      whatsappMessage: `Hello Aranya Dairy Farm, I would like to inquire about ${product.name} (${product.nameTamil}) [${product.unit}].`,
     });
   };
 
@@ -98,7 +101,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-[#FCFAF7] font-sans antialiased text-[#1C241E] flex flex-col selection:bg-[#1B4D2E] selection:text-white">
+    <main className="min-h-screen bg-[#FCFAF7] font-sans antialiased text-[#1C241E] flex flex-col selection:bg-[#1B4D2E] selection:text-white pb-16 md:pb-0">
 
       {/* Header */}
       <Header
@@ -134,8 +137,14 @@ export default function Home() {
       {/* Footer */}
       <Footer onOpenStory={handleOpenStory} onOpenContact={handleOpenContact} />
 
-      {/* Floating WhatsApp bubble */}
+      {/* Floating WhatsApp bubble (offset on mobile above bottom nav) */}
       <WhatsAppCTA />
+
+      {/* Mobile Persistent Bottom Navigation Bar */}
+      <MobileBottomNav
+        onOpenCart={() => setCartOpen(true)}
+        onOpenContact={handleOpenContact}
+      />
 
       {/* Detail / Story drawer (behind-the-button) */}
       <DetailModal
