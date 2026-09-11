@@ -11,13 +11,19 @@ import { useEffect, useRef } from 'react';
  * Uses transform/opacity only → GPU-accelerated, no layout jank.
  */
 export function useScrollReveal<T extends HTMLElement>(
-  threshold = 0.15
+  threshold = 0.01
 ) {
   const ref = useRef<T>(null);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+
+    // If IntersectionObserver is not supported, reveal immediately
+    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+      el.classList.add('is-visible');
+      return;
+    }
 
     // Respect prefers-reduced-motion — add class immediately if user prefers
     const prefersReduced = window.matchMedia(
@@ -37,7 +43,7 @@ export function useScrollReveal<T extends HTMLElement>(
           }
         });
       },
-      { threshold, rootMargin: '0px 0px -40px 0px' }
+      { threshold, rootMargin: '100px 0px 100px 0px' }
     );
 
     observer.observe(el);

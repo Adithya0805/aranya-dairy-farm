@@ -152,12 +152,11 @@ p, span, button, input, select, textarea, a {
   animation: iconBounce 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* Section scroll reveal — initial hidden state */
+/* Section scroll reveal — visible by default so content is never blank or blocked */
 .reveal-section {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
 }
 
 .reveal-section.is-visible {
