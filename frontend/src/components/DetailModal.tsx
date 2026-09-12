@@ -60,12 +60,12 @@ export default function DetailModal({ isOpen, onClose, content }: DetailModalPro
 
           {/* Optional Header Image */}
           {content.image && (
-            <div className="w-full aspect-[16/9] relative overflow-hidden bg-[#122E1B]/5 border-b border-[#122E1B]/10">
+            <div className="w-full aspect-[16/9] relative overflow-hidden bg-[#F4EFEA] border-b border-[#122E1B]/10 flex items-center justify-center p-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={content.image}
                 alt={content.title}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
               />
             </div>
           )}

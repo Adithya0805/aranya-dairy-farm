@@ -19,14 +19,23 @@ export default function Footer({ onOpenStory, onOpenContact }: FooterProps) {
           
           {/* Column 1: Logo + Short Tagline */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2.5">
-              <span className="font-serif text-3xl font-normal tracking-tight text-[#FAF7F2]">
-                ARANYA
-              </span>
-              <span className="h-4 w-px bg-[#E58A13]/40" />
-              <span className="text-xs uppercase font-sans tracking-[0.2em] text-[#E58A13] font-semibold">
-                Organic Dairy
-              </span>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full overflow-hidden bg-white border border-[#E58A13]/40 shrink-0 flex items-center justify-center p-0.5 shadow-sm">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/aranya-logo.png"
+                  alt="Aranya Organic Dairy Farm Logo"
+                  className="w-full h-full object-contain rounded-full"
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-serif text-2xl font-bold tracking-tight text-[#FAF7F2] leading-none">
+                  ARANYA
+                </span>
+                <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-[#E58A13] font-semibold mt-1">
+                  Organic Dairy
+                </span>
+              </div>
             </div>
             <p className="text-xs sm:text-sm text-[#D1DDD3] leading-relaxed max-w-sm">
               Aranya Organic Dairy Farm — 9+ years of providing unadulterated A2 Raw Whole Milk, traditional Bilona Ghee, and farm-fresh provisions from grass-fed cows in Shoolagiri, Tamil Nadu.

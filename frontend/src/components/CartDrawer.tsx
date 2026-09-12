@@ -182,12 +182,12 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                   <li key={product.id} className="py-4 flex gap-3 sm:gap-4">
 
                     {/* Product image — fixed square */}
-                    <div className="w-[72px] h-[72px] sm:w-20 sm:h-20 shrink-0 overflow-hidden bg-[#EAE6DF] rounded-sm">
+                    <div className="w-[72px] h-[72px] sm:w-20 sm:h-20 shrink-0 overflow-hidden bg-[#EAE6DF] rounded-md flex items-center justify-center p-1">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={product.image}
                         alt={product.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                         onError={(e) => {
                           const target = e.currentTarget;
                           if (!target.src.endsWith('/images/placeholder-product.svg')) {

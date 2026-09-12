@@ -90,8 +90,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="flex items-center justify-between h-16">
             {/* Logo & Title */}
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded bg-[#1B4D2E] text-white flex items-center justify-center shadow-xs">
-                <Shield className="w-4 h-4" />
+              <div className="w-8 h-8 rounded-full overflow-hidden bg-white border border-[#1B4D2E]/20 flex items-center justify-center p-0.5 shadow-xs shrink-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/aranya-logo.png"
+                  alt="Aranya Farm Logo"
+                  className="w-full h-full object-contain rounded-full"
+                />
               </div>
               <div>
                 <span className="font-serif font-bold text-base text-[#1C241E] leading-tight block">

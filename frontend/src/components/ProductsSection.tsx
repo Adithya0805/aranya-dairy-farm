@@ -281,7 +281,7 @@ export default function ProductsSection({
 
                   {/* Product Image */}
                   <div
-                    className="w-full aspect-square bg-[#F4EFEA] overflow-hidden mb-4 relative cursor-pointer rounded-xl flex items-center justify-center"
+                    className="w-full aspect-square bg-[#F4EFEA] overflow-hidden mb-4 relative cursor-pointer rounded-xl flex items-center justify-center p-2.5"
                     onClick={() => onSelectProduct?.(product)}
                     aria-label={`View details for ${product.name}`}
                   >
@@ -289,7 +289,7 @@ export default function ProductsSection({
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                         const target = e.currentTarget;
                         if (!target.src.endsWith('/images/placeholder-product.svg')) {
@@ -297,7 +297,7 @@ export default function ProductsSection({
                         }
                       }}
                     />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors" />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors pointer-events-none" />
 
                     {/* In-cart badge */}
                     {inCart > 0 && (

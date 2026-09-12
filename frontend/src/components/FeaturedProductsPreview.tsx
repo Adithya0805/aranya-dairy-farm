@@ -138,14 +138,14 @@ export default function FeaturedProductsPreview({
               >
                 {/* Product Image */}
                 <div
-                  className="w-full aspect-square bg-[#F4EFEA] rounded-xl overflow-hidden mb-4 relative cursor-pointer"
+                  className="w-full aspect-square bg-[#F4EFEA] rounded-xl overflow-hidden mb-4 relative cursor-pointer flex items-center justify-center p-2.5"
                   onClick={() => onSelectProduct?.(product)}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={product.image}
                     alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
                     onError={(e) => {
                       const target = e.currentTarget;
                       if (!target.src.endsWith('/images/placeholder-product.svg')) {

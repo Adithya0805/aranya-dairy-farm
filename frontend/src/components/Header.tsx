@@ -32,13 +32,22 @@ export default function Header({ onOpenCart, onOpenStory, onOpenContact }: Heade
           {/* ── Brand Title + Wordmark on Left ── */}
           <div className="flex items-center">
             <a href="#" className="flex items-center gap-2.5 sm:gap-3 group py-2">
-              <span className="font-serif text-2xl sm:text-3xl font-normal tracking-tight text-[#FAF7F2] group-hover:text-[#E58A13] transition-colors">
-                ARANYA
-              </span>
-              <span className="hidden sm:inline-block h-4 w-px bg-[#E58A13]/40" />
-              <span className="text-[10px] sm:text-xs uppercase font-sans tracking-[0.2em] text-[#E58A13] font-semibold">
-                Organic Dairy
-              </span>
+              <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full overflow-hidden bg-white border border-[#E58A13]/40 shrink-0 flex items-center justify-center p-0.5 shadow-sm group-hover:scale-105 transition-transform">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/aranya-logo.png"
+                  alt="Aranya Organic Dairy Farm Logo"
+                  className="w-full h-full object-contain rounded-full"
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-[#FAF7F2] group-hover:text-[#E58A13] transition-colors leading-none">
+                  ARANYA
+                </span>
+                <span className="text-[9px] sm:text-[10px] uppercase font-sans tracking-[0.2em] text-[#E58A13] font-bold mt-1">
+                  Organic Dairy
+                </span>
+              </div>
             </a>
           </div>
 
