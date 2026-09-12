@@ -84,7 +84,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
         aria-label="Shopping cart"
         aria-modal="true"
         className={`
-          fixed z-50 bg-[#FCFAF7] flex flex-col shadow-2xl
+          fixed z-50 bg-[#FAF7F2] flex flex-col shadow-2xl
           /* Mobile bottom sheet */
           bottom-0 left-0 right-0
           h-[92dvh]
@@ -104,17 +104,17 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
         {/* Mobile drag handle indicator */}
         <div className="sm:hidden flex justify-center pt-3 pb-1 shrink-0">
-          <div className="w-10 h-1 rounded-full bg-[#1B4D2E]/20" />
+          <div className="w-10 h-1 rounded-full bg-[#122E1B]/20" />
         </div>
 
         {/* ── Header ── */}
-        <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-[#1B4D2E]/10 bg-[#FCFAF7] shrink-0">
+        <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-[#122E1B]/10 bg-[#FAF7F2] shrink-0">
           <div className="flex items-center gap-2.5">
-            <ShoppingBag className="w-5 h-5 text-[#1B4D2E]" />
-            <h2 className="font-serif text-xl text-[#1C241E]">
+            <ShoppingBag className="w-5 h-5 text-[#E58A13]" />
+            <h2 className="font-serif text-xl font-bold text-[#15321E]">
               Your Cart
               {totalItems > 0 && (
-                <span className="ml-2 text-sm font-sans text-[#6B472B]">
+                <span className="ml-2 text-sm font-sans font-medium text-[#B84A28]">
                   ({totalItems} {totalItems === 1 ? 'item' : 'items'})
                 </span>
               )}
@@ -123,7 +123,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
           {/* Close — min 44×44 */}
           <button
             onClick={handleClose}
-            className="w-11 h-11 flex items-center justify-center rounded-full text-[#1C241E] hover:bg-[#1B4D2E]/8 transition-colors touch-manipulation"
+            className="w-11 h-11 flex items-center justify-center rounded-full text-[#15321E] hover:bg-[#122E1B]/8 active:scale-95 transition-all touch-manipulation cursor-pointer"
             aria-label="Close cart"
           >
             <X className="w-5 h-5" />
@@ -251,15 +251,15 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
         {/* ── Footer: Total + WhatsApp CTA ── */}
         {!orderSent && items.length > 0 && (
-          <div className="shrink-0 border-t border-[#1B4D2E]/10 bg-[#FCFAF7] px-5 sm:px-6 pt-4 pb-safe-4 space-y-4"
+          <div className="shrink-0 border-t border-[#122E1B]/10 bg-[#FAF7F2] px-5 sm:px-6 pt-4 pb-safe-4 space-y-4"
             style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
           >
             {/* Running Total */}
             <div className="flex items-center justify-between">
-              <span className="font-sans text-[#57655B] uppercase tracking-wider text-xs font-semibold">
+              <span className="font-sans text-[#5F6E62] uppercase tracking-wider text-xs font-semibold">
                 Order Total
               </span>
-              <span className="font-serif text-xl text-[#1C241E] font-bold">{totalPriceLabel}</span>
+              <span className="font-serif text-2xl text-[#15321E] font-bold">{totalPriceLabel}</span>
             </div>
             <p className="text-[11px] text-[#8A7B6E] font-sans -mt-2">
               Delivery charges calculated at confirmation.
@@ -268,13 +268,13 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
             {/* WhatsApp Checkout — full width, min 52px tall for comfort */}
             <button
               onClick={handleWhatsAppCheckout}
-              className="w-full flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#1FB055] active:bg-[#18943E] text-white font-sans text-sm font-bold py-4 min-h-[52px] transition-colors touch-manipulation active:scale-[0.98]"
+              className="w-full flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#1FB055] active:bg-[#18943E] text-white font-sans text-sm font-bold py-4 min-h-[52px] rounded-full shadow-lg shadow-[#25D366]/20 transition-all touch-manipulation active:scale-[0.98] cursor-pointer"
             >
               <MessageSquare className="w-4 h-4 fill-white shrink-0" />
               <span>Order via WhatsApp</span>
             </button>
 
-            <p className="text-[11px] text-center text-[#8A7B6E] font-sans">
+            <p className="text-[11px] text-center text-[#5F6E62] font-sans">
               We&apos;ll confirm your order and share a delivery slot on WhatsApp.
             </p>
           </div>

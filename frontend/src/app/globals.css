@@ -1,16 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --color-primary: #1B4D2E;
-  --color-primary-hover: #143A22;
+  --color-primary: #122E1B;
+  --color-primary-hover: #0E2314;
   --color-primary-light: #F4F8F5;
-  --color-earth-dark: #3A271C;
-  --color-earth: #6B472B;
+  --color-earth-dark: #2B1D14;
+  --color-earth: #B84A28;
+  --color-terracotta: #B84A28;
   --color-cream: #FAF7F2;
-  --color-cream-light: #FCFAF7;
-  --color-accent: #D99B26;
-  --color-text-main: #1C241E;
-  --color-text-muted: #57655B;
+  --color-cream-light: #FDFBF7;
+  --color-accent: #E58A13;
+  --color-accent-hover: #CA7508;
+  --color-text-main: #15321E;
+  --color-text-body: #3E4B41;
+  --color-text-muted: #5F6E62;
   --color-border: #E8ECE9;
   --color-surface: #FFFFFF;
 }
@@ -21,6 +24,7 @@
   --color-brand-primary-light: var(--color-primary-light);
   --color-brand-earth-dark: var(--color-earth-dark);
   --color-brand-earth: var(--color-earth);
+  --color-brand-terracotta: var(--color-terracotta);
   --color-brand-cream: var(--color-cream);
   --color-brand-cream-light: var(--color-cream-light);
   --color-brand-accent: var(--color-accent);
@@ -35,7 +39,7 @@ html {
 
 body {
   background-color: var(--color-cream-light);
-  color: var(--color-text-main);
+  color: var(--color-text-body);
   font-family: Georgia, Cambria, "Times New Roman", Times, serif;
   overflow-x: hidden;
   width: 100%;
@@ -45,6 +49,7 @@ body {
 h1, h2, h3, h4 {
   font-family: Georgia, Cambria, serif;
   letter-spacing: -0.02em;
+  color: var(--color-text-main);
 }
 
 p, span, button, input, select, textarea, a {
@@ -64,34 +69,38 @@ p, span, button, input, select, textarea, a {
 }
 
 .link-editorial:hover {
-  color: var(--color-primary-hover);
+  color: var(--color-accent);
   transform: translateX(3px);
 }
 
-/* ─── Primary Button ────────────────────────────────────────────────────────── */
-.btn-primary-single {
-  background-color: var(--color-primary);
+/* ─── Primary Amber Pill Button ─────────────────────────────────────────────── */
+.btn-pill-amber {
+  background-color: var(--color-accent);
   color: #ffffff;
-  min-height: 50px;
+  min-height: 48px;
   padding: 0.875rem 2rem;
   border-radius: 9999px;
   font-weight: 600;
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.625rem;
-  transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-              transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 14px rgba(27, 77, 46, 0.25);
+  gap: 0.5rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 14px rgba(229, 138, 19, 0.3);
   touch-action: manipulation;
 }
 
-.btn-primary-single:hover {
-  background-color: var(--color-primary-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(27, 77, 46, 0.35);
+.btn-pill-amber:hover {
+  background-color: var(--color-accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(229, 138, 19, 0.4);
+}
+
+.btn-pill-amber:active {
+  transform: scale(0.97);
 }
 
 /* ─── Keyframes ─────────────────────────────────────────────────────────────── */

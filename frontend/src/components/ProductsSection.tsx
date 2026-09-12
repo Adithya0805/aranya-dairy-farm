@@ -12,9 +12,17 @@ import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 interface ProductsSectionProps {
   onSelectProduct?: (product: Product) => void;
+  selectedCategory?: string;
+  onCategoryChange?: (category: string) => void;
+  onProductsLoaded?: (products: Product[]) => void;
 }
 
-export default function ProductsSection({ onSelectProduct }: ProductsSectionProps) {
+export default function ProductsSection({
+  onSelectProduct,
+  selectedCategory: externalCategory,
+  onCategoryChange,
+  onProductsLoaded,
+}: ProductsSectionProps) {
   const { addItem, items } = useCart();
 
   // Section scroll reveal
@@ -26,7 +34,18 @@ export default function ProductsSection({ onSelectProduct }: ProductsSectionProp
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Category filter state ('All' or one of the dynamic category names)
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [selectedCategory, setSelectedCategory] = useState<string>(externalCategory || 'All');
+
+  useEffect(() => {
+    if (externalCategory !== undefined) {
+      setSelectedCategory(externalCategory);
+    }
+  }, [externalCategory]);
+
+  const handleSelectCategory = (cat: string) => {
+    setSelectedCategory(cat);
+    onCategoryChange?.(cat);
+  };
 
   // Per-card local quantities (for products that have an active price)
   const [localQty, setLocalQty] = useState<Record<string, number>>(() =>
@@ -53,6 +72,7 @@ export default function ProductsSection({ onSelectProduct }: ProductsSectionProp
           if (cats && cats.length > 0) setCategories(cats);
           if (prods && prods.length > 0) {
             setProducts(prods);
+            onProductsLoaded?.(prods);
             setLocalQty((prev) => {
               const updated = { ...prev };
               prods.forEach((p) => {
@@ -84,7 +104,7 @@ export default function ProductsSection({ onSelectProduct }: ProductsSectionProp
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [onProductsLoaded]);
 
   // ── RICE SECTION HANDLING & AVAILABILITY ──────────────────────────────────
   // Exactly 24 confirmed products are marked available: true.
@@ -154,36 +174,55 @@ export default function ProductsSection({ onSelectProduct }: ProductsSectionProp
   return (
     <>
       <section
-        id="products"
+        id="shop"
         ref={sectionRef}
-        className="reveal-section py-16 sm:py-24 bg-[#FCFAF7] border-b border-[#1B4D2E]/10 w-full"
+        className="reveal-section py-16 sm:py-24 bg-[#FAF7F2] border-b border-[#122E1B]/10 w-full"
       >
+        {/* Anchor for backwards-compatibility */}
+        <div id="products" className="scroll-mt-24" />
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          {/* Section Header */}
-          <div className="grid lg:grid-cols-12 gap-6 lg:gap-8 items-end mb-8 sm:mb-12">
-            <div className="lg:col-span-7 space-y-3">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1B4D2E]/10 text-[#1B4D2E] text-xs font-semibold uppercase tracking-wider">
-                <span>மளிகைக் கடை • Farm Store Catalog</span>
-              </div>
-              <h2 className="text-4xl sm:text-6xl font-serif text-[#1C241E] tracking-tight">
-                Farm provisions
+          {/* Full-bleed Photo Banner Header overlay in hero style */}
+          <div className="relative w-full aspect-[21/9] sm:aspect-[24/7] min-h-[220px] sm:min-h-[260px] flex items-center justify-center overflow-hidden bg-[#122E1B] mb-12 sm:mb-16 rounded-3xl shadow-lg border border-[#122E1B]/15">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/nature_hero_pasture.jpg"
+              alt="Our Shop - Aranya Organic Dairy"
+              className="absolute inset-0 w-full h-full object-cover object-center opacity-35"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#122E1B] via-[#122E1B]/60 to-black/40" />
+            <div className="relative z-10 text-center px-4 space-y-2.5 animate-fade-in">
+              <span className="inline-block text-xs uppercase font-sans tracking-[0.25em] text-[#E58A13] font-bold">
+                Farm Provisions &amp; Daily Grocery • மளிகைக் கடை
+              </span>
+              <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif text-[#FAF7F2] font-bold tracking-tight drop-shadow-md">
+                Our Shop
               </h2>
-              <p className="text-sm sm:text-base text-[#57655B] max-w-lg font-sans leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#F4EFEB] font-sans max-w-lg mx-auto leading-relaxed">
                 Pure A2 milk, traditional Bilona ghee, native millets, lentils, and daily domestic grocery essentials from our Shoolagiri farm.
               </p>
             </div>
+          </div>
 
-            <div className="lg:col-span-5 lg:text-right">
-              <a
-                href={WA_CATALOG_INQUIRY}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block bg-[#1C241E] hover:bg-[#1B4D2E] text-white font-sans text-xs uppercase font-semibold tracking-widest px-8 py-4 min-h-[48px] flex items-center justify-center lg:inline-flex transition-colors touch-manipulation"
-              >
-                Inquire Full Price List
-              </a>
+          {/* Top Info Bar with WhatsApp catalog inquiry */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 sm:mb-10">
+            <div>
+              <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#15321E]">
+                All Farm Offerings
+              </h3>
+              <p className="text-xs sm:text-sm text-[#5F6E62]">
+                Showing {displayedProducts.length} verified farm items
+              </p>
             </div>
+            <a
+              href={WA_CATALOG_INQUIRY}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 bg-[#122E1B] hover:bg-[#1C3E25] text-white font-sans text-xs uppercase font-bold tracking-wider px-6 py-3 min-h-[44px] rounded-full transition-all touch-manipulation active:scale-95"
+            >
+              Inquire Full Price List
+            </a>
           </div>
 
           {/* Category Filter Chips / Tabs (Horizontal scrollable, dynamic from Supabase) */}
@@ -195,13 +234,13 @@ export default function ProductsSection({ onSelectProduct }: ProductsSectionProp
                 return (
                   <button
                     key={category}
-                    onClick={() => setSelectedCategory(category)}
+                    onClick={() => handleSelectCategory(category)}
                     className={`
                       shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-sans uppercase tracking-wider transition-all duration-200 ease-out min-h-[40px] touch-manipulation cursor-pointer active:scale-95
                       ${
                         isSelected
-                          ? 'bg-[#1B4D2E] text-white font-bold shadow-md shadow-[#1B4D2E]/15 scale-[1.02]'
-                          : 'bg-[#F2ECE7] hover:bg-[#E8E1DA] hover:text-[#1B4D2E] text-[#1C241E] font-medium border border-transparent'
+                          ? 'bg-[#E58A13] text-white font-bold shadow-md shadow-[#E58A13]/25 scale-[1.02]'
+                          : 'bg-[#FAF7F2] hover:bg-[#F2ECE7] hover:text-[#15321E] text-[#15321E] font-medium border border-[#122E1B]/10'
                       }
                     `}
                     aria-pressed={isSelected}
@@ -211,7 +250,7 @@ export default function ProductsSection({ onSelectProduct }: ProductsSectionProp
                     <span
                       className={`
                         text-[11px] px-1.5 py-0.2 rounded-full font-bold transition-colors duration-200
-                        ${isSelected ? 'bg-white/25 text-white' : 'bg-[#1C241E]/10 text-[#57655B]'}
+                        ${isSelected ? 'bg-white/25 text-white' : 'bg-[#15321E]/10 text-[#5F6E62]'}
                       `}
                     >
                       {count}
@@ -222,12 +261,7 @@ export default function ProductsSection({ onSelectProduct }: ProductsSectionProp
             </div>
           </div>
 
-          {/* Product Cards Grid
-              — 1 column on mobile (< 640px)
-              — 2 columns on tablet (sm)
-              — 3 columns on desktop (md+)
-              Smooth fade transition when category filter changes
-          */}
+          {/* Product Cards Grid */}
           <div
             key={selectedCategory}
             className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 animate-grid-fade"
@@ -241,13 +275,13 @@ export default function ProductsSection({ onSelectProduct }: ProductsSectionProp
               return (
                 <div
                   key={product.id}
-                  className="group flex flex-col bg-white border border-[#1B4D2E]/10 rounded-sm p-4 sm:p-5 hover:border-[#1B4D2E]/35 hover:-translate-y-1 hover:shadow-lg hover:shadow-[#1B4D2E]/6 active:scale-[0.99] transition-all duration-200 ease-out animate-card-reveal"
+                  className="group flex flex-col bg-white border border-[#122E1B]/10 rounded-2xl p-4 sm:p-5 hover:border-[#E58A13]/35 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#122E1B]/6 active:scale-[0.99] transition-all duration-200 ease-out animate-card-reveal"
                   style={{ animationDelay: `${(index % 6) * 80}ms` }}
                 >
 
-                  {/* Product Image — displays Supabase storage photo or soft neutral placeholder */}
+                  {/* Product Image */}
                   <div
-                    className="w-full aspect-square bg-[#F4EFEA] overflow-hidden mb-4 relative cursor-pointer rounded-sm flex items-center justify-center"
+                    className="w-full aspect-square bg-[#F4EFEA] overflow-hidden mb-4 relative cursor-pointer rounded-xl flex items-center justify-center"
                     onClick={() => onSelectProduct?.(product)}
                     aria-label={`View details for ${product.name}`}
                   >
@@ -267,13 +301,13 @@ export default function ProductsSection({ onSelectProduct }: ProductsSectionProp
 
                     {/* In-cart badge */}
                     {inCart > 0 && (
-                      <div className="absolute top-3 right-3 bg-[#1B4D2E] text-white text-[10px] font-bold font-sans px-2.5 py-1 rounded-full shadow-sm">
+                      <div className="absolute top-3 right-3 bg-[#E58A13] text-white text-[10px] font-bold font-sans px-2.5 py-1 rounded-full shadow-sm">
                         {inCart} in cart
                       </div>
                     )}
 
-                    {/* Category tag */}
-                    <div className="absolute bottom-2.5 left-2.5 bg-[#FCFAF7]/90 backdrop-blur-xs text-[#57655B] text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded">
+                    {/* Category tag in terracotta accent */}
+                    <div className="absolute bottom-2.5 left-2.5 bg-[#FAF7F2]/90 backdrop-blur-xs text-[#B84A28] border border-[#B84A28]/20 text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full">
                       {product.category}
                     </div>
                   </div>
@@ -282,72 +316,68 @@ export default function ProductsSection({ onSelectProduct }: ProductsSectionProp
                   <div className="space-y-1.5 mb-4 flex-1">
                     <div className="flex items-baseline justify-between gap-2">
                       <h3
-                        className="font-serif text-lg sm:text-xl text-[#1C241E] group-hover:text-[#1B4D2E] transition-colors cursor-pointer leading-snug"
+                        className="font-serif text-lg sm:text-xl text-[#15321E] font-bold group-hover:text-[#E58A13] transition-colors cursor-pointer leading-snug"
                         onClick={() => onSelectProduct?.(product)}
                       >
                         {product.name}
                       </h3>
                     </div>
 
-                    {/* Tamil Name (Authentic local grocery touch) */}
-                    <p className="text-xs font-sans text-[#1B4D2E] font-medium tracking-wide">
+                    {/* Tamil Name */}
+                    <p className="text-xs font-sans text-[#122E1B]/75 font-medium tracking-wide">
                       {product.nameTamil}
                     </p>
 
                     {/* Packaging Unit */}
                     <p className="text-xs text-[#8A7B6E] font-sans">
-                      Pack: <span className="text-[#1C241E] font-medium">{product.unit}</span>
+                      Pack: <span className="text-[#15321E] font-medium">{product.unit}</span>
                     </p>
 
                     {/* Price Display */}
                     <div className="pt-2">
                       {hasPrice ? (
-                        <p className="text-base font-sans font-bold text-[#1C241E]">
+                        <p className="text-base font-sans font-bold text-[#15321E]">
                           {formatPrice(product.price!)}
                         </p>
                       ) : (
-                        <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#F2ECE7] text-[#6B472B] text-[11px] font-sans font-semibold uppercase tracking-wider">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#6B472B]/60 animate-pulse" />
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E58A13]/10 text-[#E58A13] text-[11px] font-sans font-semibold uppercase tracking-wider">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#E58A13] animate-pulse" />
                           <span>Price updating soon</span>
                         </div>
                       )}
                     </div>
                   </div>
 
-                  {/* Action Controls
-                      — When price is available: Stepper + Add to Cart
-                      — When price is null: "Notify Me" WhatsApp button
-                      Zero layout changes will be required when price is populated later.
-                  */}
-                  <div className="mt-auto pt-2 border-t border-[#1B4D2E]/8">
+                  {/* Action Controls */}
+                  <div className="mt-auto pt-2 border-t border-[#122E1B]/8">
                     {hasPrice ? (
                       <div className="flex items-center gap-2">
                         {/* Stepper */}
-                        <div className="flex items-center border border-[#1B4D2E]/20 rounded-full overflow-hidden shrink-0 bg-[#FAF7F2]">
+                        <div className="flex items-center border border-[#122E1B]/20 rounded-full overflow-hidden shrink-0 bg-[#FAF7F2]">
                           <button
                             onClick={() => changeLocalQty(product.id, -1)}
                             disabled={lQty <= 1}
-                            className="w-11 h-11 flex items-center justify-center text-[#1C241E] hover:bg-[#1B4D2E]/10 active:scale-90 disabled:opacity-25 transition-all duration-150 touch-manipulation cursor-pointer"
+                            className="w-11 h-11 flex items-center justify-center text-[#15321E] hover:bg-[#E58A13]/15 active:scale-90 disabled:opacity-25 transition-all duration-150 touch-manipulation cursor-pointer"
                             aria-label={`Decrease quantity for ${product.name}`}
                           >
                             <Minus className="w-3.5 h-3.5" />
                           </button>
-                          <span className="w-8 text-center text-sm font-semibold text-[#1C241E] font-sans select-none">
+                          <span className="w-8 text-center text-sm font-semibold text-[#15321E] font-sans select-none">
                             {lQty}
                           </span>
                           <button
                             onClick={() => changeLocalQty(product.id, 1)}
-                            className="w-11 h-11 flex items-center justify-center text-[#1C241E] hover:bg-[#1B4D2E]/10 active:scale-90 transition-all duration-150 touch-manipulation cursor-pointer"
+                            className="w-11 h-11 flex items-center justify-center text-[#15321E] hover:bg-[#E58A13]/15 active:scale-90 transition-all duration-150 touch-manipulation cursor-pointer"
                             aria-label={`Increase quantity for ${product.name}`}
                           >
                             <Plus className="w-3.5 h-3.5" />
                           </button>
                         </div>
 
-                        {/* Add to Cart */}
+                        {/* Add to Cart in amber pill style */}
                         <button
                           onClick={() => handleAddToCart(product)}
-                          className="flex-1 flex items-center justify-center gap-2 bg-[#1C241E] hover:bg-[#1B4D2E] active:scale-[0.97] active:bg-[#143A22] text-white text-xs uppercase font-semibold tracking-wider py-3 px-3 min-h-[44px] rounded-sm transition-all duration-150 touch-manipulation cursor-pointer shadow-xs hover:shadow-md"
+                          className="flex-1 flex items-center justify-center gap-2 bg-[#E58A13] hover:bg-[#CA7508] active:scale-[0.97] text-white text-xs uppercase font-bold tracking-wider py-3 px-3 min-h-[44px] rounded-full transition-all duration-150 touch-manipulation cursor-pointer shadow-md shadow-[#E58A13]/20"
                         >
                           <ShoppingBag
                             className={`w-4 h-4 shrink-0 ${isBouncing ? 'animate-icon-bounce' : ''}`}
@@ -359,7 +389,7 @@ export default function ProductsSection({ onSelectProduct }: ProductsSectionProp
                       /* Price Pending State: Notify Me via WhatsApp button */
                       <button
                         onClick={() => handleNotifyMe(product)}
-                        className="w-full flex items-center justify-center gap-2 border border-[#1B4D2E]/25 hover:border-[#1B4D2E] bg-[#FCFAF7] hover:bg-[#1B4D2E] text-[#1B4D2E] hover:text-white text-xs uppercase font-semibold tracking-wider py-3 px-3 min-h-[44px] rounded-sm transition-all duration-200 touch-manipulation active:scale-[0.98] cursor-pointer"
+                        className="w-full flex items-center justify-center gap-2 border border-[#E58A13] hover:bg-[#E58A13] bg-[#FAF7F2] text-[#E58A13] hover:text-white text-xs uppercase font-bold tracking-wider py-3 px-3 min-h-[44px] rounded-full transition-all duration-200 touch-manipulation active:scale-[0.98] cursor-pointer"
                         aria-label={`Notify me when price for ${product.name} is available`}
                       >
                         <Bell className="w-3.5 h-3.5 shrink-0" />
@@ -375,14 +405,14 @@ export default function ProductsSection({ onSelectProduct }: ProductsSectionProp
 
           {/* Empty state if a selected category has no available products */}
           {displayedProducts.length === 0 && (
-            <div className="py-16 text-center space-y-3 bg-white border border-[#1B4D2E]/10 rounded-sm p-8">
-              <p className="font-serif text-2xl text-[#1C241E]">No items currently available in this category</p>
-              <p className="text-sm text-[#57655B] font-sans max-w-md mx-auto">
+            <div className="py-16 text-center space-y-3 bg-white border border-[#122E1B]/10 rounded-2xl p-8">
+              <p className="font-serif text-2xl text-[#15321E] font-bold">No items currently available in this category</p>
+              <p className="text-sm text-[#5F6E62] font-sans max-w-md mx-auto">
                 We are actively restocking and confirming items with the farm. In the meantime, select another category or check back soon.
               </p>
               <button
-                onClick={() => setSelectedCategory('All')}
-                className="mt-4 inline-block bg-[#1B4D2E] text-white text-xs uppercase font-semibold tracking-widest px-6 py-3 rounded transition-colors touch-manipulation"
+                onClick={() => handleSelectCategory('All')}
+                className="mt-4 inline-block bg-[#E58A13] hover:bg-[#CA7508] text-white text-xs uppercase font-bold tracking-widest px-6 py-3 rounded-full transition-colors touch-manipulation"
               >
                 View All Products
               </button>

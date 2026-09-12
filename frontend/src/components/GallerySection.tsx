@@ -31,16 +31,16 @@ export default function GallerySection() {
     <section
       id="gallery"
       ref={sectionRef}
-      className="reveal-section py-20 bg-[#FCFAF7] border-b border-[#1B4D2E]/10 w-full overflow-hidden"
+      className="reveal-section py-20 bg-[#FAF7F2] border-b border-[#122E1B]/10 w-full overflow-hidden"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         
         {/* Editorial Section Header */}
         <div className="max-w-2xl space-y-3">
-          <span className="text-xs font-sans uppercase font-bold tracking-widest text-[#6B472B]">
+          <span className="text-xs font-sans uppercase font-bold tracking-widest text-[#B84A28]">
             Life at Shoolagiri
           </span>
-          <h2 className="text-3xl sm:text-5xl font-serif font-bold text-[#1C241E]">
+          <h2 className="text-3xl sm:text-5xl font-serif font-bold text-[#15321E]">
             A glimpse into our pastures.
           </h2>
         </div>
@@ -57,11 +57,11 @@ export default function GallerySection() {
                 <div className="text-6xl group-hover:scale-105 transition-transform duration-300">
                   {item.emoji}
                 </div>
-                <div className="font-serif font-bold text-lg text-[#FCFAF7] mt-3">
+                <div className="font-serif font-bold text-lg text-[#FAF7F2] mt-3">
                   {item.title}
                 </div>
               </div>
-              <p className="text-xs text-[#57655B] leading-relaxed">
+              <p className="text-xs text-[#5F6E62] leading-relaxed">
                 {item.subtitle}
               </p>
             </div>

@@ -3,10 +3,11 @@
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
-import AnnouncementBanner from '@/components/AnnouncementBanner';
-import ProductsSection from '@/components/ProductsSection';
+import TrustBadgesSection from '@/components/TrustBadgesSection';
+import FeaturedCategoriesSection from '@/components/FeaturedCategoriesSection';
+import FeaturedProductsPreview from '@/components/FeaturedProductsPreview';
 import AboutSection from '@/components/AboutSection';
-import CategoryGridSection from '@/components/CategoryGridSection';
+import ProductsSection from '@/components/ProductsSection';
 import GallerySection from '@/components/GallerySection';
 import TestimonialsSection from '@/components/TestimonialsSection';
 import ContactSection from '@/components/ContactSection';
@@ -24,6 +25,10 @@ export default function Home() {
 
   // ── Shopping Cart Drawer ────────────────────────────────────────────────────
   const [cartOpen, setCartOpen] = useState(false);
+
+  // ── Active Category for synchronization between Showcase and Shop Catalog ───
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [liveProducts, setLiveProducts] = useState<Product[]>([]);
 
   const openModal = (content: ModalContent) => {
     setActiveModalContent(content);
@@ -100,44 +105,62 @@ export default function Home() {
     });
   };
 
-  return (
-    <main className="min-h-screen bg-[#FCFAF7] font-sans antialiased text-[#1C241E] flex flex-col selection:bg-[#1B4D2E] selection:text-white pb-16 md:pb-0">
+  const handleCategorySelection = (cat: string) => {
+    setSelectedCategory(cat);
+  };
 
-      {/* Header */}
+  return (
+    <main className="min-h-screen bg-[#FDFBF7] font-sans antialiased text-[#3E4B41] flex flex-col selection:bg-[#E58A13] selection:text-white pb-16 md:pb-0">
+
+      {/* 1. Dark Header Bar with Brand Wordmark, Nav, & Cart */}
       <Header
         onOpenCart={() => setCartOpen(true)}
         onOpenStory={handleOpenStory}
         onOpenContact={handleOpenContact}
       />
 
-      {/* Hero — Image 1 template */}
+      {/* 2. Hero Section with Full-Bleed Nature Photography & Amber Pill CTA */}
       <Hero />
 
-      {/* Forest-green announcement bar — Image 2 template */}
-      <AnnouncementBanner onLearnMore={handleOpenStory} />
+      {/* 3. Trust Badge Row (9 Years Trusted, 100% Organic, Fresh Daily) */}
+      <TrustBadgesSection />
 
-      {/* Best Sellers product grid — Image 2 template */}
-      <ProductsSection onSelectProduct={handleSelectProduct} />
+      {/* 4. Featured Categories Showcase (Dairy, Rice & Millets, Pulses & Lentils) */}
+      <FeaturedCategoriesSection onSelectCategory={handleCategorySelection} />
 
-      {/* Split feature section — Image 3 template */}
-      <AboutSection onOpenColdChain={openModal} />
+      {/* 5. Featured Products Preview with Pill Add to Cart */}
+      <FeaturedProductsPreview
+        products={liveProducts}
+        onSelectProduct={handleSelectProduct}
+      />
 
-      {/* "What We Do" category grid — Images 4 & 5 template */}
-      <CategoryGridSection onOpenStory={openModal} />
+      {/* 6. Split About/Story Section with 3-Feature Row */}
+      <AboutSection
+        onOpenColdChain={openModal}
+        onOpenStory={handleOpenStory}
+      />
 
-      {/* Farm gallery */}
+      {/* 7. Shop Catalog with Full-Bleed Photo Banner & Category Chips */}
+      <ProductsSection
+        selectedCategory={selectedCategory}
+        onCategoryChange={setSelectedCategory}
+        onSelectProduct={handleSelectProduct}
+        onProductsLoaded={setLiveProducts}
+      />
+
+      {/* 8. Farm Life Gallery */}
       <GallerySection />
 
-      {/* Customer testimonials */}
+      {/* 9. Customer Testimonials */}
       <TestimonialsSection />
 
-      {/* Contact & inquiry form */}
+      {/* 10. Contact & Visit Inquiry Form */}
       <ContactSection />
 
-      {/* Footer */}
+      {/* 11. Redesigned 3-Column Dark Footer */}
       <Footer onOpenStory={handleOpenStory} onOpenContact={handleOpenContact} />
 
-      {/* Floating WhatsApp bubble (offset on mobile above bottom nav) */}
+      {/* Floating WhatsApp CTA */}
       <WhatsAppCTA />
 
       {/* Mobile Persistent Bottom Navigation Bar */}
@@ -146,7 +169,7 @@ export default function Home() {
         onOpenContact={handleOpenContact}
       />
 
-      {/* Detail / Story drawer (behind-the-button) */}
+      {/* Detail / Story drawer */}
       <DetailModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
