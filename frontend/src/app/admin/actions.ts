@@ -75,12 +75,13 @@ function extractStoragePath(imageUrl?: string | null): string | null {
 }
 
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 4.2 * 1024 * 1024; // 4.2MB to stay within Vercel's 4.5MB Serverless Function request limit
 
 function getExtension(file: File): string {
-  if (file.type === 'image/png') return 'png';
-  if (file.type === 'image/webp') return 'webp';
-  if (file.type === 'image/jpeg' || file.type === 'image/jpg') return 'jpg';
+  const type = (file.type || '').toLowerCase();
+  if (type === 'image/png') return 'png';
+  if (type === 'image/webp') return 'webp';
+  if (type === 'image/jpeg' || type === 'image/jpg') return 'jpg';
   const nameParts = file.name.split('.');
   if (nameParts.length > 1) {
     const ext = nameParts.pop()?.toLowerCase();
@@ -115,9 +116,13 @@ export async function updateProductAction(payload: AdminProductPayload, token?: 
       return { success: false, error: error.message };
     }
 
-    // Revalidate frontend storefront and admin caches
-    revalidatePath('/', 'layout');
-    revalidatePath('/admin/products');
+    // Revalidate frontend storefront and admin caches safely
+    try {
+      revalidatePath('/');
+      revalidatePath('/admin/products');
+    } catch (revErr) {
+      console.warn('[Admin] revalidatePath warning:', revErr);
+    }
 
     return { success: true };
   } catch (err: unknown) {
@@ -164,7 +169,12 @@ export async function updateProductWithImageAction(formData: FormData) {
 
     // Handle image upload if a new file was provided
     if (imageFile && typeof imageFile === 'object' && 'size' in imageFile && imageFile.size > 0) {
-      if (!ALLOWED_MIME_TYPES.includes(imageFile.type)) {
+      const mimeType = (imageFile.type || '').toLowerCase();
+      const ext = getExtension(imageFile);
+      const isAllowedMime = ALLOWED_MIME_TYPES.includes(mimeType);
+      const isAllowedExt = ['jpg', 'jpeg', 'png', 'webp'].includes(ext);
+
+      if (!isAllowedMime && !isAllowedExt) {
         return {
           success: false,
           error: 'Invalid file format. Please upload a JPG, PNG, or WebP image.',
@@ -174,21 +184,21 @@ export async function updateProductWithImageAction(formData: FormData) {
       if (imageFile.size > MAX_FILE_SIZE) {
         return {
           success: false,
-          error: 'Image file exceeds the 5MB limit. Please upload a smaller file.',
+          error: 'Image file exceeds the 4.2MB limit. Please upload a smaller file.',
         };
       }
 
       const categoryFolder = getCategoryFolder(categoryName);
-      const ext = getExtension(imageFile);
       const storagePath = `${categoryFolder}/${id}-${Date.now()}.${ext}`;
 
       const arrayBuffer = await imageFile.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
+      const uploadContentType = mimeType || (ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg');
 
       const { error: uploadError } = await admin.storage
         .from('product-images')
         .upload(storagePath, buffer, {
-          contentType: imageFile.type,
+          contentType: uploadContentType,
           upsert: true,
         });
 
@@ -206,15 +216,19 @@ export async function updateProductWithImageAction(formData: FormData) {
       newImageUrl = publicUrlData.publicUrl;
 
       // Clean up previous image in storage to avoid accumulating orphan files
-      const { data: currentProduct } = await admin
-        .from('products')
-        .select('image_url')
-        .eq('id', id)
-        .single();
+      try {
+        const { data: currentProduct } = await admin
+          .from('products')
+          .select('image_url')
+          .eq('id', id)
+          .single();
 
-      const oldPath = extractStoragePath(currentProduct?.image_url);
-      if (oldPath && oldPath !== storagePath) {
-        await admin.storage.from('product-images').remove([oldPath]);
+        const oldPath = extractStoragePath(currentProduct?.image_url);
+        if (oldPath && oldPath !== storagePath) {
+          await admin.storage.from('product-images').remove([oldPath]);
+        }
+      } catch (cleanupErr) {
+        console.warn('[Admin Storage] Cleanup old image warning:', cleanupErr);
       }
     }
 
@@ -241,9 +255,13 @@ export async function updateProductWithImageAction(formData: FormData) {
       return { success: false, error: updateError.message };
     }
 
-    // Revalidate storefront and admin caches
-    revalidatePath('/', 'layout');
-    revalidatePath('/admin/products');
+    // Revalidate storefront and admin caches safely
+    try {
+      revalidatePath('/');
+      revalidatePath('/admin/products');
+    } catch (revErr) {
+      console.warn('[Admin] revalidatePath warning:', revErr);
+    }
 
     return { success: true, imageUrl: newImageUrl };
   } catch (err: unknown) {

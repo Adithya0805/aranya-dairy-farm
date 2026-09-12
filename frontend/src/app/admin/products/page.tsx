@@ -123,12 +123,19 @@ export default function AdminProductsPage() {
   const handleFileValidationAndSelect = (file: File) => {
     setImageError(null);
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    if (!allowedTypes.includes(file.type.toLowerCase())) {
+    const ext = file.name.split('.').pop()?.toLowerCase();
+    const isAllowedExt = ext && ['jpg', 'jpeg', 'png', 'webp'].includes(ext);
+    const isAllowedMime = allowedTypes.includes((file.type || '').toLowerCase());
+
+    if (!isAllowedMime && !isAllowedExt) {
       setImageError('Unsupported format. Please select a JPG, PNG, or WebP image.');
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      setImageError('Image file exceeds the 5MB limit. Please choose a smaller image.');
+    const MAX_ALLOWED_BYTES = 4.2 * 1024 * 1024;
+    if (file.size > MAX_ALLOWED_BYTES) {
+      setImageError(
+        `Image size is ${(file.size / (1024 * 1024)).toFixed(1)}MB. Maximum allowed size is 4MB. Please choose a smaller image.`
+      );
       return;
     }
     if (newImagePreview) {
@@ -230,8 +237,20 @@ export default function AdminProductsPage() {
         });
       }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Exception while updating product';
-      setFeedback({ type: 'error', message });
+      const message = err instanceof Error ? err.message : String(err);
+      if (
+        message.includes('441') ||
+        message.includes('Server Components render') ||
+        message.includes('Body exceeded') ||
+        message.includes('413')
+      ) {
+        setFeedback({
+          type: 'error',
+          message: 'Upload could not be processed. The selected image may exceed server limits (max 4MB). Please select an image under 4MB.',
+        });
+      } else {
+        setFeedback({ type: 'error', message });
+      }
     } finally {
       setSaving(false);
     }
@@ -686,7 +705,7 @@ export default function AdminProductsPage() {
                     <span>{newImageFile ? 'Change Photo Selection' : 'Select Photo from Device'}</span>
                   </label>
                   <p className="text-[11px] text-[#8A7B6E] mt-1.5">
-                    or drag & drop file here &bull; JPG, PNG, WebP up to 5MB
+                    or drag & drop file here &bull; JPG, PNG, WebP up to 4MB
                   </p>
                 </div>
 
