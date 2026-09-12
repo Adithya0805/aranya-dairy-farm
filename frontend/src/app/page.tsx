@@ -14,6 +14,7 @@ import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
 import WhatsAppCTA from '@/components/WhatsAppCTA';
 import DetailModal, { ModalContent } from '@/components/DetailModal';
+import QuickViewModal from '@/components/QuickViewModal';
 import CartDrawer from '@/components/CartDrawer';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import { Product, getProductPriceLabel } from '@/lib/products';
@@ -22,6 +23,10 @@ export default function Home() {
   // ── Detail Drawer (Our Story, Cold-Chain, Product details) ─────────────────
   const [modalOpen, setModalOpen] = useState(false);
   const [activeModalContent, setActiveModalContent] = useState<ModalContent | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  // ── Quick View Modal State ──────────────────────────────────────────────────
+  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
 
   // ── Shopping Cart Drawer ────────────────────────────────────────────────────
   const [cartOpen, setCartOpen] = useState(false);
@@ -37,6 +42,7 @@ export default function Home() {
 
   /** Map a Product to a ModalContent for the detail drawer */
   const handleSelectProduct = (product: Product) => {
+    setSelectedProduct(product);
     const priceDisplay = getProductPriceLabel(product);
     openModal({
       title: `${product.name} (${product.nameTamil})`,
@@ -61,6 +67,7 @@ export default function Home() {
   };
 
   const handleOpenStory = () => {
+    setSelectedProduct(null);
     openModal({
       title: 'Our 9-Year Heritage Story',
       subtitle: 'Pure A2 Organic Farming in Shoolagiri',
@@ -84,6 +91,7 @@ export default function Home() {
   };
 
   const handleOpenContact = () => {
+    setSelectedProduct(null);
     openModal({
       title: 'Farm Location & Contact',
       subtitle: 'Visit or Inquire Directly',
@@ -132,6 +140,7 @@ export default function Home() {
       <FeaturedProductsPreview
         products={liveProducts}
         onSelectProduct={handleSelectProduct}
+        onQuickView={(p) => setQuickViewProduct(p)}
       />
 
       {/* 6. Split About/Story Section with 3-Feature Row */}
@@ -145,6 +154,7 @@ export default function Home() {
         selectedCategory={selectedCategory}
         onCategoryChange={setSelectedCategory}
         onSelectProduct={handleSelectProduct}
+        onQuickView={(p) => setQuickViewProduct(p)}
         onProductsLoaded={setLiveProducts}
       />
 
@@ -172,8 +182,19 @@ export default function Home() {
       {/* Detail / Story drawer */}
       <DetailModal
         isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={() => {
+          setModalOpen(false);
+          setSelectedProduct(null);
+        }}
         content={activeModalContent}
+        product={selectedProduct}
+      />
+
+      {/* Fast Quick-View modal */}
+      <QuickViewModal
+        isOpen={Boolean(quickViewProduct)}
+        product={quickViewProduct}
+        onClose={() => setQuickViewProduct(null)}
       />
 
       {/* Shopping cart slide-in drawer */}

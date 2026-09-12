@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { Plus, Minus, ShoppingBag, Bell, Check } from 'lucide-react';
+import { Plus, Minus, ShoppingBag, Bell, Check, Eye } from 'lucide-react';
 import { PRODUCTS, Product, ProductCategory, CATEGORIES, getProductPriceLabel, formatPrice } from '@/lib/products';
 import { getCategories, getProducts, testAnonProductWrite } from '@/lib/catalog';
 import { supabase } from '@/lib/supabase';
@@ -12,6 +12,7 @@ import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 interface ProductsSectionProps {
   onSelectProduct?: (product: Product) => void;
+  onQuickView?: (product: Product) => void;
   selectedCategory?: string;
   onCategoryChange?: (category: string) => void;
   onProductsLoaded?: (products: Product[]) => void;
@@ -19,6 +20,7 @@ interface ProductsSectionProps {
 
 export default function ProductsSection({
   onSelectProduct,
+  onQuickView,
   selectedCategory: externalCategory,
   onCategoryChange,
   onProductsLoaded,
@@ -301,13 +303,43 @@ export default function ProductsSection({
 
                     {/* In-cart badge */}
                     {inCart > 0 && (
-                      <div className="absolute top-3 right-3 bg-[#E58A13] text-white text-[10px] font-bold font-sans px-2.5 py-1 rounded-full shadow-sm">
+                      <div className="absolute top-3 right-3 bg-[#E58A13] text-white text-[10px] font-bold font-sans px-2.5 py-1 rounded-full shadow-sm z-10">
                         {inCart} in cart
                       </div>
                     )}
 
+                    {/* Mobile Quick-View Pill (top-left) */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onQuickView ? onQuickView(product) : onSelectProduct?.(product);
+                      }}
+                      className="sm:hidden absolute top-2.5 left-2.5 z-10 flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#FAF7F2]/95 backdrop-blur-xs text-[#15321E] border border-[#122E1B]/15 text-[10px] font-sans font-bold uppercase tracking-wider shadow-sm active:scale-95 transition-all cursor-pointer"
+                      aria-label={`Quick view ${product.name}`}
+                    >
+                      <Eye className="w-3 h-3 text-[#E58A13]" />
+                      <span>Quick View</span>
+                    </button>
+
+                    {/* Desktop Hover Quick-View Pill (centered) */}
+                    <div className="hidden sm:flex absolute inset-0 items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-10">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onQuickView ? onQuickView(product) : onSelectProduct?.(product);
+                        }}
+                        className="pointer-events-auto flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#FAF7F2]/95 backdrop-blur-xs text-[#15321E] border border-[#122E1B]/20 text-xs font-sans font-bold uppercase tracking-wider shadow-lg hover:bg-[#E58A13] hover:text-white hover:border-[#E58A13] active:scale-95 transition-all duration-200 cursor-pointer"
+                        aria-label={`Quick view ${product.name}`}
+                      >
+                        <Eye className="w-3.5 h-3.5 text-current" />
+                        <span>Quick View</span>
+                      </button>
+                    </div>
+
                     {/* Category tag in terracotta accent */}
-                    <div className="absolute bottom-2.5 left-2.5 bg-[#FAF7F2]/90 backdrop-blur-xs text-[#B84A28] border border-[#B84A28]/20 text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full">
+                    <div className="absolute bottom-2.5 left-2.5 bg-[#FAF7F2]/90 backdrop-blur-xs text-[#B84A28] border border-[#B84A28]/20 text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full z-10">
                       {product.category}
                     </div>
                   </div>

@@ -1,9 +1,11 @@
 'use client';
 
-import React from 'react';
-import { X, CheckCircle, MessageSquare } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, CheckCircle, MessageSquare, Plus, Minus, ShoppingBag, Check } from 'lucide-react';
 import { WHATSAPP_NUMBER } from '@/lib/whatsapp';
-
+import { Product, formatPrice } from '@/lib/products';
+import { useCart } from '@/context/CartContext';
+import StickyMobileAddToCartBar from './StickyMobileAddToCartBar';
 
 export interface ModalContent {
   title: string;
@@ -20,10 +22,67 @@ interface DetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   content: ModalContent | null;
+  product?: Product | null;
 }
 
-export default function DetailModal({ isOpen, onClose, content }: DetailModalProps) {
+export default function DetailModal({
+  isOpen,
+  onClose,
+  content,
+  product,
+}: DetailModalProps) {
+  const { addItem } = useCart();
+  const [qty, setQty] = useState(1);
+  const [isAdded, setIsAdded] = useState(false);
+  const [showStickyBar, setShowStickyBar] = useState(false);
+  const drawerRef = useRef<HTMLDivElement>(null);
+
+  // Reset local state when product changes or modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setQty(1);
+      setIsAdded(false);
+      setShowStickyBar(false);
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen, product]);
+
+  // Handle escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
+  // Scroll listener for sticky add-to-cart bar
+  const handleScroll = () => {
+    if (!drawerRef.current) return;
+    setShowStickyBar(drawerRef.current.scrollTop > 160);
+  };
+
   if (!isOpen || !content) return null;
+
+  const hasPrice = product?.price !== null && product?.price !== undefined;
+
+  const handleAddToCart = (targetProduct: Product, addQty: number) => {
+    if (targetProduct.price === null) return;
+    for (let i = 0; i < addQty; i++) {
+      addItem(targetProduct);
+    }
+    setIsAdded(true);
+    setTimeout(() => setIsAdded(false), 1200);
+  };
 
   const defaultWhatsappMsg = encodeURIComponent(
     `Hello Aranya Dairy Farm, I'd like to learn more about ${content.title}.`
@@ -34,16 +93,18 @@ export default function DetailModal({ isOpen, onClose, content }: DetailModalPro
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden flex justify-end bg-black/40 backdrop-blur-xs transition-opacity duration-300">
-      
       {/* Backdrop Click */}
-      <div className="absolute inset-0" onClick={onClose} />
+      <div className="absolute inset-0 cursor-pointer" onClick={onClose} />
 
       {/* Drawer Container */}
-      <div className="relative w-full max-w-lg bg-[#FAF7F2] h-full shadow-2xl overflow-y-auto flex flex-col justify-between border-l border-[#122E1B]/10 animate-in slide-in-from-right duration-300">
-        
+      <div
+        ref={drawerRef}
+        onScroll={handleScroll}
+        className="relative w-full max-w-lg bg-[#FAF7F2] h-full shadow-2xl overflow-y-auto flex flex-col justify-between border-l border-[#122E1B]/10 animate-in slide-in-from-right duration-300 pb-[calc(56px+env(safe-area-inset-bottom,0px))] md:pb-0"
+      >
         <div>
           {/* Drawer Header */}
-          <div className="sticky top-0 bg-[#FAF7F2]/95 backdrop-blur-md px-6 py-5 border-b border-[#122E1B]/10 flex items-center justify-between z-10">
+          <div className="sticky top-0 bg-[#FAF7F2]/95 backdrop-blur-md px-6 py-4 border-b border-[#122E1B]/10 flex items-center justify-between z-10">
             {content.category && (
               <span className="text-xs font-sans uppercase font-bold tracking-widest text-[#B84A28]">
                 {content.category}
@@ -66,6 +127,12 @@ export default function DetailModal({ isOpen, onClose, content }: DetailModalPro
                 src={content.image}
                 alt={content.title}
                 className="w-full h-full object-contain"
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  if (!target.src.endsWith('/images/placeholder-product.svg')) {
+                    target.src = '/images/placeholder-product.svg';
+                  }
+                }}
               />
             </div>
           )}
@@ -82,6 +149,76 @@ export default function DetailModal({ isOpen, onClose, content }: DetailModalPro
                 </p>
               )}
             </div>
+
+            {/* Product Price & Inline Quick Action (if product view) */}
+            {product && (
+              <div className="p-4 bg-white rounded-xl border border-[#122E1B]/10 space-y-3">
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="text-xs font-sans text-[#8A7B6E]">Price & Packaging:</span>
+                  {hasPrice ? (
+                    <span className="text-xl font-sans font-bold text-[#15321E]">
+                      {formatPrice(product.price!)}
+                    </span>
+                  ) : (
+                    <span className="text-xs font-sans font-semibold text-[#E58A13] uppercase tracking-wider">
+                      Price updating soon
+                    </span>
+                  )}
+                </div>
+
+                {hasPrice && (
+                  <div className="flex items-center gap-3 pt-1">
+                    {/* Stepper */}
+                    <div className="flex items-center border border-[#122E1B]/20 rounded-full overflow-hidden shrink-0 bg-[#FAF7F2]">
+                      <button
+                        type="button"
+                        onClick={() => setQty((prev) => Math.max(1, prev - 1))}
+                        disabled={qty <= 1}
+                        className="w-10 h-10 flex items-center justify-center text-[#15321E] hover:bg-[#E58A13]/15 active:scale-90 disabled:opacity-25 transition-all touch-manipulation cursor-pointer"
+                        aria-label="Decrease quantity"
+                      >
+                        <Minus className="w-3.5 h-3.5" />
+                      </button>
+                      <span className="w-8 text-center text-sm font-semibold text-[#15321E] font-sans select-none">
+                        {qty}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setQty((prev) => prev + 1)}
+                        className="w-10 h-10 flex items-center justify-center text-[#15321E] hover:bg-[#E58A13]/15 active:scale-90 transition-all touch-manipulation cursor-pointer"
+                        aria-label="Increase quantity"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+
+                    {/* Add to cart */}
+                    <button
+                      type="button"
+                      onClick={() => handleAddToCart(product, qty)}
+                      disabled={isAdded}
+                      className={`flex-1 min-h-[42px] rounded-full text-white font-sans text-xs uppercase font-bold tracking-wider px-4 py-2.5 flex items-center justify-center gap-2 shadow-md transition-all active:scale-95 cursor-pointer ${
+                        isAdded
+                          ? 'bg-[#15321E] text-[#FAF7F2]'
+                          : 'bg-[#E58A13] hover:bg-[#CA7508] shadow-[#E58A13]/25'
+                      }`}
+                    >
+                      {isAdded ? (
+                        <>
+                          <Check className="w-4 h-4 text-[#8FA382]" />
+                          <span>Added to Cart! ✓</span>
+                        </>
+                      ) : (
+                        <>
+                          <ShoppingBag className="w-4 h-4" />
+                          <span>Add to Cart</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Paragraphs */}
             <div className="space-y-4 text-sm text-[#5F6E62] leading-relaxed font-sans">
@@ -115,7 +252,7 @@ export default function DetailModal({ isOpen, onClose, content }: DetailModalPro
             href={`https://wa.me/${WHATSAPP_NUMBER}?text=${finalWhatsappMsg}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full min-h-[48px] bg-[#E58A13] hover:bg-[#CA7508] active:scale-[0.98] text-white font-sans text-xs uppercase font-bold tracking-wider py-4 px-6 rounded-full flex items-center justify-center gap-2 transition-all shadow-md shadow-[#E58A13]/20"
+            className="w-full min-h-[48px] bg-[#E58A13] hover:bg-[#CA7508] active:scale-[0.98] text-white font-sans text-xs uppercase font-bold tracking-wider py-3.5 px-6 rounded-full flex items-center justify-center gap-2 transition-all shadow-md shadow-[#E58A13]/20"
           >
             <MessageSquare className="w-4 h-4 text-white" />
             <span>{content.ctaLabel || 'Inquire on WhatsApp'}</span>
@@ -127,8 +264,16 @@ export default function DetailModal({ isOpen, onClose, content }: DetailModalPro
             Back to Nature View
           </button>
         </div>
-
       </div>
+
+      {/* Sticky Mobile Add to Cart Bar (Visible when user scrolls down in product detail) */}
+      {product && (
+        <StickyMobileAddToCartBar
+          product={product}
+          isVisible={showStickyBar}
+          onAddToCart={(p, q) => handleAddToCart(p, q)}
+        />
+      )}
     </div>
   );
 }
