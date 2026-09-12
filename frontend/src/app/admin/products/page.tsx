@@ -707,6 +707,9 @@ export default function AdminProductsPage() {
                   <p className="text-[11px] text-[#8A7B6E] mt-1.5">
                     or drag & drop file here &bull; JPG, PNG, WebP up to 4MB
                   </p>
+                  <p className="text-[11px] text-[#1B4D2E] font-medium mt-1">
+                    Best fit: 1:1 square photo (e.g. 800×800 px or 1000×1000 px) with product centered.
+                  </p>
                 </div>
 
                 {/* Validation Error */}
