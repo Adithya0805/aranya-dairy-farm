@@ -9,6 +9,7 @@ import { useCart } from '@/context/CartContext';
 import Toast from '@/components/Toast';
 import { WA_CATALOG_INQUIRY, WHATSAPP_NUMBER } from '@/lib/whatsapp';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
+import { getRecentOrderCountAction } from '@/app/actions/orderStats';
 
 interface ProductsSectionProps {
   onSelectProduct?: (product: Product) => void;
@@ -64,12 +65,19 @@ export default function ProductsSection({
   const [bouncingId, setBouncingId] = useState<string | null>(null);
   const bounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Real order activity state (aggregated count from last 7 days)
+  const [weeklyOrderCount, setWeeklyOrderCount] = useState<number | null>(null);
+
   // Load live catalog and categories from Supabase on mount
   useEffect(() => {
     let isMounted = true;
     async function loadCatalog() {
       try {
-        const [cats, prods] = await Promise.all([getCategories(), getProducts()]);
+        const [cats, prods, orderStats] = await Promise.all([
+          getCategories(),
+          getProducts(),
+          getRecentOrderCountAction(),
+        ]);
         if (isMounted) {
           if (cats && cats.length > 0) setCategories(cats);
           if (prods && prods.length > 0) {
@@ -82,6 +90,9 @@ export default function ProductsSection({
               });
               return updated;
             });
+          }
+          if (orderStats && orderStats.success) {
+            setWeeklyOrderCount(orderStats.count);
           }
           setIsLoading(false);
         }
@@ -213,9 +224,18 @@ export default function ProductsSection({
               <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#15321E]">
                 All Farm Offerings
               </h3>
-              <p className="text-xs sm:text-sm text-[#5F6E62]">
-                Showing {displayedProducts.length} verified farm items
-              </p>
+              <div className="flex flex-wrap items-center gap-2.5 mt-1">
+                <p className="text-xs sm:text-sm text-[#5F6E62]">
+                  Showing {displayedProducts.length} verified farm items
+                </p>
+                {/* Genuine order activity count — ONLY rendered if real weekly count >= 5 */}
+                {weeklyOrderCount !== null && weeklyOrderCount >= 5 && (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#122E1B]/5 text-[#15321E] border border-[#122E1B]/10 text-xs font-sans font-medium">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#E58A13] animate-pulse" />
+                    <span>{weeklyOrderCount} orders this week</span>
+                  </span>
+                )}
+              </div>
             </div>
             <a
               href={WA_CATALOG_INQUIRY}

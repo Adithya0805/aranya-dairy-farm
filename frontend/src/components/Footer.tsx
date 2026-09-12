@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { MapPin, Phone, Mail, Clock } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, ShieldCheck, ExternalLink } from 'lucide-react';
 import { WHATSAPP_TEL, WHATSAPP_DISPLAY } from '@/lib/whatsapp';
 
 interface FooterProps {
@@ -102,6 +102,18 @@ export default function Footer({ onOpenStory, onOpenContact }: FooterProps) {
               <div className="flex items-center gap-2.5 text-xs text-[#A8B7AA]">
                 <Clock className="w-3.5 h-3.5 text-[#E58A13] shrink-0" />
                 <span>Morning Delivery: 5:30 AM – 7:30 AM</span>
+              </div>
+              <div className="pt-2.5 border-t border-white/10 flex items-center gap-2 text-xs">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#E58A13] shrink-0" />
+                <a
+                  href="https://www.justdial.com/Hosur/Aranya-Organic-Dairy-Farm-Shoolagiri/9999P4344-4344-200625222032-D9B4_BZDET"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-[#E58A13] hover:underline underline-offset-4 flex items-center gap-1 text-[#D1DDD3] transition-colors"
+                >
+                  <span>Verified Business · Justdial (3.6★)</span>
+                  <ExternalLink className="w-3 h-3 text-[#A8B7AA]" />
+                </a>
               </div>
             </div>
           </div>

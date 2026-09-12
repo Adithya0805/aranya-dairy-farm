@@ -1,69 +1,96 @@
 'use client';
 
 import React from 'react';
-import { ArrowRight } from 'lucide-react';
+import { Star, ExternalLink, ShieldCheck } from 'lucide-react';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
+
+const JUSTDIAL_URL =
+  'https://www.justdial.com/Hosur/Aranya-Organic-Dairy-Farm-Shoolagiri/9999P4344-4344-200625222032-D9B4_BZDET';
 
 export default function TestimonialsSection() {
   const sectionRef = useScrollReveal<HTMLElement>();
-
-  const SPOTLIGHT_QUOTES = [
-    {
-      name: 'Ramesh Sundaram',
-      location: 'Hosur Town',
-      quote: 'Switched to Aranya A2 milk 8 months ago for my children. The thick cream layer and sweet natural aroma remind me of village dairy.',
-    },
-    {
-      name: 'Priya Krishnan',
-      location: 'Shoolagiri',
-      quote: 'Their Bilona Cow Ghee is unmatched! You can see the golden granular texture. Knowing the cows are raised ethically right here in Shoolagiri gives total peace of mind.',
-    },
-  ];
 
   return (
     <section
       id="reviews"
       ref={sectionRef}
-      className="reveal-section py-20 sm:py-28 bg-[#FCFAF7] border-b border-[#122E1B]/10 w-full overflow-hidden"
+      className="reveal-section py-16 sm:py-24 bg-[#FCFAF7] border-b border-[#122E1B]/10 w-full overflow-hidden"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         
         {/* Editorial Section Header */}
-        <div className="max-w-2xl space-y-3">
-          <span className="text-xs font-sans uppercase font-bold tracking-widest text-[#B84A28]">
-            Verified Local Feedback
-          </span>
-          <h2 className="text-3xl sm:text-5xl font-serif font-bold text-[#15321E]">
-            Trusted by families across Hosur &amp; Shoolagiri.
-          </h2>
-        </div>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="max-w-2xl space-y-3">
+            <span className="text-xs font-sans uppercase font-bold tracking-widest text-[#B84A28]">
+              Verified Feedback • Justdial Listed
+            </span>
+            <h2 className="text-3xl sm:text-5xl font-serif font-bold text-[#15321E]">
+              Trusted by families across Hosur &amp; Shoolagiri.
+            </h2>
+            <p className="text-xs sm:text-sm text-[#5F6E62] font-sans leading-relaxed">
+              We stand by transparent, unadulterated farm ethics. Explore real customer feedback and ratings on Justdial.
+            </p>
+          </div>
 
-        {/* Full-Width Alternating Spotlight Quote Blocks */}
-        <div className="grid lg:grid-cols-2 gap-8 sm:gap-16">
-          {SPOTLIGHT_QUOTES.map((item, idx) => (
-            <div
-              key={idx}
-              className="space-y-6 bg-white p-6 sm:p-10 rounded-3xl border border-[#122E1B]/10 hover:border-[#E58A13]/35 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 animate-card-reveal"
-              style={{ animationDelay: `${idx * 80}ms` }}
-            >
-              <div className="text-4xl text-[#E58A13] font-serif font-bold">
-                &ldquo;
-              </div>
-              <p className="text-base sm:text-lg font-serif text-[#15321E] leading-relaxed italic">
-                {item.quote}
-              </p>
-              <div className="pt-4 border-t border-[#122E1B]/10 flex items-center justify-between">
-                <div>
-                  <div className="font-sans font-bold text-sm text-[#122E1B]">{item.name}</div>
-                  <div className="text-xs text-[#5F6E62]">{item.location}</div>
+          {/* Justdial Verified Rating Card */}
+          <div className="bg-white p-5 rounded-2xl border border-[#122E1B]/15 shadow-sm space-y-3 shrink-0 max-w-sm">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <div className="px-2.5 py-1 rounded-md bg-[#122E1B] text-white font-sans font-bold text-sm flex items-center gap-1">
+                  <span>3.6</span>
+                  <Star className="w-3.5 h-3.5 fill-[#E58A13] text-[#E58A13]" />
                 </div>
-                <a href="#contact" className="link-editorial min-h-[44px] inline-flex items-center touch-manipulation">
-                  <span>Contact Farm</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-[#E58A13]" />
-                </a>
+                <div className="text-xs font-sans font-bold text-[#15321E]">
+                  15 Reviews
+                </div>
+              </div>
+              <div className="flex items-center gap-1 text-[11px] font-sans text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60 font-medium">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
+                <span>Verified Business</span>
               </div>
             </div>
-          ))}
+
+            <p className="text-xs text-[#5F6E62] font-sans leading-snug">
+              Aranya Organic Dairy Farm, Shoolagiri listed on Justdial since June 2020.
+            </p>
+
+            <a
+              href={JUSTDIAL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-1.5 w-full text-center bg-[#FAF7F2] hover:bg-[#E58A13] hover:text-white border border-[#122E1B]/15 hover:border-[#E58A13] text-[#15321E] font-sans text-xs font-bold uppercase tracking-wider py-2.5 px-4 rounded-full transition-all active:scale-[0.98] shadow-2xs"
+            >
+              <span>Read Reviews on Justdial</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
+        </div>
+
+        {/* 2 Core Verifiable Standards Spotlights */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+          <div className="space-y-4 bg-white p-6 sm:p-8 rounded-2xl border border-[#122E1B]/10">
+            <div className="w-10 h-10 rounded-full bg-[#E58A13]/10 flex items-center justify-center text-[#E58A13] font-serif font-bold text-lg">
+              A2
+            </div>
+            <h3 className="text-lg sm:text-xl font-serif font-bold text-[#15321E]">
+              Pure Raw Milk Delivery Since 2017
+            </h3>
+            <p className="text-xs sm:text-sm text-[#5F6E62] font-sans leading-relaxed">
+              Customers across Shoolagiri and Hosur depend on our uninterrupted morning doorstep delivery of unpasteurized, grass-fed A2 cow milk in eco glass bottles chilled to 4°C.
+            </p>
+          </div>
+
+          <div className="space-y-4 bg-white p-6 sm:p-8 rounded-2xl border border-[#122E1B]/10">
+            <div className="w-10 h-10 rounded-full bg-[#E58A13]/10 flex items-center justify-center text-[#E58A13] font-serif font-bold text-lg">
+              ★
+            </div>
+            <h3 className="text-lg sm:text-xl font-serif font-bold text-[#15321E]">
+              Vedic Bilona Curd-Churned Ghee
+            </h3>
+            <p className="text-xs sm:text-sm text-[#5F6E62] font-sans leading-relaxed">
+              Handcrafted in small batches from whole curd cream. Highly valued by local patrons for its rich golden granular texture, traditional nutty aroma, and strict absence of adulterants.
+            </p>
+          </div>
         </div>
 
       </div>
