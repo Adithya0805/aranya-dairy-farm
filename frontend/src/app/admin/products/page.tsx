@@ -11,9 +11,13 @@ import {
   EyeOff,
   RefreshCw,
   ExternalLink,
+  Upload,
+  Image as ImageIcon,
+  Trash2,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { getAdminProductsAction, updateProductAction } from '@/app/admin/actions';
+import { getAdminProductsAction, updateProductAction, updateProductWithImageAction } from '@/app/admin/actions';
+import { resolveProductImageUrl } from '@/lib/catalog';
 
 interface AdminProduct {
   id: string;
@@ -42,6 +46,10 @@ export default function AdminProductsPage() {
   const [editingProduct, setEditingProduct] = useState<AdminProduct | null>(null);
   const [editPrice, setEditPrice] = useState<string>('');
   const [editAvailable, setEditAvailable] = useState<boolean>(true);
+  const [newImageFile, setNewImageFile] = useState<File | null>(null);
+  const [newImagePreview, setNewImagePreview] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const [saving, setSaving] = useState(false);
 
   // User feedback toast/alert
@@ -84,21 +92,92 @@ export default function AdminProductsPage() {
     fetchProducts();
   }, [fetchProducts]);
 
+  // Close Edit Form and clean up object URLs
+  const handleCloseModal = () => {
+    if (newImagePreview) {
+      URL.revokeObjectURL(newImagePreview);
+    }
+    setEditingProduct(null);
+    setNewImageFile(null);
+    setNewImagePreview(null);
+    setImageError(null);
+    setIsDragging(false);
+  };
+
   // Open Edit Form
   const handleOpenEdit = (product: AdminProduct) => {
+    if (newImagePreview) {
+      URL.revokeObjectURL(newImagePreview);
+    }
     setEditingProduct(product);
     setEditPrice(product.price !== null && product.price !== undefined ? String(product.price) : '');
     setEditAvailable(Boolean(product.available));
+    setNewImageFile(null);
+    setNewImagePreview(null);
+    setImageError(null);
+    setIsDragging(false);
     setFeedback(null);
   };
 
-  // Save changes via Server Action
+  // Validate and stage newly selected image file
+  const handleFileValidationAndSelect = (file: File) => {
+    setImageError(null);
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type.toLowerCase())) {
+      setImageError('Unsupported format. Please select a JPG, PNG, or WebP image.');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setImageError('Image file exceeds the 5MB limit. Please choose a smaller image.');
+      return;
+    }
+    if (newImagePreview) {
+      URL.revokeObjectURL(newImagePreview);
+    }
+    setNewImageFile(file);
+    setNewImagePreview(URL.createObjectURL(file));
+  };
+
+  // Revert newly selected file back to existing photo
+  const handleClearNewImage = () => {
+    if (newImagePreview) {
+      URL.revokeObjectURL(newImagePreview);
+    }
+    setNewImageFile(null);
+    setNewImagePreview(null);
+    setImageError(null);
+  };
+
+  // Drag and drop handlers
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFileValidationAndSelect(e.dataTransfer.files[0]);
+    }
+  };
+
+  // Save changes via Server Action (supporting both price/stock and image uploads)
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingProduct) return;
 
     setSaving(true);
     setFeedback(null);
+    setImageError(null);
 
     const parsedPrice = editPrice.trim() === '' ? null : Number(editPrice);
     if (parsedPrice !== null && (isNaN(parsedPrice) || parsedPrice < 0)) {
@@ -111,31 +190,39 @@ export default function AdminProductsPage() {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
 
-      const res = await updateProductAction(
-        {
-          id: editingProduct.id,
-          price: parsedPrice,
-          available: editAvailable,
-        },
-        token
-      );
+      const formData = new FormData();
+      formData.append('id', editingProduct.id);
+      formData.append('price', editPrice);
+      formData.append('available', String(editAvailable));
+      formData.append('categoryName', editingProduct.categories?.name || 'General Store');
+      if (token) formData.append('token', token);
+      if (newImageFile) formData.append('image', newImageFile);
+
+      const res = await updateProductWithImageAction(formData);
 
       if (res.success) {
         setFeedback({
           type: 'success',
-          message: `Successfully updated "${editingProduct.name}"!`,
+          message: res.imageUrl
+            ? `Successfully updated "${editingProduct.name}" and uploaded new photo!`
+            : `Successfully updated "${editingProduct.name}"!`,
         });
 
         // Update local state immediately
         setProducts((prev) =>
           prev.map((p) =>
             p.id === editingProduct.id
-              ? { ...p, price: parsedPrice, available: editAvailable }
+              ? {
+                  ...p,
+                  price: parsedPrice,
+                  available: editAvailable,
+                  image_url: res.imageUrl || p.image_url,
+                }
               : p
           )
         );
 
-        setEditingProduct(null);
+        handleCloseModal();
       } else {
         setFeedback({
           type: 'error',
@@ -369,16 +456,34 @@ export default function AdminProductsPage() {
                       key={p.id}
                       className="hover:bg-[#FAF8F5] transition-colors group"
                     >
-                      {/* Name & Tamil */}
+                      {/* Name & Thumbnail */}
                       <td className="py-3.5 px-4 sm:px-6">
-                        <div className="font-serif font-bold text-[#1C241E]">
-                          {p.name}
-                        </div>
-                        {p.name_tamil && (
-                          <div className="text-xs text-[#1B4D2E] font-medium font-sans">
-                            {p.name_tamil}
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-md bg-[#F4EFEA] border border-[#1B4D2E]/10 overflow-hidden shrink-0 flex items-center justify-center">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={resolveProductImageUrl(p.image_url)}
+                              alt={p.name}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                const target = e.currentTarget;
+                                if (!target.src.endsWith('/images/placeholder-product.svg')) {
+                                  target.src = '/images/placeholder-product.svg';
+                                }
+                              }}
+                            />
                           </div>
-                        )}
+                          <div>
+                            <div className="font-serif font-bold text-[#1C241E]">
+                              {p.name}
+                            </div>
+                            {p.name_tamil && (
+                              <div className="text-xs text-[#1B4D2E] font-medium font-sans">
+                                {p.name_tamil}
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </td>
 
                       {/* Category */}
@@ -459,19 +564,20 @@ export default function AdminProductsPage() {
       {/* Edit Product Modal */}
       {editingProduct && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px] flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl border border-[#1B4D2E]/15 max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-lg shadow-xl border border-[#1B4D2E]/15 max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-[#1B4D2E]/10 flex items-center justify-between bg-[#FCFAF7]">
+            <div className="px-6 py-4 border-b border-[#1B4D2E]/10 flex items-center justify-between bg-[#FCFAF7] shrink-0">
               <div>
                 <h3 className="font-serif font-bold text-lg text-[#1C241E]">
                   Edit Product
                 </h3>
                 <p className="text-xs text-[#57655B] font-sans">
-                  {editingProduct.name} ({editingProduct.name_tamil})
+                  {editingProduct.name} {editingProduct.name_tamil ? `(${editingProduct.name_tamil})` : ''}
                 </p>
               </div>
               <button
-                onClick={() => setEditingProduct(null)}
+                type="button"
+                onClick={handleCloseModal}
                 className="w-8 h-8 rounded-full flex items-center justify-center text-[#57655B] hover:bg-[#1B4D2E]/10 transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
@@ -479,7 +585,7 @@ export default function AdminProductsPage() {
             </div>
 
             {/* Modal Form */}
-            <form onSubmit={handleSaveProduct} className="p-6 space-y-5">
+            <form onSubmit={handleSaveProduct} className="p-6 space-y-5 overflow-y-auto flex-1">
               {/* Product Info Summary */}
               <div className="p-3 bg-[#F4EFEA] rounded text-xs space-y-1 text-[#57655B]">
                 <p>
@@ -490,6 +596,107 @@ export default function AdminProductsPage() {
                   <span className="font-semibold text-[#1C241E]">Unit Size:</span>{' '}
                   {editingProduct.unit || 'Standard'}
                 </p>
+              </div>
+
+              {/* Product Photo Upload Section */}
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#1C241E] mb-2">
+                  Product Photo
+                </label>
+
+                {/* Current / New Image Preview Container */}
+                <div className="flex items-center gap-3.5 p-3.5 bg-[#FCFAF7] border border-[#1B4D2E]/15 rounded-md mb-2.5">
+                  <div className="w-16 h-16 rounded-md overflow-hidden bg-[#F4EFEA] border border-[#1B4D2E]/15 shrink-0 relative flex items-center justify-center shadow-2xs">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={newImagePreview || resolveProductImageUrl(editingProduct.image_url)}
+                      alt={editingProduct.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        if (!target.src.endsWith('/images/placeholder-product.svg')) {
+                          target.src = '/images/placeholder-product.svg';
+                        }
+                      }}
+                    />
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    {newImagePreview ? (
+                      <div>
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-[#1B4D2E]">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[#1B4D2E] shrink-0" />
+                          <span>New Photo Selected</span>
+                        </div>
+                        <p className="text-[11px] text-[#57655B] truncate mt-0.5 font-mono">
+                          {newImageFile?.name} ({(newImageFile ? (newImageFile.size / 1024).toFixed(1) : 0)} KB)
+                        </p>
+                        <button
+                          type="button"
+                          onClick={handleClearNewImage}
+                          className="inline-flex items-center gap-1 mt-1 text-[11px] font-semibold text-[#B84A28] hover:underline cursor-pointer"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                          <span>Revert / Keep existing</span>
+                        </button>
+                      </div>
+                    ) : (
+                      <div>
+                        <div className="text-xs font-semibold text-[#1C241E] flex items-center gap-1.5">
+                          <ImageIcon className="w-3.5 h-3.5 text-[#8A7B6E]" />
+                          <span>{editingProduct.image_url ? 'Current Product Photo' : 'No photo uploaded'}</span>
+                        </div>
+                        <p className="text-[11px] text-[#8A7B6E] mt-0.5 leading-snug">
+                          {editingProduct.image_url
+                            ? 'Custom photo currently displayed on customer storefront.'
+                            : 'Default placeholder image is currently shown.'}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Dropzone & File Input */}
+                <div
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  className={`border-2 border-dashed rounded-md p-3.5 text-center transition-colors ${
+                    isDragging
+                      ? 'border-[#1B4D2E] bg-[#E8F5EE]/40'
+                      : 'border-[#1B4D2E]/20 hover:border-[#1B4D2E]/40 bg-[#FAF8F5]'
+                  }`}
+                >
+                  <input
+                    type="file"
+                    id="admin-product-image-file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        handleFileValidationAndSelect(e.target.files[0]);
+                      }
+                    }}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="admin-product-image-file"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded bg-white border border-[#1B4D2E]/20 text-xs font-bold text-[#1B4D2E] hover:bg-[#F2ECE7] cursor-pointer shadow-2xs transition-colors"
+                  >
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>{newImageFile ? 'Change Photo Selection' : 'Select Photo from Device'}</span>
+                  </label>
+                  <p className="text-[11px] text-[#8A7B6E] mt-1.5">
+                    or drag & drop file here &bull; JPG, PNG, WebP up to 5MB
+                  </p>
+                </div>
+
+                {/* Validation Error */}
+                {imageError && (
+                  <p className="text-[11px] text-[#B84A28] font-semibold mt-1.5 flex items-center gap-1">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{imageError}</span>
+                  </p>
+                )}
               </div>
 
               {/* Price Input */}
@@ -545,8 +752,9 @@ export default function AdminProductsPage() {
               <div className="pt-3 border-t border-[#1B4D2E]/10 flex items-center justify-end gap-3">
                 <button
                   type="button"
-                  onClick={() => setEditingProduct(null)}
-                  className="px-4 py-2 rounded text-xs font-bold uppercase tracking-wider text-[#57655B] hover:bg-[#F2ECE7] transition-colors cursor-pointer"
+                  onClick={handleCloseModal}
+                  disabled={saving}
+                  className="px-4 py-2 rounded text-xs font-bold uppercase tracking-wider text-[#57655B] hover:bg-[#F2ECE7] transition-colors disabled:opacity-50 cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -556,7 +764,7 @@ export default function AdminProductsPage() {
                   disabled={saving}
                   className="px-5 py-2.5 rounded bg-[#1B4D2E] hover:bg-[#143B23] text-white text-xs font-bold uppercase tracking-wider shadow-sm transition-all disabled:opacity-50 cursor-pointer"
                 >
-                  {saving ? 'Saving...' : 'Save Changes'}
+                  {saving ? (newImageFile ? 'Uploading photo & saving...' : 'Saving changes...') : 'Save Changes'}
                 </button>
               </div>
             </form>
