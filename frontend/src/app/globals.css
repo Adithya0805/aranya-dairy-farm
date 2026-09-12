@@ -46,10 +46,12 @@ body {
 }
 
 /* ─── Editorial Typography ─────────────────────────────────────────────────── */
-h1, h2, h3, h4 {
-  font-family: Georgia, Cambria, serif;
-  letter-spacing: -0.02em;
-  color: var(--color-text-main);
+@layer base {
+  h1, h2, h3, h4 {
+    font-family: Georgia, Cambria, serif;
+    letter-spacing: -0.02em;
+    color: var(--color-text-main);
+  }
 }
 
 p, span, button, input, select, textarea, a {

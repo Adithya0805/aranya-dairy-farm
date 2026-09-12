@@ -112,13 +112,13 @@ export default function AboutSection({ onOpenColdChain, onOpenStory }: AboutSect
             </div>
 
             <div className="pt-2">
-              <button
-                onClick={handleStoryClick}
+              <a
+                href="/story"
                 className="group text-sm font-sans font-bold text-[#15321E] hover:text-[#E58A13] underline underline-offset-8 inline-flex items-center gap-2 transition-all duration-150 cursor-pointer min-h-[44px] touch-manipulation active:scale-95"
               >
                 <span>Read our full 9-year story</span>
                 <ArrowRight className="w-4 h-4 text-[#E58A13] group-hover:translate-x-1.5 transition-transform duration-200" />
-              </button>
+              </a>
             </div>
           </div>
 

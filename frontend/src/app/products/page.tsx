@@ -1,14 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
-import Hero from '@/components/Hero';
+import ProductsSection from '@/components/ProductsSection';
 import TrustBadgesSection from '@/components/TrustBadgesSection';
-import FeaturedCategoriesSection from '@/components/FeaturedCategoriesSection';
-import FeaturedProductsPreview from '@/components/FeaturedProductsPreview';
-import AboutSection from '@/components/AboutSection';
-import TestimonialsSection from '@/components/TestimonialsSection';
-import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
 import WhatsAppCTA from '@/components/WhatsAppCTA';
 import DetailModal, { ModalContent } from '@/components/DetailModal';
@@ -16,37 +12,35 @@ import QuickViewModal from '@/components/QuickViewModal';
 import CartDrawer from '@/components/CartDrawer';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import { Product, getProductPriceLabel } from '@/lib/products';
-import { getProducts } from '@/lib/catalog';
+import { ArrowLeft, Sparkles } from 'lucide-react';
 
-export default function Home() {
-  // ── Detail Drawer (Our Story, Cold-Chain, Product details) ─────────────────
+function ProductsContent() {
+  const searchParams = useSearchParams();
+  const initialCategory = searchParams.get('category') || 'All';
+
+  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
+  const [liveProducts, setLiveProducts] = useState<Product[]>([]);
+
+  // Update selected category when query parameter changes
+  useEffect(() => {
+    const cat = searchParams.get('category');
+    if (cat) {
+      setSelectedCategory(cat);
+    }
+  }, [searchParams]);
+
+  // Modals & Cart State
   const [modalOpen, setModalOpen] = useState(false);
   const [activeModalContent, setActiveModalContent] = useState<ModalContent | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-
-  // ── Quick View Modal State ──────────────────────────────────────────────────
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
-
-  // ── Shopping Cart Drawer ────────────────────────────────────────────────────
   const [cartOpen, setCartOpen] = useState(false);
-
-  // ── Live Products for Featured Showcase ─────────────────────────────────────
-  const [liveProducts, setLiveProducts] = useState<Product[]>([]);
-
-  useEffect(() => {
-    getProducts().then((prods) => {
-      if (prods && prods.length > 0) {
-        setLiveProducts(prods);
-      }
-    });
-  }, []);
 
   const openModal = (content: ModalContent) => {
     setActiveModalContent(content);
     setModalOpen(true);
   };
 
-  /** Map a Product to a ModalContent for the detail drawer */
   const handleSelectProduct = (product: Product) => {
     setSelectedProduct(product);
     const priceDisplay = getProductPriceLabel(product);
@@ -121,43 +115,63 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#FDFBF7] font-sans antialiased text-[#3E4B41] flex flex-col selection:bg-[#E58A13] selection:text-white pb-16 md:pb-0">
-
-      {/* 1. Dark Header Bar with Brand Wordmark, Nav, & Cart */}
+      {/* Header Bar */}
       <Header
         onOpenCart={() => setCartOpen(true)}
         onOpenStory={handleOpenStory}
         onOpenContact={handleOpenContact}
+        onSelectCategory={(cat) => setSelectedCategory(cat)}
       />
 
-      {/* 2. Hero Section with Full-Bleed Nature Photography & Amber Pill CTA */}
-      <Hero />
+      {/* Subpage Breadcrumb & Hero Banner */}
+      <div className="bg-[#122E1B] text-[#FAF7F2] py-10 sm:py-14 border-b border-[#E58A13]/25 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-[#122E1B]/80 to-black/50 z-0" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-4">
+          
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-2 text-xs font-sans text-[#A8B7AA]">
+            <a href="/" className="hover:text-[#E58A13] flex items-center gap-1 transition-colors">
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Home</span>
+            </a>
+            <span>/</span>
+            <span className="text-[#FAF7F2] font-semibold">All Products</span>
+            {selectedCategory !== 'All' && (
+              <>
+                <span>/</span>
+                <span className="text-[#E58A13] font-semibold">{selectedCategory}</span>
+              </>
+            )}
+          </nav>
 
-      {/* 3. Trust Badge Row (9 Years Trusted, 100% Organic, Fresh Daily) */}
+          <div className="space-y-2">
+            <span className="inline-flex items-center gap-1.5 text-xs font-sans uppercase font-bold tracking-widest text-[#E58A13]">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Farm Provisions Showcase • மளிகைப் பட்டியல்</span>
+            </span>
+            <h1 className="text-3xl sm:text-5xl font-serif font-bold text-white tracking-tight">
+              All Farm Products
+            </h1>
+            <p className="text-xs sm:text-sm text-[#D1DDD3] font-sans max-w-2xl leading-relaxed">
+              Browse our complete harvest of unadulterated A2 dairy, Vedic Bilona ghee, indigenous millets, and unpolished pulses from Shoolagiri.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Trust Badges Row */}
       <TrustBadgesSection />
 
-      {/* 4. Featured Categories Showcase (Dairy, Rice & Millets, Pulses & Lentils) */}
-      <FeaturedCategoriesSection />
-
-      {/* 5. Featured Products Preview with Pill Add to Cart */}
-      <FeaturedProductsPreview
-        products={liveProducts}
+      {/* Complete Product Catalog Grid */}
+      <ProductsSection
+        selectedCategory={selectedCategory}
+        onCategoryChange={setSelectedCategory}
         onSelectProduct={handleSelectProduct}
         onQuickView={(p) => setQuickViewProduct(p)}
+        onProductsLoaded={setLiveProducts}
       />
 
-      {/* 6. Split About/Story Section with 3-Feature Row */}
-      <AboutSection
-        onOpenColdChain={openModal}
-        onOpenStory={handleOpenStory}
-      />
-
-      {/* 7. Customer Testimonials */}
-      <TestimonialsSection />
-
-      {/* 10. Contact & Visit Inquiry Form */}
-      <ContactSection />
-
-      {/* 11. Redesigned 3-Column Dark Footer */}
+      {/* Footer */}
       <Footer onOpenStory={handleOpenStory} onOpenContact={handleOpenContact} />
 
       {/* Floating WhatsApp CTA */}
@@ -167,6 +181,7 @@ export default function Home() {
       <MobileBottomNav
         onOpenCart={() => setCartOpen(true)}
         onOpenContact={handleOpenContact}
+        onSelectCategory={(cat) => setSelectedCategory(cat)}
       />
 
       {/* Detail / Story drawer */}
@@ -180,7 +195,7 @@ export default function Home() {
         product={selectedProduct}
       />
 
-      {/* Fast Quick-View modal */}
+      {/* Quick-View Modal */}
       <QuickViewModal
         isOpen={Boolean(quickViewProduct)}
         product={quickViewProduct}
@@ -189,7 +204,22 @@ export default function Home() {
 
       {/* Shopping cart slide-in drawer */}
       <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
-
     </main>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center">
+          <div className="text-sm font-sans font-semibold text-[#15321E]">
+            Loading Products Showcase...
+          </div>
+        </div>
+      }
+    >
+      <ProductsContent />
+    </Suspense>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Star, ExternalLink } from 'lucide-react';
+import { Star, ExternalLink, ArrowRight } from 'lucide-react';
 
 interface HeroProps {
   onShopClick?: () => void;
@@ -21,7 +21,7 @@ export default function Hero({ onShopClick }: HeroProps) {
       />
 
       {/* Overlay gradient — rich dark green vignette ensuring pristine text contrast */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/55 to-black/25 sm:from-[#122E1B]/85 sm:via-[#122E1B]/60 sm:to-black/30" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/65 to-black/30 sm:from-[#122E1B]/90 sm:via-[#122E1B]/70 sm:to-black/35" />
 
       {/* Content — animate-fade-in plays on load */}
       <div className="max-w-7xl mx-auto px-5 sm:px-10 lg:px-16 relative z-10 w-full py-16 sm:py-24">
@@ -32,9 +32,13 @@ export default function Hero({ onShopClick }: HeroProps) {
             <span className="inline-block text-xs uppercase font-sans tracking-[0.25em] text-[#E58A13] font-bold">
               Shoolagiri, Tamil Nadu • Estd. 2017
             </span>
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-serif text-[#FAF7F2] leading-[1.1] tracking-tight drop-shadow-md">
-              Aranya Organic <br />
-              <span className="italic font-light text-[#FAF7F2]">Dairy Farm</span>
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-serif text-white leading-[1.1] tracking-tight">
+              <span className="block text-white font-serif font-bold drop-shadow-[0_2px_14px_rgba(0,0,0,0.9)]">
+                Aranya Organic
+              </span>
+              <span className="block italic font-light text-[#FAF7F2] drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
+                Dairy Farm
+              </span>
             </h1>
           </div>
 
@@ -44,19 +48,19 @@ export default function Hero({ onShopClick }: HeroProps) {
           </p>
 
           {/* Amber pill CTA button & Justdial rating badge */}
-          <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center gap-3.5 sm:gap-4">
+          <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <a
-              href="#shop"
-              onClick={onShopClick}
+              href="/products"
               className="
-                inline-flex items-center justify-center text-center
+                inline-flex items-center justify-center gap-2 text-center
                 bg-[#E58A13] hover:bg-[#CA7508] active:scale-95
-                text-white font-sans text-xs uppercase font-bold tracking-widest
-                px-8 py-3.5 min-h-[48px] rounded-full
-                shadow-xl shadow-[#E58A13]/25 transition-all duration-200 touch-manipulation cursor-pointer
+                text-white font-sans text-xs sm:text-sm uppercase font-bold tracking-widest
+                px-8 sm:px-9 py-4 min-h-[52px] rounded-full
+                shadow-2xl shadow-[#E58A13]/35 transition-all duration-200 touch-manipulation cursor-pointer group
               "
             >
-              Shop Our Products
+              <span>Explore All Farm Products</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </a>
 
             {/* Above-the-fold Justdial Social Proof Pill */}

@@ -49,30 +49,30 @@ export default function Footer({ onOpenStory, onOpenContact }: FooterProps) {
             </h4>
             <ul className="space-y-2.5 text-xs sm:text-sm text-[#D1DDD3]">
               <li>
-                <a href="#shop" className="hover:text-[#E58A13] hover:underline underline-offset-4 transition-colors">
+                <a href="/products" className="hover:text-[#E58A13] hover:underline underline-offset-4 transition-colors">
                   Shop All Provisions
                 </a>
               </li>
               <li>
-                <a href="#categories" className="hover:text-[#E58A13] hover:underline underline-offset-4 transition-colors">
+                <a href="/products" className="hover:text-[#E58A13] hover:underline underline-offset-4 transition-colors">
                   Featured Categories
                 </a>
               </li>
               <li>
-                <button
-                  onClick={onOpenStory}
+                <a
+                  href="/story"
                   className="hover:text-[#E58A13] hover:underline underline-offset-4 transition-colors text-left cursor-pointer"
                 >
                   Our 9-Year Heritage Story
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  onClick={onOpenContact}
+                <a
+                  href="/contact"
                   className="hover:text-[#E58A13] hover:underline underline-offset-4 transition-colors text-left cursor-pointer"
                 >
                   Location &amp; Farm Visit
-                </button>
+                </a>
               </li>
             </ul>
           </div>

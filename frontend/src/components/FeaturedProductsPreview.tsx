@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ShoppingBag, Bell, Plus, Minus, Sparkles, Check, Eye } from 'lucide-react';
+import { ShoppingBag, Bell, Plus, Minus, Sparkles, Check, Eye, ArrowRight } from 'lucide-react';
 import { Product, formatPrice } from '@/lib/products';
 import { useCart } from '@/context/CartContext';
 import { WHATSAPP_NUMBER } from '@/lib/whatsapp';
@@ -99,11 +99,6 @@ export default function FeaturedProductsPreview({
       `Hello Aranya Dairy Farm, please notify me when pricing for ${product.name} (${product.nameTamil}) is available.`
     );
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`, '_blank', 'noopener,noreferrer');
-  };
-
-  const scrollToShop = () => {
-    const el = document.getElementById('shop');
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -273,14 +268,15 @@ export default function FeaturedProductsPreview({
           })}
         </div>
 
-        {/* Link to all products */}
-        <div className="text-center pt-4">
-          <button
-            onClick={scrollToShop}
-            className="inline-flex items-center gap-2 text-sm font-sans font-bold text-[#15321E] hover:text-[#E58A13] underline underline-offset-8 transition-colors min-h-[44px] touch-manipulation cursor-pointer"
+        {/* Big Important Button to full product showcase */}
+        <div className="text-center pt-8">
+          <a
+            href="/products"
+            className="inline-flex items-center justify-center gap-3 bg-[#E58A13] hover:bg-[#CA7508] active:scale-95 text-white font-sans text-xs sm:text-sm uppercase font-bold tracking-widest px-8 sm:px-10 py-4 sm:py-4.5 rounded-full shadow-xl shadow-[#E58A13]/25 transition-all min-h-[52px] touch-manipulation cursor-pointer group"
           >
-            <span>→ Shop All Products</span>
-          </button>
+            <span>View All Products in Showcase</span>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-200" />
+          </a>
         </div>
       </div>
     </section>

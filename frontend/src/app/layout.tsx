@@ -20,6 +20,16 @@ export const metadata: Metadata = {
     locale: "en_IN",
     type: "website",
   },
+  icons: {
+    icon: [
+      { url: '/images/aranya-logo.png', type: 'image/png' },
+      { url: '/favicon.ico', type: 'image/x-icon' },
+    ],
+    apple: [
+      { url: '/images/aranya-logo.png', type: 'image/png' },
+    ],
+    shortcut: '/images/aranya-logo.png',
+  },
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
