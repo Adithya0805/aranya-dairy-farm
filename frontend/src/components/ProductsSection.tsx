@@ -197,11 +197,11 @@ export default function ProductsSection({ onSelectProduct }: ProductsSectionProp
                     key={category}
                     onClick={() => setSelectedCategory(category)}
                     className={`
-                      shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-sans uppercase tracking-wider transition-all duration-200 min-h-[40px] touch-manipulation
+                      shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-sans uppercase tracking-wider transition-all duration-200 ease-out min-h-[40px] touch-manipulation cursor-pointer active:scale-95
                       ${
                         isSelected
                           ? 'bg-[#1B4D2E] text-white font-bold shadow-md shadow-[#1B4D2E]/15 scale-[1.02]'
-                          : 'bg-[#F2ECE7] hover:bg-[#E8E1DA] text-[#1C241E] font-medium border border-transparent'
+                          : 'bg-[#F2ECE7] hover:bg-[#E8E1DA] hover:text-[#1B4D2E] text-[#1C241E] font-medium border border-transparent'
                       }
                     `}
                     aria-pressed={isSelected}
@@ -210,7 +210,7 @@ export default function ProductsSection({ onSelectProduct }: ProductsSectionProp
                     <span>{category}</span>
                     <span
                       className={`
-                        text-[11px] px-1.5 py-0.2 rounded-full font-bold
+                        text-[11px] px-1.5 py-0.2 rounded-full font-bold transition-colors duration-200
                         ${isSelected ? 'bg-white/25 text-white' : 'bg-[#1C241E]/10 text-[#57655B]'}
                       `}
                     >
@@ -226,8 +226,12 @@ export default function ProductsSection({ onSelectProduct }: ProductsSectionProp
               — 1 column on mobile (< 640px)
               — 2 columns on tablet (sm)
               — 3 columns on desktop (md+)
+              Smooth fade transition when category filter changes
           */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 lg:gap-10">
+          <div
+            key={selectedCategory}
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 animate-grid-fade"
+          >
             {displayedProducts.map((product, index) => {
               const inCart = cartQty(product.id);
               const lQty = localQty[product.id] ?? 1;
@@ -237,8 +241,8 @@ export default function ProductsSection({ onSelectProduct }: ProductsSectionProp
               return (
                 <div
                   key={product.id}
-                  className="group flex flex-col bg-white border border-[#1B4D2E]/10 rounded-sm p-4 sm:p-5 hover:border-[#1B4D2E]/30 transition-all duration-300 animate-card-reveal"
-                  style={{ animationDelay: `${(index % 6) * 60}ms` }}
+                  className="group flex flex-col bg-white border border-[#1B4D2E]/10 rounded-sm p-4 sm:p-5 hover:border-[#1B4D2E]/35 hover:-translate-y-1 hover:shadow-lg hover:shadow-[#1B4D2E]/6 active:scale-[0.99] transition-all duration-200 ease-out animate-card-reveal"
+                  style={{ animationDelay: `${(index % 6) * 80}ms` }}
                 >
 
                   {/* Product Image — displays Supabase storage photo or soft neutral placeholder */}
@@ -319,11 +323,11 @@ export default function ProductsSection({ onSelectProduct }: ProductsSectionProp
                     {hasPrice ? (
                       <div className="flex items-center gap-2">
                         {/* Stepper */}
-                        <div className="flex items-center border border-[#1B4D2E]/20 rounded-full overflow-hidden shrink-0">
+                        <div className="flex items-center border border-[#1B4D2E]/20 rounded-full overflow-hidden shrink-0 bg-[#FAF7F2]">
                           <button
                             onClick={() => changeLocalQty(product.id, -1)}
                             disabled={lQty <= 1}
-                            className="w-11 h-11 flex items-center justify-center text-[#1C241E] hover:bg-[#1B4D2E]/8 disabled:opacity-30 transition-colors touch-manipulation"
+                            className="w-11 h-11 flex items-center justify-center text-[#1C241E] hover:bg-[#1B4D2E]/10 active:scale-90 disabled:opacity-25 transition-all duration-150 touch-manipulation cursor-pointer"
                             aria-label={`Decrease quantity for ${product.name}`}
                           >
                             <Minus className="w-3.5 h-3.5" />
@@ -333,7 +337,7 @@ export default function ProductsSection({ onSelectProduct }: ProductsSectionProp
                           </span>
                           <button
                             onClick={() => changeLocalQty(product.id, 1)}
-                            className="w-11 h-11 flex items-center justify-center text-[#1C241E] hover:bg-[#1B4D2E]/8 transition-colors touch-manipulation"
+                            className="w-11 h-11 flex items-center justify-center text-[#1C241E] hover:bg-[#1B4D2E]/10 active:scale-90 transition-all duration-150 touch-manipulation cursor-pointer"
                             aria-label={`Increase quantity for ${product.name}`}
                           >
                             <Plus className="w-3.5 h-3.5" />
@@ -343,7 +347,7 @@ export default function ProductsSection({ onSelectProduct }: ProductsSectionProp
                         {/* Add to Cart */}
                         <button
                           onClick={() => handleAddToCart(product)}
-                          className="flex-1 flex items-center justify-center gap-2 bg-[#1C241E] hover:bg-[#1B4D2E] active:scale-95 text-white text-xs uppercase font-semibold tracking-wider py-3 px-3 min-h-[44px] transition-all touch-manipulation"
+                          className="flex-1 flex items-center justify-center gap-2 bg-[#1C241E] hover:bg-[#1B4D2E] active:scale-[0.97] active:bg-[#143A22] text-white text-xs uppercase font-semibold tracking-wider py-3 px-3 min-h-[44px] rounded-sm transition-all duration-150 touch-manipulation cursor-pointer shadow-xs hover:shadow-md"
                         >
                           <ShoppingBag
                             className={`w-4 h-4 shrink-0 ${isBouncing ? 'animate-icon-bounce' : ''}`}
@@ -355,7 +359,7 @@ export default function ProductsSection({ onSelectProduct }: ProductsSectionProp
                       /* Price Pending State: Notify Me via WhatsApp button */
                       <button
                         onClick={() => handleNotifyMe(product)}
-                        className="w-full flex items-center justify-center gap-2 border border-[#1B4D2E]/25 hover:border-[#1B4D2E] bg-[#FCFAF7] hover:bg-[#1B4D2E] text-[#1B4D2E] hover:text-white text-xs uppercase font-semibold tracking-wider py-3 px-3 min-h-[44px] rounded transition-all duration-200 touch-manipulation active:scale-[0.98]"
+                        className="w-full flex items-center justify-center gap-2 border border-[#1B4D2E]/25 hover:border-[#1B4D2E] bg-[#FCFAF7] hover:bg-[#1B4D2E] text-[#1B4D2E] hover:text-white text-xs uppercase font-semibold tracking-wider py-3 px-3 min-h-[44px] rounded-sm transition-all duration-200 touch-manipulation active:scale-[0.98] cursor-pointer"
                         aria-label={`Notify me when price for ${product.name} is available`}
                       >
                         <Bell className="w-3.5 h-3.5 shrink-0" />

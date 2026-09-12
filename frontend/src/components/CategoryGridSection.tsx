@@ -77,7 +77,7 @@ export default function CategoryGridSection({ onOpenStory }: CategoryGridSection
           <div className="pt-2">
             <button
               onClick={handleStoryClick}
-              className="inline-block bg-[#1C241E] hover:bg-[#1B4D2E] text-white font-sans text-xs uppercase font-semibold tracking-widest px-8 py-4 transition-all cursor-pointer min-h-[44px] touch-manipulation"
+              className="inline-block bg-[#1C241E] hover:bg-[#1B4D2E] active:scale-95 text-white font-sans text-xs uppercase font-semibold tracking-widest px-8 py-4 transition-all duration-150 cursor-pointer min-h-[44px] touch-manipulation shadow-xs hover:shadow-md"
             >
               Our Story
             </button>
@@ -92,11 +92,11 @@ export default function CategoryGridSection({ onOpenStory }: CategoryGridSection
               <div
                 key={cat.id}
                 className="text-center group space-y-5 animate-card-reveal"
-                style={{ animationDelay: `${index * 100}ms` }}
+                style={{ animationDelay: `${index * 80}ms` }}
               >
                 
                 {/* Visual Container */}
-                <div className="w-full aspect-[4/5] bg-[#EAE6DF] overflow-hidden">
+                <div className="w-full aspect-[4/5] bg-[#EAE6DF] overflow-hidden rounded-2xl shadow-xs group-hover:shadow-md transition-all duration-300">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={cat.image}

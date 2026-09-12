@@ -48,12 +48,12 @@ export default function AboutSection({ onOpenColdChain }: AboutSectionProps) {
           
           {/* Left Side Visual matching Image 3 tall visual */}
           <div className="lg:col-span-6">
-            <div className="w-full aspect-[4/5] sm:aspect-[1/1] overflow-hidden bg-[#D8E3DB] relative shadow-md">
+            <div className="w-full aspect-[4/5] sm:aspect-[1/1] overflow-hidden bg-[#D8E3DB] relative shadow-md rounded-2xl group">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/a2_milk_bottle.jpg"
                 alt="Aranya Pure Organic A2 Milk Bottle"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
               />
             </div>
           </div>
@@ -75,10 +75,10 @@ export default function AboutSection({ onOpenColdChain }: AboutSectionProps) {
             <div className="pt-2">
               <button
                 onClick={handleColdChainClick}
-                className="group text-sm font-sans font-semibold text-[#1C241E] hover:text-[#1B4D2E] underline underline-offset-8 inline-flex items-center gap-2 transition-colors cursor-pointer min-h-[44px] touch-manipulation"
+                className="group text-sm font-sans font-semibold text-[#1C241E] hover:text-[#1B4D2E] underline underline-offset-8 inline-flex items-center gap-2 transition-all duration-150 cursor-pointer min-h-[44px] touch-manipulation active:scale-95"
               >
                 <span>Discover cold-chain standards</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-200" />
               </button>
             </div>
           </div>

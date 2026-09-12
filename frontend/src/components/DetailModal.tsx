@@ -51,7 +51,7 @@ export default function DetailModal({ isOpen, onClose, content }: DetailModalPro
             )}
             <button
               onClick={onClose}
-              className="p-2 text-[#1C241E] hover:text-[#1B4D2E] rounded-full hover:bg-[#1B4D2E]/5 transition-colors ml-auto"
+              className="min-w-[44px] min-h-[44px] flex items-center justify-center text-[#1C241E] hover:text-[#1B4D2E] rounded-full hover:bg-[#1B4D2E]/5 active:scale-95 transition-all ml-auto"
               aria-label="Close drawer"
             >
               <X className="w-5 h-5" />
@@ -115,14 +115,14 @@ export default function DetailModal({ isOpen, onClose, content }: DetailModalPro
             href={`https://wa.me/${WHATSAPP_NUMBER}?text=${finalWhatsappMsg}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full bg-[#1C241E] hover:bg-[#1B4D2E] text-white font-sans text-xs uppercase font-semibold tracking-wider py-4 px-6 rounded-none flex items-center justify-center gap-2 transition-all"
+            className="w-full min-h-[44px] bg-[#1C241E] hover:bg-[#1B4D2E] active:scale-[0.98] text-white font-sans text-xs uppercase font-semibold tracking-wider py-4 px-6 rounded-none flex items-center justify-center gap-2 transition-all"
           >
             <MessageSquare className="w-4 h-4 text-[#D99B26]" />
             <span>{content.ctaLabel || 'Inquire on WhatsApp'}</span>
           </a>
           <button
             onClick={onClose}
-            className="w-full text-center text-xs text-[#6B472B] hover:underline font-medium py-1"
+            className="w-full min-h-[44px] flex items-center justify-center text-center text-xs text-[#6B472B] hover:underline active:scale-95 font-medium py-1 transition-all"
           >
             Back to Nature View
           </button>

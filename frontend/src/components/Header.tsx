@@ -33,27 +33,31 @@ export default function Header({ onOpenCart, onOpenStory, onOpenContact }: Heade
           <nav className="hidden md:flex items-center gap-8 text-xs font-sans font-medium text-[#1C241E] uppercase tracking-wider">
             <a
               href="#products"
-              className="hover:text-[#1B4D2E] transition-colors py-3 min-h-[44px] flex items-center"
+              className="relative hover:text-[#1B4D2E] transition-colors py-3 min-h-[44px] flex items-center group/nav cursor-pointer"
             >
-              Shop
+              <span>Shop</span>
+              <span className="absolute bottom-1.5 left-0 right-0 h-0.5 bg-[#1B4D2E] scale-x-0 group-hover/nav:scale-x-100 transition-transform duration-200 origin-left" />
             </a>
             <button
               onClick={onOpenStory}
-              className="hover:text-[#1B4D2E] transition-colors py-3 min-h-[44px] flex items-center cursor-pointer"
+              className="relative hover:text-[#1B4D2E] transition-colors py-3 min-h-[44px] flex items-center group/nav cursor-pointer"
             >
-              Our Story
+              <span>Our Story</span>
+              <span className="absolute bottom-1.5 left-0 right-0 h-0.5 bg-[#1B4D2E] scale-x-0 group-hover/nav:scale-x-100 transition-transform duration-200 origin-left" />
             </button>
             <button
               onClick={onOpenContact}
-              className="hover:text-[#1B4D2E] transition-colors py-3 min-h-[44px] flex items-center cursor-pointer"
+              className="relative hover:text-[#1B4D2E] transition-colors py-3 min-h-[44px] flex items-center group/nav cursor-pointer"
             >
-              Get in Touch
+              <span>Get in Touch</span>
+              <span className="absolute bottom-1.5 left-0 right-0 h-0.5 bg-[#1B4D2E] scale-x-0 group-hover/nav:scale-x-100 transition-transform duration-200 origin-left" />
             </button>
             <a
               href="#gallery"
-              className="hover:text-[#1B4D2E] transition-colors py-3 min-h-[44px] flex items-center"
+              className="relative hover:text-[#1B4D2E] transition-colors py-3 min-h-[44px] flex items-center group/nav cursor-pointer"
             >
-              Gallery
+              <span>Gallery</span>
+              <span className="absolute bottom-1.5 left-0 right-0 h-0.5 bg-[#1B4D2E] scale-x-0 group-hover/nav:scale-x-100 transition-transform duration-200 origin-left" />
             </a>
           </nav>
 
@@ -74,7 +78,7 @@ export default function Header({ onOpenCart, onOpenStory, onOpenContact }: Heade
             {/* Cart Icon with live badge */}
             <button
               onClick={onOpenCart}
-              className="relative flex items-center justify-center gap-1.5 bg-[#F2ECE7] hover:bg-[#E8E1DA] py-2 px-4 rounded-full transition-colors touch-manipulation min-h-[44px]"
+              className="relative flex items-center justify-center gap-1.5 bg-[#F2ECE7] hover:bg-[#E8E1DA] active:scale-95 py-2 px-4 rounded-full transition-all duration-150 touch-manipulation min-h-[44px] cursor-pointer"
               aria-label={`Open cart, ${totalItems} item${totalItems !== 1 ? 's' : ''}`}
             >
               <ShoppingBag className="w-4 h-4 text-[#1C241E]" />
@@ -94,7 +98,7 @@ export default function Header({ onOpenCart, onOpenStory, onOpenContact }: Heade
           <div className="md:hidden flex items-center">
             <button
               onClick={onOpenCart}
-              className="relative w-11 h-11 flex items-center justify-center text-[#1C241E] hover:bg-[#1B4D2E]/8 touch-manipulation rounded-full transition-colors"
+              className="relative w-11 h-11 flex items-center justify-center text-[#1C241E] hover:bg-[#1B4D2E]/8 active:scale-90 touch-manipulation rounded-full transition-all duration-150 cursor-pointer"
               aria-label={`Open cart, ${totalItems} item${totalItems !== 1 ? 's' : ''}`}
             >
               <ShoppingBag className="w-5 h-5 text-[#1C241E]" />

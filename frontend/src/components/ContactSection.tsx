@@ -156,13 +156,13 @@ export default function ContactSection() {
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                     placeholder="Tell us if you want morning delivery or weekend farm visit..."
-                    className="w-full px-4 py-3 rounded-xl border border-[#E8ECE9] bg-[#FCFAF7] text-base sm:text-sm focus:outline-none focus:border-[#1B4D2E]"
+                    className="w-full px-4 py-3 rounded-xl border border-[#E8ECE9] bg-[#FCFAF7] text-base sm:text-sm focus:outline-none focus:border-[#1B4D2E] focus:ring-2 focus:ring-[#1B4D2E]/15 transition-all duration-150"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="btn-primary-single w-full font-bold text-sm mt-2 min-h-[48px]"
+                  className="btn-primary-single w-full font-bold text-sm mt-2 min-h-[48px] active:scale-[0.98] cursor-pointer"
                 >
                   <span>Submit Order Inquiry</span>
                   <ArrowRight className="w-4 h-4 text-[#D99B26]" />

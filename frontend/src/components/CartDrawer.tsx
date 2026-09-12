@@ -210,7 +210,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                         {/* Remove — min 44×44 */}
                         <button
                           onClick={() => removeItem(product.id)}
-                          className="w-10 h-10 flex items-center justify-center text-[#8A7B6E] hover:text-red-500 transition-colors shrink-0 touch-manipulation rounded-full"
+                          className="w-10 h-10 flex items-center justify-center text-[#8A7B6E] hover:text-red-500 active:scale-90 transition-all duration-150 shrink-0 touch-manipulation rounded-full cursor-pointer"
                           aria-label={`Remove ${product.name}`}
                         >
                           <Trash2 className="w-4 h-4" />
@@ -219,10 +219,10 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
                       <div className="flex items-center justify-between">
                         {/* Quantity Stepper — min 44px height */}
-                        <div className="flex items-center border border-[#1B4D2E]/20 rounded-full overflow-hidden">
+                        <div className="flex items-center border border-[#1B4D2E]/20 rounded-full overflow-hidden bg-[#FAF7F2]">
                           <button
                             onClick={() => updateQuantity(product.id, quantity - 1)}
-                            className="w-11 h-11 flex items-center justify-center text-[#1C241E] hover:bg-[#1B4D2E]/8 transition-colors touch-manipulation"
+                            className="w-11 h-11 flex items-center justify-center text-[#1C241E] hover:bg-[#1B4D2E]/10 active:scale-90 transition-all duration-150 touch-manipulation cursor-pointer"
                             aria-label="Decrease quantity"
                           >
                             <Minus className="w-3.5 h-3.5" />
@@ -232,7 +232,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                           </span>
                           <button
                             onClick={() => updateQuantity(product.id, quantity + 1)}
-                            className="w-11 h-11 flex items-center justify-center text-[#1C241E] hover:bg-[#1B4D2E]/8 transition-colors touch-manipulation"
+                            className="w-11 h-11 flex items-center justify-center text-[#1C241E] hover:bg-[#1B4D2E]/10 active:scale-90 transition-all duration-150 touch-manipulation cursor-pointer"
                             aria-label="Increase quantity"
                           >
                             <Plus className="w-3.5 h-3.5" />

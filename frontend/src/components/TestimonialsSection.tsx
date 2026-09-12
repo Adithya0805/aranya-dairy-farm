@@ -43,8 +43,8 @@ export default function TestimonialsSection() {
           {SPOTLIGHT_QUOTES.map((item, idx) => (
             <div
               key={idx}
-              className="space-y-6 bg-[#FCFAF7] p-6 sm:p-10 rounded-3xl border border-[#1B4D2E]/10 animate-card-reveal"
-              style={{ animationDelay: `${idx * 150}ms` }}
+              className="space-y-6 bg-[#FCFAF7] p-6 sm:p-10 rounded-3xl border border-[#1B4D2E]/10 hover:border-[#1B4D2E]/25 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 animate-card-reveal"
+              style={{ animationDelay: `${idx * 80}ms` }}
             >
               <div className="text-4xl text-[#1B4D2E] font-serif font-bold">
                 &ldquo;

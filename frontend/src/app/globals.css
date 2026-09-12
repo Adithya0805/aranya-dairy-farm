@@ -96,37 +96,37 @@ p, span, button, input, select, textarea, a {
 
 /* ─── Keyframes ─────────────────────────────────────────────────────────────── */
 
-/* Hero / general fade-up */
+/* Hero / general fade-up — fast, graceful 350ms */
 @keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Staggered card reveal (used by product cards) — 320ms */
+@keyframes cardReveal {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Staggered card reveal (used by product cards) */
-@keyframes cardReveal {
-  from { opacity: 0; transform: translateY(24px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* Cart badge pop — scale up then settle */
+/* Cart badge pop — quick 280ms bounce */
 @keyframes badgePop {
-  0%   { transform: scale(1); }
-  40%  { transform: scale(1.5); }
-  70%  { transform: scale(0.9); }
+  0%   { transform: scale(0.85); }
+  50%  { transform: scale(1.35); }
+  80%  { transform: scale(0.95); }
   100% { transform: scale(1); }
 }
 
-/* Add-to-cart icon bounce */
+/* Add-to-cart icon bounce — 320ms snappy */
 @keyframes iconBounce {
-  0%   { transform: translateY(0)  scale(1); }
-  35%  { transform: translateY(-6px) scale(1.2); }
-  65%  { transform: translateY(2px)  scale(0.95); }
-  100% { transform: translateY(0)  scale(1); }
+  0%   { transform: translateY(0) scale(1); }
+  35%  { transform: translateY(-5px) scale(1.18); }
+  65%  { transform: translateY(1.5px) scale(0.96); }
+  100% { transform: translateY(0) scale(1); }
 }
 
-/* Section fade-in used by scroll observer */
-@keyframes sectionFadeUp {
-  from { opacity: 0; transform: translateY(20px); }
+/* Category grid quick transition — 240ms */
+@keyframes gridFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
@@ -134,29 +134,35 @@ p, span, button, input, select, textarea, a {
 
 /* Hero content */
 .animate-fade-in {
-  animation: fadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: fadeUp 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* Staggered product cards — apply via JS-driven inline style */
+/* Staggered product cards */
 .animate-card-reveal {
-  animation: cardReveal 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: cardReveal 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* Cart badge pop */
 .animate-badge-pop {
-  animation: badgePop 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: badgePop 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
 }
 
 /* Add-to-cart icon bounce */
 .animate-icon-bounce {
-  animation: iconBounce 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: iconBounce 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* Section scroll reveal — visible by default so content is never blank or blocked */
+/* Category grid transition */
+.animate-grid-fade {
+  animation: gridFadeIn 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Section scroll reveal — GPU transform only, smoothly reveals on scroll */
 .reveal-section {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.36s cubic-bezier(0.22, 1, 0.36, 1), transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
 }
 
 .reveal-section.is-visible {
@@ -164,15 +170,13 @@ p, span, button, input, select, textarea, a {
   transform: translateY(0);
 }
 
-/* ─── prefers-reduced-motion — disable / simplify all animations ─────────────
-   GPU-only properties (opacity, transform) are still allowed but instant.
-   No layout-animating properties are used anywhere so this is safe.
-────────────────────────────────────────────────────────────────────────────── */
+/* ─── prefers-reduced-motion — disable all animations instantly ───────────── */
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in,
   .animate-card-reveal,
   .animate-badge-pop,
-  .animate-icon-bounce {
+  .animate-icon-bounce,
+  .animate-grid-fade {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
