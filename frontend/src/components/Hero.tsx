@@ -16,9 +16,7 @@ export default function Hero({ onShopClick }: HeroProps) {
         src="/images/nature_hero_pasture.jpg"
         alt="Aranya Organic Dairy Pasture in Shoolagiri"
         className="absolute inset-0 w-full h-full object-cover object-center"
-        /* fetchpriority="high" keeps LCP fast */
-        // @ts-expect-error - fetchpriority is valid HTML but not in React types
-        fetchpriority="high"
+        fetchPriority="high"
       />
 
       {/* Overlay gradient — stronger on mobile so text is always readable */}

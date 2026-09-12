@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { X, Plus, Minus, Trash2, ShoppingBag, MessageSquare, CheckCircle } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { WHATSAPP_NUMBER } from '@/lib/whatsapp';
+import { createOrder } from '@/lib/catalog';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -15,9 +16,26 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     useCart();
   const [orderSent, setOrderSent] = useState(false);
 
-  const handleWhatsAppCheckout = () => {
+  const handleWhatsAppCheckout = async () => {
     if (items.length === 0) return;
     const message = buildWhatsAppMessage();
+
+    // Asynchronously log the order to Supabase orders table (public INSERT)
+    try {
+      await createOrder({
+        items: items.map((i) => ({
+          product_id: i.product.id,
+          name: i.product.name,
+          qty: i.quantity,
+          price: i.product.price,
+        })),
+        total: items.reduce((sum, i) => sum + (i.product.price ?? 0) * i.quantity, 0),
+        whatsapp_message: message,
+      });
+    } catch (err) {
+      console.warn('[CartDrawer] Could not save order to Supabase:', err);
+    }
+
     const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank', 'noopener,noreferrer');
     clearCart();
@@ -170,6 +188,12 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                         src={product.image}
                         alt={product.name}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.currentTarget;
+                          if (!target.src.endsWith('/images/placeholder-product.svg')) {
+                            target.src = '/images/placeholder-product.svg';
+                          }
+                        }}
                       />
                     </div>
 

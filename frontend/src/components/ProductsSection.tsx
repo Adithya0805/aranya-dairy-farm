@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState, useCallback, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Plus, Minus, ShoppingBag, Bell, Check } from 'lucide-react';
 import { PRODUCTS, Product, ProductCategory, CATEGORIES, getProductPriceLabel, formatPrice } from '@/lib/products';
+import { getCategories, getProducts, testAnonProductWrite } from '@/lib/catalog';
+import { supabase } from '@/lib/supabase';
 import { useCart } from '@/context/CartContext';
 import Toast from '@/components/Toast';
 import { WA_CATALOG_INQUIRY, WHATSAPP_NUMBER } from '@/lib/whatsapp';
@@ -18,7 +20,12 @@ export default function ProductsSection({ onSelectProduct }: ProductsSectionProp
   // Section scroll reveal
   const sectionRef = useScrollReveal<HTMLElement>();
 
-  // Category filter state ('All' or one of the 6 ProductCategory values)
+  // Dynamic Catalog State from Supabase (with fallback defaults)
+  const [products, setProducts] = useState<Product[]>(PRODUCTS);
+  const [categories, setCategories] = useState<string[]>(CATEGORIES);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Category filter state ('All' or one of the dynamic category names)
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
   // Per-card local quantities (for products that have an active price)
@@ -36,23 +43,66 @@ export default function ProductsSection({ onSelectProduct }: ProductsSectionProp
   const [bouncingId, setBouncingId] = useState<string | null>(null);
   const bounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Load live catalog and categories from Supabase on mount
+  useEffect(() => {
+    let isMounted = true;
+    async function loadCatalog() {
+      try {
+        const [cats, prods] = await Promise.all([getCategories(), getProducts()]);
+        if (isMounted) {
+          if (cats && cats.length > 0) setCategories(cats);
+          if (prods && prods.length > 0) {
+            setProducts(prods);
+            setLocalQty((prev) => {
+              const updated = { ...prev };
+              prods.forEach((p) => {
+                if (!(p.id in updated)) updated[p.id] = 1;
+              });
+              return updated;
+            });
+          }
+          setIsLoading(false);
+        }
+      } catch (err) {
+        console.error('Error fetching live catalog from Supabase:', err);
+        if (isMounted) setIsLoading(false);
+      }
+    }
+
+    loadCatalog();
+
+    // Expose helpers on window for browser console testing
+    if (typeof window !== 'undefined') {
+      const win = window as unknown as Window & {
+        testSupabaseRLS?: typeof testAnonProductWrite;
+        supabase?: typeof supabase;
+      };
+      win.testSupabaseRLS = testAnonProductWrite;
+      win.supabase = supabase;
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   // ── RICE SECTION HANDLING & AVAILABILITY ──────────────────────────────────
   // Exactly 24 confirmed products are marked available: true.
-  // The 8 traditional Rice items remain available: false (transcribed in lib/products.ts
+  // The 8 traditional Rice items remain available: false (transcribed in database
   // but excluded from the visible storefront catalog until client confirms final details).
   const availableProducts = useMemo(
-    () => PRODUCTS.filter((p) => p.available),
-    []
+    () => products.filter((p) => p.available),
+    [products]
   );
 
-  // Category counts based on confirmed available products
+  // Category counts based on confirmed available products from Supabase
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = { All: availableProducts.length };
-    CATEGORIES.forEach((cat) => {
+    categories.forEach((cat) => {
       counts[cat] = availableProducts.filter((p) => p.category === cat).length;
     });
     return counts;
-  }, [availableProducts]);
+  }, [availableProducts, categories]);
 
   // Filtered products to display in the grid
   const displayedProducts = useMemo(() => {
@@ -136,10 +186,10 @@ export default function ProductsSection({ onSelectProduct }: ProductsSectionProp
             </div>
           </div>
 
-          {/* Category Filter Chips / Tabs (Horizontal scrollable, instant in-memory filter) */}
+          {/* Category Filter Chips / Tabs (Horizontal scrollable, dynamic from Supabase) */}
           <div id="category-filters" className="mb-10 sm:mb-14 scroll-mt-24">
             <div className="flex items-center gap-2 sm:gap-2.5 overflow-x-auto pb-3 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 no-scrollbar touch-pan-x">
-              {['All', ...CATEGORIES].map((category) => {
+              {['All', ...categories].map((category) => {
                 const isSelected = selectedCategory === category;
                 const count = categoryCounts[category] ?? 0;
                 return (
@@ -191,7 +241,7 @@ export default function ProductsSection({ onSelectProduct }: ProductsSectionProp
                   style={{ animationDelay: `${(index % 6) * 60}ms` }}
                 >
 
-                  {/* Product Image — displays natural unbranded photo or soft neutral placeholder */}
+                  {/* Product Image — displays Supabase storage photo or soft neutral placeholder */}
                   <div
                     className="w-full aspect-square bg-[#F4EFEA] overflow-hidden mb-4 relative cursor-pointer rounded-sm flex items-center justify-center"
                     onClick={() => onSelectProduct?.(product)}
@@ -202,6 +252,12 @@ export default function ProductsSection({ onSelectProduct }: ProductsSectionProp
                       src={product.image}
                       alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        if (!target.src.endsWith('/images/placeholder-product.svg')) {
+                          target.src = '/images/placeholder-product.svg';
+                        }
+                      }}
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors" />
 
