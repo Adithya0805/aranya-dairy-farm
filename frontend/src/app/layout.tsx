@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
+import ChatAssistantWidget from "@/components/ChatAssistantWidget";
 
 export const metadata: Metadata = {
   title: "Aranya Organic Dairy Farm | Fresh A2 Milk & Bilona Ghee in Shoolagiri, Hosur",
@@ -54,7 +55,10 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased">
         {/* CartProvider wraps the entire app so any component can access cart state */}
-        <CartProvider>{children}</CartProvider>
+        <CartProvider>
+          {children}
+          <ChatAssistantWidget />
+        </CartProvider>
       </body>
     </html>
   );
