@@ -97,6 +97,10 @@ export default function AdminProductsPage() {
   const [editingProduct, setEditingProduct] = useState<AdminProduct | null>(null);
   const [editPrice, setEditPrice] = useState<string>('');
   const [editAvailable, setEditAvailable] = useState<boolean>(true);
+  const [editCategoryId, setEditCategoryId] = useState<string>('');
+  const [editCategoryName, setEditCategoryName] = useState<string>('');
+  const [editUnit, setEditUnit] = useState<string>('');
+  const [editDescription, setEditDescription] = useState<string>('');
   const [newImageFile, setNewImageFile] = useState<File | null>(null);
   const [newImagePreview, setNewImagePreview] = useState<string | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
@@ -152,6 +156,15 @@ export default function AdminProductsPage() {
         const res = await getAdminCategoriesAction(session?.access_token);
         if (res.success && res.categories && res.categories.length > 0) {
           setAvailableCategories(res.categories);
+        } else {
+          // Fallback: load distinct categories from public categories table
+          const { data } = await supabase
+            .from('categories')
+            .select('id, name')
+            .order('name', { ascending: true });
+          if (data && data.length > 0) {
+            setAvailableCategories(data);
+          }
         }
       } catch (err) {
         console.warn('Could not preload categories:', err);
@@ -160,12 +173,35 @@ export default function AdminProductsPage() {
     loadCategories();
   }, []);
 
+  // Sync available categories from loaded products if categories query returned empty
+  useEffect(() => {
+    if (products.length > 0 && availableCategories.length === 0) {
+      const extracted: { id: string; name: string }[] = [];
+      const seen = new Set<string>();
+      for (const p of products) {
+        if (p.categories?.id && p.categories?.name && !seen.has(p.categories.id)) {
+          seen.add(p.categories.id);
+          extracted.push({ id: p.categories.id, name: p.categories.name });
+        }
+      }
+      if (extracted.length > 0) {
+        setAvailableCategories(extracted);
+      }
+    }
+  }, [products, availableCategories.length]);
+
   // Close Edit Form and clean up object URLs
   const handleCloseModal = () => {
     if (newImagePreview) {
       URL.revokeObjectURL(newImagePreview);
     }
     setEditingProduct(null);
+    setEditPrice('');
+    setEditAvailable(true);
+    setEditCategoryId('');
+    setEditCategoryName('');
+    setEditUnit('');
+    setEditDescription('');
     setNewImageFile(null);
     setNewImagePreview(null);
     setImageError(null);
@@ -180,6 +216,18 @@ export default function AdminProductsPage() {
     setEditingProduct(product);
     setEditPrice(product.price !== null && product.price !== undefined ? String(product.price) : '');
     setEditAvailable(Boolean(product.available));
+    const catId = product.category_id || product.categories?.id || '';
+    const catName = product.categories?.name || '';
+    setEditCategoryId(catId);
+    setEditCategoryName(catName);
+    setEditUnit(product.unit || '');
+    setEditDescription(product.description || '');
+
+    // Ensure current product's category exists in availableCategories
+    if (catId && catName && !availableCategories.some((c) => c.id === catId)) {
+      setAvailableCategories((prev) => [...prev, { id: catId, name: catName }]);
+    }
+
     setNewImageFile(null);
     setNewImagePreview(null);
     setImageError(null);
@@ -269,7 +317,15 @@ export default function AdminProductsPage() {
       formData.append('id', editingProduct.id);
       formData.append('price', editPrice);
       formData.append('available', String(editAvailable));
-      formData.append('categoryName', editingProduct.categories?.name || 'General Store');
+      if (editCategoryId) {
+        formData.append('categoryId', editCategoryId);
+      }
+      formData.append(
+        'categoryName',
+        editCategoryName || editingProduct.categories?.name || 'General Store'
+      );
+      formData.append('unit', editUnit);
+      formData.append('description', editDescription);
       if (token) formData.append('token', token);
       if (newImageFile) formData.append('image', newImageFile);
 
@@ -283,6 +339,13 @@ export default function AdminProductsPage() {
             : `Successfully updated "${editingProduct.name}"!`,
         });
 
+        const matchedCat = editCategoryId
+          ? availableCategories.find((c) => c.id === editCategoryId)
+          : null;
+        const finalCategoryObj = matchedCat
+          ? { id: matchedCat.id, name: matchedCat.name }
+          : editingProduct.categories;
+
         // Update local state immediately
         setProducts((prev) =>
           prev.map((p) =>
@@ -291,6 +354,10 @@ export default function AdminProductsPage() {
                   ...p,
                   price: parsedPrice,
                   available: editAvailable,
+                  category_id: editCategoryId || p.category_id,
+                  unit: editUnit.trim() || p.unit,
+                  description: editDescription.trim() || null,
+                  categories: finalCategoryObj,
                   image_url: res.imageUrl || p.image_url,
                 }
               : p
@@ -1293,15 +1360,68 @@ export default function AdminProductsPage() {
 
             {/* Modal Form */}
             <form onSubmit={handleSaveProduct} className="p-6 space-y-5 overflow-y-auto flex-1">
-              {/* Product Info Summary */}
-              <div className="p-3 bg-[#F4EFEA] rounded text-xs space-y-1 text-[#57655B]">
-                <p>
-                  <span className="font-semibold text-[#1C241E]">Category:</span>{' '}
-                  {editingProduct.categories?.name || 'General Store'}
-                </p>
-                <p>
-                  <span className="font-semibold text-[#1C241E]">Unit Size:</span>{' '}
-                  {editingProduct.unit || 'Standard'}
+              {/* Category & Unit Size Row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#1C241E] mb-1.5">
+                    Category *
+                  </label>
+                  <select
+                    required
+                    value={editCategoryId}
+                    onChange={(e) => {
+                      setEditCategoryId(e.target.value);
+                      const cat = availableCategories.find((c) => c.id === e.target.value);
+                      if (cat) setEditCategoryName(cat.name);
+                    }}
+                    className="w-full px-3 py-2 text-xs font-semibold uppercase tracking-wider bg-[#FCFAF7] border border-[#1B4D2E]/20 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1B4D2E] text-[#1C241E] cursor-pointer"
+                  >
+                    {availableCategories.length === 0 ? (
+                      <option value="">
+                        {editingProduct.categories?.name || 'General Store'}
+                      </option>
+                    ) : (
+                      availableCategories.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}
+                        </option>
+                      ))
+                    )}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#1C241E] mb-1.5">
+                    Packaging / Unit *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editUnit}
+                    onChange={(e) => setEditUnit(e.target.value)}
+                    placeholder="e.g. 1 Litre, 500g, 1kg"
+                    className="w-full px-3 py-2 text-sm bg-[#FCFAF7] border border-[#1B4D2E]/20 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1B4D2E] text-[#1C241E]"
+                  />
+                </div>
+              </div>
+
+              {/* Product Description */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#1C241E]">
+                    Product Description
+                  </label>
+                  <span className="text-[11px] text-[#8A7B6E] font-medium">Optional</span>
+                </div>
+                <textarea
+                  rows={3}
+                  value={editDescription}
+                  onChange={(e) => setEditDescription(e.target.value)}
+                  placeholder="Enter product description, benefits, or preparation details (optional)..."
+                  className="w-full px-3 py-2 text-sm bg-[#FCFAF7] border border-[#1B4D2E]/20 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1B4D2E] text-[#1C241E] placeholder:text-[#8A7B6E]/70 leading-relaxed"
+                />
+                <p className="text-[11px] text-[#8A7B6E] mt-1">
+                  Optional. Displayed in customer product details &amp; quick-view modals across the website.
                 </p>
               </div>
 

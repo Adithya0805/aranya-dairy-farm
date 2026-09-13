@@ -8,6 +8,9 @@ export interface AdminProductPayload {
   id: string;
   price: number | null;
   available: boolean;
+  category_id?: string | null;
+  unit?: string | null;
+  description?: string | null;
 }
 
 /**
@@ -94,7 +97,7 @@ function getExtension(file: File): string {
 }
 
 /**
- * Server Action: Updates a product's price and availability status.
+ * Server Action: Updates a product's price, availability status, category, unit, and description.
  * Uses the service_role key to bypass RLS safely on the server.
  */
 export async function updateProductAction(payload: AdminProductPayload, token?: string) {
@@ -105,12 +108,18 @@ export async function updateProductAction(payload: AdminProductPayload, token?: 
 
   try {
     const admin = getAdminClient();
+    const updateData: Record<string, any> = {
+      price: payload.price,
+      available: payload.available,
+    };
+
+    if (payload.category_id !== undefined) updateData.category_id = payload.category_id;
+    if (payload.unit !== undefined) updateData.unit = payload.unit ? payload.unit.trim() : null;
+    if (payload.description !== undefined) updateData.description = payload.description ? payload.description.trim() : null;
+
     const { error } = await admin
       .from('products')
-      .update({
-        price: payload.price,
-        available: payload.available,
-      })
+      .update(updateData)
       .eq('id', payload.id);
 
     if (error) {
@@ -120,6 +129,7 @@ export async function updateProductAction(payload: AdminProductPayload, token?: 
     // Revalidate frontend storefront and admin caches safely
     try {
       revalidatePath('/');
+      revalidatePath('/products');
       revalidatePath('/admin/products');
     } catch (revErr) {
       console.warn('[Admin] revalidatePath warning:', revErr);
@@ -133,7 +143,7 @@ export async function updateProductAction(payload: AdminProductPayload, token?: 
 }
 
 /**
- * Server Action: Updates a product's price, availability, and optionally uploads a new image.
+ * Server Action: Updates a product's price, availability, category, unit, description, and optionally uploads a new image.
  * Uses service_role to upload to Supabase Storage and remove any old image in storage.
  */
 export async function updateProductWithImageAction(formData: FormData) {
@@ -151,6 +161,9 @@ export async function updateProductWithImageAction(formData: FormData) {
   const rawPrice = formData.get('price') as string | null;
   const rawAvailable = formData.get('available') as string | null;
   const categoryName = formData.get('categoryName') as string | null;
+  const categoryId = formData.get('categoryId') as string | null;
+  const unit = formData.get('unit') as string | null;
+  const description = formData.get('description') as string | null;
   const imageFile = formData.get('image') as File | null;
 
   let parsedPrice: number | null = null;
@@ -238,10 +251,23 @@ export async function updateProductWithImageAction(formData: FormData) {
       price: number | null;
       available: boolean;
       image_url?: string;
+      category_id?: string;
+      unit?: string | null;
+      description?: string | null;
     } = {
       price: parsedPrice,
       available: isAvailable,
     };
+
+    if (categoryId && categoryId.trim() !== '') {
+      updatePayload.category_id = categoryId.trim();
+    }
+    if (unit !== null && unit !== undefined) {
+      updatePayload.unit = unit.trim() || null;
+    }
+    if (description !== null && description !== undefined) {
+      updatePayload.description = description.trim() || null;
+    }
 
     if (newImageUrl) {
       updatePayload.image_url = newImageUrl;
@@ -259,6 +285,7 @@ export async function updateProductWithImageAction(formData: FormData) {
     // Revalidate storefront and admin caches safely
     try {
       revalidatePath('/');
+      revalidatePath('/products');
       revalidatePath('/admin/products');
     } catch (revErr) {
       console.warn('[Admin] revalidatePath warning:', revErr);
