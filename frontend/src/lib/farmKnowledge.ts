@@ -1,6 +1,6 @@
 import { getProducts } from '@/lib/catalog';
-import { PRODUCTS, ProductCategory, CATEGORIES } from '@/lib/products';
-import { WHATSAPP_DISPLAY, WHATSAPP_NUMBER, buildWhatsAppUrl } from '@/lib/whatsapp';
+import { PRODUCTS, CATEGORIES } from '@/lib/products';
+import { WHATSAPP_DISPLAY, WHATSAPP_NUMBER } from '@/lib/whatsapp';
 
 /**
  * Returns a concise summary of the live product catalog:
