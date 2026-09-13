@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { Plus, Minus, ShoppingBag, Bell, Check, Eye } from 'lucide-react';
+import { Plus, Minus, ShoppingBag, Bell, Check, Eye, Sparkles } from 'lucide-react';
 import { PRODUCTS, Product, ProductCategory, CATEGORIES, getProductPriceLabel, formatPrice } from '@/lib/products';
 import { getCategories, getProducts, testAnonProductWrite } from '@/lib/catalog';
 import { supabase } from '@/lib/supabase';
@@ -196,25 +196,39 @@ export default function ProductsSection({
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          {/* Full-bleed Photo Banner Header overlay in hero style */}
-          <div className="relative w-full aspect-[21/9] sm:aspect-[24/7] min-h-[220px] sm:min-h-[260px] flex items-center justify-center overflow-hidden bg-[#122E1B] mb-12 sm:mb-16 rounded-3xl shadow-lg border border-[#122E1B]/15">
+          {/* Compact Mini-Banner for Our Shop */}
+          <div className="relative w-full overflow-hidden bg-[#122E1B] mb-6 sm:mb-8 rounded-2xl shadow-xs border border-[#122E1B]/20 py-3.5 px-4 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/nature_hero_pasture.jpg"
               alt="Our Shop - Aranya Organic Dairy"
-              className="absolute inset-0 w-full h-full object-cover object-center opacity-35"
+              className="absolute inset-0 w-full h-full object-cover object-center opacity-20 pointer-events-none"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#122E1B] via-[#122E1B]/60 to-black/40" />
-            <div className="relative z-10 text-center px-4 space-y-2.5 animate-fade-in">
-              <span className="inline-block text-xs uppercase font-sans tracking-[0.25em] text-[#E58A13] font-bold">
-                Farm Provisions &amp; Daily Grocery • மளிகைக் கடை
-              </span>
-              <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif text-[#FAF7F2] font-bold tracking-tight drop-shadow-md">
-                Our Shop
-              </h2>
-              <p className="text-xs sm:text-sm text-[#F4EFEB] font-sans max-w-lg mx-auto leading-relaxed">
-                Pure A2 milk, traditional Bilona ghee, native millets, lentils, and daily domestic grocery essentials from our Shoolagiri farm.
-              </p>
+            <div className="absolute inset-0 bg-gradient-to-r from-[#122E1B]/95 via-[#122E1B]/85 to-[#122E1B]/95 pointer-events-none" />
+            
+            <div className="relative z-10 flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-[#E58A13]/20 border border-[#E58A13]/30 flex items-center justify-center text-[#E58A13] shrink-0">
+                <Sparkles className="w-4 h-4" />
+              </div>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2.5">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base sm:text-lg font-serif text-[#FAF7F2] font-bold tracking-tight">
+                    Our Shop
+                  </h2>
+                  <span className="text-[10px] uppercase font-sans tracking-wider text-[#E58A13] font-bold">
+                    • மளிகைக் கடை
+                  </span>
+                </div>
+                <span className="hidden sm:inline text-white/30">•</span>
+                <p className="text-xs text-[#D1DDD3] font-sans">
+                  Pure A2 milk, Vedic Bilona ghee, native millets &amp; pulses from our Shoolagiri farm.
+                </p>
+              </div>
+            </div>
+
+            <div className="relative z-10 hidden lg:flex items-center gap-2 text-[11px] font-sans text-[#FAF7F2] bg-white/10 px-3 py-1 rounded-full border border-white/15 backdrop-blur-sm shrink-0">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#E58A13]" />
+              <span>Direct Farm Harvest</span>
             </div>
           </div>
 

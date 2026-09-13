@@ -78,21 +78,49 @@ export default function StoryPage() {
         onOpenCart={() => setCartOpen(true)}
       />
 
-      {/* 2. Subpage Breadcrumb & Hero Banner */}
+      {/* ── Prominent Larger Breadcrumb Bar with Glassmorphic Effect ── */}
+      <section className="bg-[#FAF7F2]/90 backdrop-blur-xl border-b border-[#122E1B]/10 py-4 sm:py-5 shadow-xs transition-all">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            
+            {/* Breadcrumb Navigation - Quite Larger with Rich Interaction */}
+            <nav aria-label="Breadcrumbs" className="flex items-center flex-wrap gap-2.5 sm:gap-3.5">
+              <a
+                href="/"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white/90 hover:bg-white text-[#15321E] hover:text-[#E58A13] font-sans text-sm sm:text-base font-semibold border border-[#122E1B]/10 shadow-xs transition-all duration-200 group active:scale-95 cursor-pointer"
+              >
+                <ArrowLeft className="w-4 h-4 text-[#E58A13] group-hover:-translate-x-1 transition-transform" />
+                <span>Home</span>
+              </a>
+
+              <span className="text-[#E58A13] font-bold text-base sm:text-xl">/</span>
+
+              <div className="inline-flex items-center gap-2">
+                <span className="font-serif text-xl sm:text-2xl lg:text-3xl font-bold text-[#15321E] tracking-tight">
+                  Our Story
+                </span>
+                <span className="hidden md:inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-sans font-bold uppercase tracking-wider bg-[#122E1B]/5 text-[#15321E] border border-[#122E1B]/10">
+                  Estd. 2017
+                </span>
+              </div>
+            </nav>
+
+            {/* Status Pill on Right */}
+            <div className="hidden sm:flex items-center gap-2 text-xs font-sans text-[#5F6E62]">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/80 border border-[#122E1B]/10 shadow-xs backdrop-blur-md">
+                <span className="w-2 h-2 rounded-full bg-[#1B4D2E] animate-pulse" />
+                <span className="font-medium text-[#15321E]">9 Years of Organic Heritage</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* 2. Subpage Hero Banner */}
       <section className="bg-[#122E1B] text-[#FAF7F2] py-12 sm:py-18 border-b border-[#E58A13]/25 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-[#122E1B]/80 to-black/55 z-0" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-4">
-          
-          {/* Breadcrumbs */}
-          <nav className="flex items-center gap-2 text-xs font-sans text-[#A8B7AA]">
-            <a href="/" className="hover:text-[#E58A13] flex items-center gap-1 transition-colors">
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Home</span>
-            </a>
-            <span>/</span>
-            <span className="text-[#FAF7F2] font-semibold">Our Story</span>
-          </nav>
-
           <div className="space-y-3 max-w-3xl">
             <span className="inline-flex items-center gap-1.5 text-xs font-sans uppercase font-bold tracking-widest text-[#E58A13]">
               <Sparkles className="w-3.5 h-3.5" />
