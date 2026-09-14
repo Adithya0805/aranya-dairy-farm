@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import { X, Plus, Minus, Trash2, ShoppingBag, MessageSquare, CheckCircle } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
-import { WHATSAPP_NUMBER } from '@/lib/whatsapp';
+import { buildWhatsAppUrl } from '@/lib/whatsapp';
+import { submitOrderAction } from '@/app/actions/orders';
 import { createOrder } from '@/lib/catalog';
 
 interface CartDrawerProps {
@@ -20,23 +21,32 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     if (items.length === 0) return;
     const message = buildWhatsAppMessage();
 
-    // Asynchronously log the order to Supabase orders table (public INSERT)
+    const orderPayload = {
+      items: items.map((i) => ({
+        product_id: i.product.id,
+        name: i.product.name,
+        qty: i.quantity,
+        price: i.product.price,
+      })),
+      total: items.reduce((sum, i) => sum + (i.product.price ?? 0) * i.quantity, 0),
+      whatsapp_message: message,
+    };
+
+    // Asynchronously log the order to Supabase (Server Action with client fallback)
     try {
-      await createOrder({
-        items: items.map((i) => ({
-          product_id: i.product.id,
-          name: i.product.name,
-          qty: i.quantity,
-          price: i.product.price,
-        })),
-        total: items.reduce((sum, i) => sum + (i.product.price ?? 0) * i.quantity, 0),
-        whatsapp_message: message,
-      });
-    } catch (err) {
-      console.warn('[CartDrawer] Could not save order to Supabase:', err);
+      const res = await submitOrderAction(orderPayload);
+      if (!res.success) {
+        await createOrder(orderPayload);
+      }
+    } catch {
+      try {
+        await createOrder(orderPayload);
+      } catch (err) {
+        console.warn('[CartDrawer] Could not save order to Supabase:', err);
+      }
     }
 
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+    const url = buildWhatsAppUrl(message);
     window.open(url, '_blank', 'noopener,noreferrer');
     clearCart();
     setOrderSent(true);

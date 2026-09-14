@@ -95,7 +95,7 @@ export default function AdminOrdersPage() {
       } else {
         setFeedback({
           type: 'error',
-          message: res.error || 'Failed to fetch orders. Make sure SUPABASE_SERVICE_ROLE_KEY is set in .env.local',
+          message: res.error || 'Failed to fetch orders. Please check server configuration and try again.',
         });
       }
     } catch (err: unknown) {

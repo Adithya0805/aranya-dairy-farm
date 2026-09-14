@@ -1,10 +1,12 @@
 -- ============================================================================
--- ARANYA ORGANIC DAIRY FARM — COMPLETE SUPABASE SETUP SCRIPT
--- Paste and run this complete script in the Supabase SQL Editor.
+-- ARANYA ORGANIC DAIRY FARM — COMPLETE SUPABASE SETUP SCRIPT (BOOTSTRAP ONLY)
+-- WARNING: DO NOT RUN THIS SCRIPT IN PRODUCTION. It contains destructive DROP TABLE statements.
+-- For production deployments and schema management, use versioned migrations in:
+-- supabase/migrations/
 -- ============================================================================
 
 -- ----------------------------------------------------------------------------
--- 1. DROP EXISTING CONFLICTING TABLES (CLEAN SLATE)
+-- 1. DROP EXISTING CONFLICTING TABLES (CLEAN SLATE — DEV BOOTSTRAP ONLY)
 -- ----------------------------------------------------------------------------
 drop table if exists orders cascade;
 drop table if exists products cascade;

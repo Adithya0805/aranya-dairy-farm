@@ -36,18 +36,30 @@ type CartAction =
 
 function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
-    case 'HYDRATE':
-      return { items: action.items };
+    case 'HYDRATE': {
+      const validItems = action.items
+        .filter((i) => i.product && i.product.id && i.product.available !== false && i.quantity > 0)
+        .map((i) => ({
+          ...i,
+          quantity: Math.min(Math.max(1, Math.floor(Number(i.quantity) || 1)), 99),
+        }));
+      return { items: validItems };
+    }
 
     case 'ADD_ITEM': {
+      // Hardening: strictly reject unavailable products from being added to the cart
+      if (action.product.available === false) {
+        return state;
+      }
       const existing = state.items.find(
         (i) => i.product.id === action.product.id
       );
       if (existing) {
+        const nextQty = Math.min(existing.quantity + 1, 99);
         return {
           items: state.items.map((i) =>
             i.product.id === action.product.id
-              ? { ...i, quantity: i.quantity + 1 }
+              ? { ...i, quantity: nextQty }
               : i
           ),
         };
@@ -61,15 +73,17 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       };
 
     case 'UPDATE_QUANTITY': {
-      if (action.quantity <= 0) {
+      const sanitizedQty = Math.floor(Number(action.quantity) || 0);
+      if (sanitizedQty <= 0) {
         return {
           items: state.items.filter((i) => i.product.id !== action.productId),
         };
       }
+      const boundedQty = Math.min(sanitizedQty, 99);
       return {
         items: state.items.map((i) =>
           i.product.id === action.productId
-            ? { ...i, quantity: action.quantity }
+            ? { ...i, quantity: boundedQty }
             : i
         ),
       };

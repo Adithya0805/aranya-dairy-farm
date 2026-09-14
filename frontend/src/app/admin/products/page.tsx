@@ -373,7 +373,7 @@ export default function AdminProductsPage() {
       } else {
         setFeedback({
           type: 'error',
-          message: res.error || 'Failed to update product. Ensure SUPABASE_SERVICE_ROLE_KEY is set in .env.local',
+          message: res.error || 'Failed to update product. Please check server configuration and try again.',
         });
       }
     } catch (err: unknown) {

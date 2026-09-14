@@ -218,10 +218,9 @@ export async function POST(req: NextRequest) {
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.warn('[Gemini API] Request failed with status', response.status, errorText);
+      console.warn('[Gemini API] Request failed with status', response.status);
 
-      // Try fallback to gemini-1.5-flash if model name was custom or 2.5 failed
+      // Try fallback to gemini-1.5-flash if model name was custom or primary failed
       if (modelName !== 'gemini-1.5-flash') {
         const fallbackEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
         const fbResponse = await fetch(fallbackEndpoint, {
@@ -274,7 +273,8 @@ export async function POST(req: NextRequest) {
       source: modelName,
     });
   } catch (err) {
-    console.error('[Gemini API] Error calling model:', err);
+    const errorMsg = err instanceof Error ? err.message.replace(/key=[^&]+/g, 'key=REDACTED') : 'Unknown error';
+    console.error('[Gemini API] Error calling model:', errorMsg);
     // Gracefully provide verified knowledge
     const fallbackReply = generateLocalKnowledgeReply(sanitizedContent);
     return NextResponse.json({
