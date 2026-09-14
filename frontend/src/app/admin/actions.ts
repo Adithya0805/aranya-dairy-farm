@@ -8,6 +8,7 @@ export interface AdminProductPayload {
   id: string;
   price: number | null;
   available: boolean;
+  featured?: boolean;
   category_id?: string | null;
   unit?: string | null;
   description?: string | null;
@@ -26,7 +27,7 @@ export async function getAdminProductsAction(token?: string) {
     const admin = getAdminClient();
     const { data, error } = await admin
       .from('products')
-      .select('id, name, name_tamil, category_id, price, unit, image_url, available, description, created_at, categories(id, name)')
+      .select('id, name, name_tamil, category_id, price, unit, image_url, available, featured, description, created_at, categories(id, name)')
       .order('created_at', { ascending: true });
 
     if (error) {
@@ -116,6 +117,7 @@ export async function updateProductAction(payload: AdminProductPayload, token?: 
     if (payload.category_id !== undefined) updateData.category_id = payload.category_id;
     if (payload.unit !== undefined) updateData.unit = payload.unit ? payload.unit.trim() : null;
     if (payload.description !== undefined) updateData.description = payload.description ? payload.description.trim() : null;
+    if (payload.featured !== undefined) updateData.featured = Boolean(payload.featured);
 
     const { error } = await admin
       .from('products')
@@ -160,6 +162,7 @@ export async function updateProductWithImageAction(formData: FormData) {
 
   const rawPrice = formData.get('price') as string | null;
   const rawAvailable = formData.get('available') as string | null;
+  const rawFeatured = formData.get('featured') as string | null;
   const categoryName = formData.get('categoryName') as string | null;
   const categoryId = formData.get('categoryId') as string | null;
   const unit = formData.get('unit') as string | null;
@@ -250,6 +253,7 @@ export async function updateProductWithImageAction(formData: FormData) {
     const updatePayload: {
       price: number | null;
       available: boolean;
+      featured?: boolean;
       image_url?: string;
       category_id?: string;
       unit?: string | null;
@@ -258,6 +262,10 @@ export async function updateProductWithImageAction(formData: FormData) {
       price: parsedPrice,
       available: isAvailable,
     };
+
+    if (rawFeatured !== null && rawFeatured !== undefined) {
+      updatePayload.featured = rawFeatured === 'true';
+    }
 
     if (categoryId && categoryId.trim() !== '') {
       updatePayload.category_id = categoryId.trim();

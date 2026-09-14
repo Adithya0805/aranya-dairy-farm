@@ -15,6 +15,7 @@ export interface ProductRow {
   unit: string | null;
   image_url: string | null;
   available: boolean;
+  featured?: boolean;
   description: string | null;
   created_at?: string;
   categories?: {
@@ -101,7 +102,7 @@ export async function getProducts(): Promise<Product[]> {
   try {
     const { data, error } = await supabase
       .from('products')
-      .select('id, name, name_tamil, category_id, price, unit, image_url, available, description, categories(id, name)')
+      .select('id, name, name_tamil, category_id, price, unit, image_url, available, featured, description, created_at, categories(id, name)')
       .order('created_at', { ascending: true });
 
     if (error || !data || data.length === 0) {
@@ -118,12 +119,105 @@ export async function getProducts(): Promise<Product[]> {
       unit: row.unit || '',
       image: resolveProductImageUrl(row.image_url),
       available: Boolean(row.available),
+      featured: Boolean(row.featured),
+      createdAt: row.created_at,
       description: row.description || undefined,
     }));
   } catch (err) {
     console.warn('[Supabase] Failed to get products:', err);
     return PRODUCTS;
   }
+}
+
+/**
+ * Fetches live featured products for the Homepage Farm Favorites section.
+ * Shows products where featured = true (limit 3).
+ * If fewer than 3 are marked featured, returns only what exists without placeholders.
+ */
+export async function getFeaturedProducts(limit = 3): Promise<Product[]> {
+  if (!isSupabaseConfigured) {
+    return PRODUCTS.filter((p) => p.featured).slice(0, limit);
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('id, name, name_tamil, category_id, price, unit, image_url, available, featured, description, created_at, categories(id, name)')
+      .eq('featured', true)
+      .eq('available', true)
+      .order('created_at', { ascending: true })
+      .limit(limit);
+
+    if (error || !data) {
+      if (error) console.warn('[Supabase] Featured products fetch error:', error.message);
+      return [];
+    }
+
+    return (data as unknown as ProductRow[]).map((row) => ({
+      id: row.id,
+      name: row.name,
+      nameTamil: row.name_tamil || '',
+      category: ((row.categories?.name as ProductCategory) || 'General Store'),
+      price: row.price !== null && row.price !== undefined ? Number(row.price) : null,
+      unit: row.unit || '',
+      image: resolveProductImageUrl(row.image_url),
+      available: Boolean(row.available),
+      featured: Boolean(row.featured),
+      createdAt: row.created_at,
+      description: row.description || undefined,
+    }));
+  } catch (err) {
+    console.warn('[Supabase] Failed to get featured products:', err);
+    return [];
+  }
+}
+
+/**
+ * Dynamically resolves the best category cover photo from real products in that category.
+ * Priority:
+ * 1. A product in that category marked featured = true with a real photo.
+ * 2. Any product in that category with a real uploaded image, preferring the most recently updated photo.
+ * 3. Fallback default image.
+ */
+export function resolveCategoryCoverImage(
+  products: Product[] | undefined,
+  category: ProductCategory | string,
+  fallbackDefault: string
+): string {
+  if (!products || products.length === 0) {
+    return fallbackDefault;
+  }
+
+  const isRealPhoto = (img: string | undefined | null) => {
+    if (!img) return false;
+    if (img.includes('placeholder')) return false;
+    return true;
+  };
+
+  const candidates = products.filter(
+    (p) => p.category === category && isRealPhoto(p.image)
+  );
+
+  if (candidates.length === 0) {
+    return fallbackDefault;
+  }
+
+  const sorted = [...candidates].sort((a, b) => {
+    // 1. Prefer featured product
+    const aFeat = a.featured ? 1 : 0;
+    const bFeat = b.featured ? 1 : 0;
+    if (aFeat !== bFeat) return bFeat - aFeat;
+
+    // 2. Extract timestamp from storage URL (e.g. -1789318171152.webp)
+    const aMatch = a.image.match(/-(\d{10,15})\./);
+    const bMatch = b.image.match(/-(\d{10,15})\./);
+    const aTime = aMatch ? Number(aMatch[1]) : (a.createdAt ? new Date(a.createdAt).getTime() : 0);
+    const bTime = bMatch ? Number(bMatch[1]) : (b.createdAt ? new Date(b.createdAt).getTime() : 0);
+
+    return bTime - aTime;
+  });
+
+  return sorted[0].image || fallbackDefault;
 }
 
 /**

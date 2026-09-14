@@ -32,7 +32,7 @@ export default function ContactSection() {
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           
           {/* Left Column: Farm Address & Contact Info */}
-          <div className="lg:col-span-5 space-y-8">
+          <div className="lg:col-span-5 space-y-8 reveal-child" style={{ transitionDelay: '0ms' }}>
             <div className="space-y-4">
               <span className="text-xs font-sans uppercase font-bold tracking-widest text-[#B84A28]">
                 Visit Or Contact
@@ -79,7 +79,7 @@ export default function ContactSection() {
           </div>
 
           {/* Right Column: Clean Editorial Form */}
-          <div className="lg:col-span-7 bg-white p-6 sm:p-12 rounded-3xl border border-[#122E1B]/10 shadow-xs">
+          <div className="lg:col-span-7 bg-white p-6 sm:p-12 rounded-3xl border border-[#122E1B]/10 shadow-xs reveal-child" style={{ transitionDelay: '100ms' }}>
             <h3 className="text-2xl font-serif font-bold text-[#15321E] mb-2">
               Send a Delivery Inquiry
             </h3>

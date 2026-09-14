@@ -23,12 +23,12 @@ export default function Hero({ onShopClick }: HeroProps) {
       {/* Overlay gradient — rich dark green vignette ensuring pristine text contrast */}
       <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/65 to-black/30 sm:from-[#122E1B]/90 sm:via-[#122E1B]/70 sm:to-black/35" />
 
-      {/* Content — animate-fade-in plays on load */}
+      {/* Content — Sequenced Entrance Animation */}
       <div className="max-w-7xl mx-auto px-5 sm:px-10 lg:px-16 relative z-10 w-full py-16 sm:py-24">
-        <div className="max-w-xl sm:max-w-2xl space-y-5 sm:space-y-7 animate-fade-in">
+        <div className="max-w-xl sm:max-w-2xl space-y-5 sm:space-y-7">
 
-          {/* Hero headline */}
-          <div className="space-y-2">
+          {/* Hero headline (0ms) */}
+          <div className="space-y-2 animate-hero-headline">
             <span className="inline-block text-xs uppercase font-sans tracking-[0.25em] text-[#E58A13] font-bold">
               Shoolagiri, Tamil Nadu • Estd. 2017
             </span>
@@ -42,13 +42,13 @@ export default function Hero({ onShopClick }: HeroProps) {
             </h1>
           </div>
 
-          {/* Sub-copy — readable and balanced */}
-          <p className="text-sm sm:text-base lg:text-lg text-[#F4EFEB] font-sans font-normal leading-relaxed max-w-sm sm:max-w-xl">
+          {/* Sub-copy (100ms stagger) */}
+          <p className="text-sm sm:text-base lg:text-lg text-[#F4EFEB] font-sans font-normal leading-relaxed max-w-sm sm:max-w-xl animate-hero-subtext">
             Pure A2 milk, traditional Bilona ghee, and natural farm provisions from free-roaming, grass-fed cows. Delivered fresh every morning.
           </p>
 
-          {/* Amber pill CTA button & Justdial rating badge */}
-          <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          {/* Amber pill CTA button & Justdial rating badge (200ms stagger) */}
+          <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center gap-4 animate-hero-cta">
             <a
               href="/products"
               className="

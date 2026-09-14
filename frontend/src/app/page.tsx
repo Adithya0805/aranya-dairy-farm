@@ -15,7 +15,7 @@ import DetailModal, { ModalContent } from '@/components/DetailModal';
 import QuickViewModal from '@/components/QuickViewModal';
 import CartDrawer from '@/components/CartDrawer';
 import MobileBottomNav from '@/components/MobileBottomNav';
-import { Product, getProductPriceLabel } from '@/lib/products';
+import { Product, getProductPriceLabel, PRODUCTS } from '@/lib/products';
 import { getProducts } from '@/lib/catalog';
 
 export default function Home() {
@@ -31,7 +31,7 @@ export default function Home() {
   const [cartOpen, setCartOpen] = useState(false);
 
   // ── Live Products for Featured Showcase ─────────────────────────────────────
-  const [liveProducts, setLiveProducts] = useState<Product[]>([]);
+  const [liveProducts, setLiveProducts] = useState<Product[]>(PRODUCTS);
 
   useEffect(() => {
     getProducts().then((prods) => {
@@ -136,7 +136,7 @@ export default function Home() {
       <TrustBadgesSection />
 
       {/* 4. Featured Categories Showcase (Dairy, Rice & Millets, Pulses & Lentils) */}
-      <FeaturedCategoriesSection />
+      <FeaturedCategoriesSection products={liveProducts} />
 
       {/* 5. Featured Products Preview with Pill Add to Cart */}
       <FeaturedProductsPreview

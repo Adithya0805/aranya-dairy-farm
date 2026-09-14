@@ -28,6 +28,7 @@ create table products (
   unit text,                   -- e.g. "1 Litre", "500g", "1 kg"
   image_url text,              -- Supabase storage path: <category-folder>/<filename>
   available boolean default true,
+  featured boolean default false,
   description text,
   created_at timestamp default now(),
   constraint unique_product_name unique (name)

@@ -126,84 +126,88 @@ export default function Header({
               </button>
 
               {/* Dropdown Menu below Categories button with 3 links */}
-              {categoriesOpen && (
-                <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 z-50 animate-in fade-in zoom-in-95 duration-150">
-                  <div className="w-72 bg-[#122E1B] border border-[#E58A13]/35 rounded-2xl shadow-2xl p-2.5 space-y-1 backdrop-blur-xl">
-                    <div className="px-3 py-1.5 text-[10px] font-sans font-bold uppercase tracking-widest text-[#E58A13]/80 border-b border-white/10 mb-1">
-                      Browse by Category
+              <div
+                className={`absolute top-full left-1/2 -translate-x-1/2 pt-2 z-50 transition-all duration-200 ease-out origin-top ${
+                  categoriesOpen
+                    ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto'
+                    : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
+                }`}
+              >
+                <div className="w-72 bg-[#122E1B] border border-[#E58A13]/35 rounded-2xl shadow-2xl p-2.5 space-y-1 backdrop-blur-xl">
+                  <div className="px-3 py-1.5 text-[10px] font-sans font-bold uppercase tracking-widest text-[#E58A13]/80 border-b border-white/10 mb-1">
+                    Browse by Category
+                  </div>
+
+                  {/* 1. Pure A2 Dairy */}
+                  <a
+                    href="/products?category=Dairy"
+                    onClick={(e) => handleCategoryClick('Dairy', e)}
+                    className="flex flex-col p-2.5 rounded-xl hover:bg-[#1C3E25] transition-colors group cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-serif text-sm font-bold text-[#FAF7F2] group-hover:text-[#E58A13] transition-colors">
+                        Pure A2 Dairy
+                      </span>
+                      <span className="text-[10px] text-[#E58A13] font-sans font-bold uppercase tracking-wider">
+                        Dairy
+                      </span>
                     </div>
+                    <span className="text-[11px] text-[#A8B7AA] font-sans mt-0.5">
+                      Raw milk, Bilona ghee &amp; butter
+                    </span>
+                  </a>
 
-                    {/* 1. Pure A2 Dairy */}
-                    <a
-                      href="/products?category=Dairy"
-                      onClick={(e) => handleCategoryClick('Dairy', e)}
-                      className="flex flex-col p-2.5 rounded-xl hover:bg-[#1C3E25] transition-colors group cursor-pointer"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-serif text-sm font-bold text-[#FAF7F2] group-hover:text-[#E58A13] transition-colors">
-                          Pure A2 Dairy
-                        </span>
-                        <span className="text-[10px] text-[#E58A13] font-sans font-bold uppercase tracking-wider">
-                          Dairy
-                        </span>
-                      </div>
-                      <span className="text-[11px] text-[#A8B7AA] font-sans mt-0.5">
-                        Raw milk, Bilona ghee &amp; butter
+                  {/* 2. Heritage Rice & Millets */}
+                  <a
+                    href="/products?category=Rice%20%26%20Millets"
+                    onClick={(e) => handleCategoryClick('Rice & Millets', e)}
+                    className="flex flex-col p-2.5 rounded-xl hover:bg-[#1C3E25] transition-colors group cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-serif text-sm font-bold text-[#FAF7F2] group-hover:text-[#E58A13] transition-colors">
+                        Heritage Rice &amp; Millets
                       </span>
-                    </a>
-
-                    {/* 2. Heritage Rice & Millets */}
-                    <a
-                      href="/products?category=Rice%20%26%20Millets"
-                      onClick={(e) => handleCategoryClick('Rice & Millets', e)}
-                      className="flex flex-col p-2.5 rounded-xl hover:bg-[#1C3E25] transition-colors group cursor-pointer"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-serif text-sm font-bold text-[#FAF7F2] group-hover:text-[#E58A13] transition-colors">
-                          Heritage Rice &amp; Millets
-                        </span>
-                        <span className="text-[10px] text-[#B84A28] font-sans font-bold uppercase tracking-wider">
-                          Grains
-                        </span>
-                      </div>
-                      <span className="text-[11px] text-[#A8B7AA] font-sans mt-0.5">
-                        Traditional rice &amp; native millets
+                      <span className="text-[10px] text-[#B84A28] font-sans font-bold uppercase tracking-wider">
+                        Grains
                       </span>
-                    </a>
-
-                    {/* 3. Organic Pulses & Lentils */}
-                    <a
-                      href="/products?category=Pulses%20%26%20Lentils"
-                      onClick={(e) => handleCategoryClick('Pulses & Lentils', e)}
-                      className="flex flex-col p-2.5 rounded-xl hover:bg-[#1C3E25] transition-colors group cursor-pointer"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-serif text-sm font-bold text-[#FAF7F2] group-hover:text-[#E58A13] transition-colors">
-                          Organic Pulses &amp; Lentils
-                        </span>
-                        <span className="text-[10px] text-[#E58A13] font-sans font-bold uppercase tracking-wider">
-                          Pulses
-                        </span>
-                      </div>
-                      <span className="text-[11px] text-[#A8B7AA] font-sans mt-0.5">
-                        Unpolished dals &amp; legumes
-                      </span>
-                    </a>
-
-                    {/* All Products Showcase Link */}
-                    <div className="pt-2 mt-1 border-t border-white/10">
-                      <a
-                        href="/products"
-                        onClick={() => setCategoriesOpen(false)}
-                        className="flex items-center justify-between p-2.5 rounded-xl text-xs font-sans font-bold text-[#FAF7F2] hover:bg-[#E58A13] hover:text-white transition-all uppercase tracking-wider"
-                      >
-                        <span>All Products Showcase</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </a>
                     </div>
+                    <span className="text-[11px] text-[#A8B7AA] font-sans mt-0.5">
+                      Traditional rice &amp; native millets
+                    </span>
+                  </a>
+
+                  {/* 3. Organic Pulses & Lentils */}
+                  <a
+                    href="/products?category=Pulses%20%26%20Lentils"
+                    onClick={(e) => handleCategoryClick('Pulses & Lentils', e)}
+                    className="flex flex-col p-2.5 rounded-xl hover:bg-[#1C3E25] transition-colors group cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-serif text-sm font-bold text-[#FAF7F2] group-hover:text-[#E58A13] transition-colors">
+                        Organic Pulses &amp; Lentils
+                      </span>
+                      <span className="text-[10px] text-[#E58A13] font-sans font-bold uppercase tracking-wider">
+                        Pulses
+                      </span>
+                    </div>
+                    <span className="text-[11px] text-[#A8B7AA] font-sans mt-0.5">
+                      Unpolished dals &amp; legumes
+                    </span>
+                  </a>
+
+                  {/* All Products Showcase Link */}
+                  <div className="pt-2 mt-1 border-t border-white/10">
+                    <a
+                      href="/products"
+                      onClick={() => setCategoriesOpen(false)}
+                      className="flex items-center justify-between p-2.5 rounded-xl text-xs font-sans font-bold text-[#FAF7F2] hover:bg-[#E58A13] hover:text-white transition-all uppercase tracking-wider"
+                    >
+                      <span>All Products Showcase</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </a>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
 
             <a

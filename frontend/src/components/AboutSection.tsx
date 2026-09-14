@@ -72,7 +72,7 @@ export default function AboutSection({ onOpenColdChain, onOpenStory }: AboutSect
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-center">
           
           {/* Left Side Visual: Real Farm / Pasture Photography */}
-          <div className="lg:col-span-6">
+          <div className="lg:col-span-6 reveal-child" style={{ transitionDelay: '0ms' }}>
             <div className="w-full aspect-[4/3] sm:aspect-[1/1] overflow-hidden rounded-3xl relative shadow-lg group border border-[#122E1B]/10">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -93,7 +93,7 @@ export default function AboutSection({ onOpenColdChain, onOpenStory }: AboutSect
           </div>
 
           {/* Right Side: Editorial Storytelling */}
-          <div className="lg:col-span-6 space-y-6">
+          <div className="lg:col-span-6 space-y-6 reveal-child" style={{ transitionDelay: '100ms' }}>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E58A13]/10 text-[#E58A13] text-xs font-bold uppercase tracking-wider">
               <span>Our 9-Year Story • Estd. 2017</span>
             </div>
@@ -126,10 +126,14 @@ export default function AboutSection({ onOpenColdChain, onOpenStory }: AboutSect
 
         {/* 3-Column Mini Feature Row Below */}
         <div className="pt-8 border-t border-[#122E1B]/10 grid grid-cols-1 sm:grid-cols-3 gap-8">
-          {miniFeatures.map((feat) => {
+          {miniFeatures.map((feat, index) => {
             const Icon = feat.icon;
             return (
-              <div key={feat.title} className="flex items-start gap-4 p-4 rounded-xl bg-white/70 border border-[#122E1B]/5">
+              <div
+                key={feat.title}
+                className="reveal-child flex items-start gap-4 p-4 rounded-xl bg-white/70 border border-[#122E1B]/5 hover:bg-white transition-all duration-200"
+                style={{ transitionDelay: `${index * 80 + 150}ms` }}
+              >
                 <div className="w-10 h-10 rounded-full bg-[#E58A13]/10 border border-[#E58A13]/20 flex items-center justify-center shrink-0">
                   <Icon className="w-5 h-5 text-[#E58A13]" />
                 </div>

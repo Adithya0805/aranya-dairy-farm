@@ -13,42 +13,6 @@ interface FeaturedProductsPreviewProps {
   onQuickView?: (product: Product) => void;
 }
 
-const DEFAULT_FEATURED: Product[] = [
-  {
-    id: 'a2-desi-cow-milk',
-    name: 'A2 Desi Cow Milk',
-    nameTamil: 'A2 நாட்டுப் பசும்பால்',
-    category: 'Dairy',
-    price: null,
-    unit: '1 Litre Glass Bottle',
-    image: '/images/a2_milk_bottle.jpg',
-    available: true,
-    description: '100% pure raw A2 milk from free-roaming Gir and Sahiwal cows, naturally rich in A2 beta-casein.',
-  },
-  {
-    id: 'desi-cow-ghee',
-    name: 'Traditional Desi Cow Ghee',
-    nameTamil: 'தேசி பசும் நெய்',
-    category: 'Dairy',
-    price: null,
-    unit: '500ml Glass Jar',
-    image: '/images/bilona_ghee_jar.jpg',
-    available: true,
-    description: 'Authentic Desi cow ghee crafted following time-tested Vedic Bilona curd-churning methods.',
-  },
-  {
-    id: 'fresh-butter',
-    name: 'Fresh Cultured Butter',
-    nameTamil: 'வெண்ணெய்',
-    category: 'Dairy',
-    price: null,
-    unit: '250g',
-    image: '/images/vedic_butter.jpg',
-    available: true,
-    description: 'Traditional cultured butter, freshly hand-churned daily from whole farm milk cream.',
-  },
-];
-
 export default function FeaturedProductsPreview({
   products,
   onSelectProduct,
@@ -57,26 +21,13 @@ export default function FeaturedProductsPreview({
   const { addItem, items } = useCart();
   const sectionRef = useScrollReveal<HTMLElement>();
 
-  // Use provided products (if live updated from Supabase) or fallback defaults
+  // Show products where featured = true (limit 3). If fewer than 3, show only what exists without placeholders.
   const previewProducts = React.useMemo(() => {
-    if (products && products.length >= 3) {
-      const matchA2 = products.find((p) => p.id === 'a2-desi-cow-milk') || products[0];
-      const matchGhee = products.find((p) => p.id === 'desi-cow-ghee') || products[1];
-      const matchButter = products.find((p) => p.id === 'fresh-butter') || products[2];
-      return [
-        { ...matchA2, image: matchA2.image.includes('placeholder') ? '/images/a2_milk_bottle.jpg' : matchA2.image },
-        { ...matchGhee, image: matchGhee.image.includes('placeholder') ? '/images/bilona_ghee_jar.jpg' : matchGhee.image },
-        { ...matchButter, image: matchButter.image.includes('placeholder') ? '/images/vedic_butter.jpg' : matchButter.image },
-      ];
-    }
-    return DEFAULT_FEATURED;
+    if (!products) return [];
+    return products.filter((p) => p.featured).slice(0, 3);
   }, [products]);
 
-  const [quantities, setQuantities] = useState<Record<string, number>>(() => ({
-    'a2-desi-cow-milk': 1,
-    'desi-cow-ghee': 1,
-    'fresh-butter': 1,
-  }));
+  const [quantities, setQuantities] = useState<Record<string, number>>({});
 
   const handleQtyChange = (id: string, delta: number) => {
     setQuantities((prev) => ({
@@ -101,6 +52,10 @@ export default function FeaturedProductsPreview({
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`, '_blank', 'noopener,noreferrer');
   };
 
+  if (previewProducts.length === 0) {
+    return null;
+  }
+
   return (
     <section
       ref={sectionRef}
@@ -120,8 +75,16 @@ export default function FeaturedProductsPreview({
           </p>
         </div>
 
-        {/* 3 Product Cards Preview */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
+        {/* Product Cards Preview - dynamically handles 1, 2, or 3 cards */}
+        <div
+          className={`grid grid-cols-1 ${
+            previewProducts.length === 1
+              ? 'max-w-md mx-auto'
+              : previewProducts.length === 2
+              ? 'md:grid-cols-2 max-w-4xl mx-auto'
+              : 'md:grid-cols-3'
+          } gap-8 lg:gap-10`}
+        >
           {previewProducts.map((product, index) => {
             const hasPrice = product.price !== null;
             const inCart = items.find((i) => i.product.id === product.id)?.quantity ?? 0;
@@ -130,8 +93,8 @@ export default function FeaturedProductsPreview({
             return (
               <div
                 key={product.id}
-                className="group flex flex-col bg-white rounded-2xl border border-[#122E1B]/10 overflow-hidden shadow-xs hover:shadow-xl hover:border-[#E58A13]/35 hover:-translate-y-1.5 transition-all duration-300 p-5 animate-card-reveal"
-                style={{ animationDelay: `${index * 80}ms` }}
+                className="group reveal-child flex flex-col bg-white rounded-2xl border border-[#122E1B]/10 overflow-hidden shadow-xs hover:shadow-xl hover:border-[#E58A13]/35 hover:-translate-y-1 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 p-5"
+                style={{ transitionDelay: `${index * 90}ms` }}
               >
                 {/* Product Image */}
                 <div

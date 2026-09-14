@@ -20,7 +20,7 @@ export default function TestimonialsSection() {
         
         {/* Editorial Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div className="max-w-2xl space-y-3">
+          <div className="max-w-2xl space-y-3 reveal-child" style={{ transitionDelay: '0ms' }}>
             <span className="text-xs font-sans uppercase font-bold tracking-widest text-[#B84A28]">
               Verified Feedback • Justdial Listed
             </span>
@@ -33,7 +33,7 @@ export default function TestimonialsSection() {
           </div>
 
           {/* Justdial Verified Rating Card */}
-          <div className="bg-white p-5 rounded-2xl border border-[#122E1B]/15 shadow-sm space-y-3 shrink-0 max-w-sm">
+          <div className="bg-white p-5 rounded-2xl border border-[#122E1B]/15 shadow-sm space-y-3 shrink-0 max-w-sm reveal-child" style={{ transitionDelay: '100ms' }}>
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-2">
                 <div className="px-2.5 py-1 rounded-md bg-[#122E1B] text-white font-sans font-bold text-sm flex items-center gap-1">
@@ -68,7 +68,7 @@ export default function TestimonialsSection() {
 
         {/* 2 Core Verifiable Standards Spotlights */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-          <div className="space-y-4 bg-white p-6 sm:p-8 rounded-2xl border border-[#122E1B]/10">
+          <div className="space-y-4 bg-white p-6 sm:p-8 rounded-2xl border border-[#122E1B]/10 reveal-child hover:border-[#E58A13]/30 transition-all duration-200" style={{ transitionDelay: '180ms' }}>
             <div className="w-10 h-10 rounded-full bg-[#E58A13]/10 flex items-center justify-center text-[#E58A13] font-serif font-bold text-lg">
               A2
             </div>
@@ -80,7 +80,7 @@ export default function TestimonialsSection() {
             </p>
           </div>
 
-          <div className="space-y-4 bg-white p-6 sm:p-8 rounded-2xl border border-[#122E1B]/10">
+          <div className="space-y-4 bg-white p-6 sm:p-8 rounded-2xl border border-[#122E1B]/10 reveal-child hover:border-[#E58A13]/30 transition-all duration-200" style={{ transitionDelay: '260ms' }}>
             <div className="w-10 h-10 rounded-full bg-[#E58A13]/10 flex items-center justify-center text-[#E58A13] font-serif font-bold text-lg">
               ★
             </div>

@@ -53,6 +53,7 @@ interface AdminProduct {
   unit: string | null;
   image_url: string | null;
   available: boolean;
+  featured?: boolean;
   description: string | null;
   categories?: {
     id: string;
@@ -97,6 +98,7 @@ export default function AdminProductsPage() {
   const [editingProduct, setEditingProduct] = useState<AdminProduct | null>(null);
   const [editPrice, setEditPrice] = useState<string>('');
   const [editAvailable, setEditAvailable] = useState<boolean>(true);
+  const [editFeatured, setEditFeatured] = useState<boolean>(false);
   const [editCategoryId, setEditCategoryId] = useState<string>('');
   const [editCategoryName, setEditCategoryName] = useState<string>('');
   const [editUnit, setEditUnit] = useState<string>('');
@@ -126,7 +128,7 @@ export default function AdminProductsPage() {
         // Fallback: public select is allowed by RLS on products table
         const { data, error } = await supabase
           .from('products')
-          .select('id, name, name_tamil, category_id, price, unit, image_url, available, description, created_at, categories(id, name)')
+          .select('id, name, name_tamil, category_id, price, unit, image_url, available, featured, description, created_at, categories(id, name)')
           .order('created_at', { ascending: true });
 
         if (!error && data) {
@@ -216,6 +218,7 @@ export default function AdminProductsPage() {
     setEditingProduct(product);
     setEditPrice(product.price !== null && product.price !== undefined ? String(product.price) : '');
     setEditAvailable(Boolean(product.available));
+    setEditFeatured(Boolean(product.featured));
     const catId = product.category_id || product.categories?.id || '';
     const catName = product.categories?.name || '';
     setEditCategoryId(catId);
@@ -317,6 +320,7 @@ export default function AdminProductsPage() {
       formData.append('id', editingProduct.id);
       formData.append('price', editPrice);
       formData.append('available', String(editAvailable));
+      formData.append('featured', String(editFeatured));
       if (editCategoryId) {
         formData.append('categoryId', editCategoryId);
       }
@@ -354,6 +358,7 @@ export default function AdminProductsPage() {
                   ...p,
                   price: parsedPrice,
                   available: editAvailable,
+                  featured: editFeatured,
                   category_id: editCategoryId || p.category_id,
                   unit: editUnit.trim() || p.unit,
                   description: editDescription.trim() || null,
@@ -1573,6 +1578,31 @@ export default function AdminProductsPage() {
                       {editAvailable
                         ? 'Product appears live on customer storefront catalog.'
                         : 'Product is hidden from customer storefront catalog.'}
+                    </span>
+                  </div>
+                </label>
+              </div>
+
+              {/* Show on Homepage Toggle */}
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#1C241E] mb-2">
+                  Homepage Placement
+                </label>
+                <label className="flex items-center gap-3 p-3 border border-[#1B4D2E]/15 rounded-md cursor-pointer hover:bg-[#FCFAF7] transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={editFeatured}
+                    onChange={(e) => setEditFeatured(e.target.checked)}
+                    className="w-4 h-4 text-[#1B4D2E] rounded focus:ring-[#1B4D2E] cursor-pointer"
+                  />
+                  <div>
+                    <span className="text-sm font-semibold text-[#1C241E] block">
+                      Show on Homepage (Farm Favorites)
+                    </span>
+                    <span className="text-[11px] text-[#57655B] block">
+                      {editFeatured
+                        ? 'Product will be featured on the homepage Farm Favorites section (up to 3 items).'
+                        : 'Product will not be highlighted in Farm Favorites on the homepage.'}
                     </span>
                   </div>
                 </label>

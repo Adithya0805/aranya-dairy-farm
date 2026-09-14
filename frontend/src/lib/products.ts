@@ -40,6 +40,8 @@ export interface Product {
   unit: string;         // e.g. "1 Litre", "500g", "1 kg"
   image: string;        // neutral placeholder until real photography is shot
   available: boolean;   // true for 24 confirmed items, false for 8 pending Rice items
+  featured?: boolean;   // true if featured on homepage Farm Favorites
+  createdAt?: string;   // ISO timestamp
   description?: string;
 }
 
@@ -65,8 +67,9 @@ export const PRODUCTS: Product[] = [
     category: 'Dairy',
     price: null,
     unit: '1 Litre Glass Bottle',
-    image: '/images/placeholder-product.svg',
+    image: '/images/a2_milk_bottle.jpg',
     available: true,
+    featured: true,
     description: '100% pure raw A2 milk from free-roaming Gir and Sahiwal cows, naturally rich in A2 beta-casein.',
   },
   {
@@ -87,8 +90,9 @@ export const PRODUCTS: Product[] = [
     category: 'Dairy',
     price: null,
     unit: '250g',
-    image: '/images/placeholder-product.svg',
+    image: '/images/vedic_butter.jpg',
     available: true,
+    featured: true,
     description: 'Traditional cultured butter, freshly hand-churned daily from whole farm cream.',
   },
   {
@@ -109,8 +113,9 @@ export const PRODUCTS: Product[] = [
     category: 'Dairy',
     price: null,
     unit: '500ml Glass Jar',
-    image: '/images/placeholder-product.svg',
+    image: '/images/bilona_ghee_jar.jpg',
     available: true,
+    featured: true,
     description: 'Authentic Desi cow ghee crafted following time-tested indigenous Indian methods.',
   },
   {

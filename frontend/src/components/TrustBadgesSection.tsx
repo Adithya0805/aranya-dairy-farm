@@ -39,7 +39,7 @@ export default function TrustBadgesSection() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 lg:gap-8">
-          {badges.map((badge) => {
+          {badges.map((badge, index) => {
             const IconComponent = badge.icon;
             const content = (
               <div
@@ -79,7 +79,8 @@ export default function TrustBadgesSection() {
                   href={badge.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block focus:outline-hidden focus:ring-2 focus:ring-[#E58A13] rounded-xl"
+                  className="reveal-child block focus:outline-hidden focus:ring-2 focus:ring-[#E58A13] rounded-xl"
+                  style={{ transitionDelay: `${index * 80}ms` }}
                   aria-label="View Aranya Organic Dairy Farm reviews on Justdial"
                 >
                   {content}
@@ -87,7 +88,15 @@ export default function TrustBadgesSection() {
               );
             }
 
-            return <div key={badge.title}>{content}</div>;
+            return (
+              <div
+                key={badge.title}
+                className="reveal-child block"
+                style={{ transitionDelay: `${index * 80}ms` }}
+              >
+                {content}
+              </div>
+            );
           })}
         </div>
       </div>

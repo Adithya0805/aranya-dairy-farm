@@ -3,15 +3,23 @@
 import React from 'react';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
+import { Product } from '@/lib/products';
+import { resolveCategoryCoverImage } from '@/lib/catalog';
 
 interface FeaturedCategoriesSectionProps {
+  products?: Product[];
   onSelectCategory?: (category: string) => void;
 }
 
 export default function FeaturedCategoriesSection({
+  products,
   onSelectCategory,
 }: FeaturedCategoriesSectionProps) {
   const sectionRef = useScrollReveal<HTMLElement>();
+
+  const dairyImg = resolveCategoryCoverImage(products, 'Dairy', '/images/a2_milk_bottle.jpg');
+  const riceImg = resolveCategoryCoverImage(products, 'Rice & Millets', '/images/placeholder-product.svg');
+  const pulsesImg = resolveCategoryCoverImage(products, 'Pulses & Lentils', '/images/placeholder-product.svg');
 
   const featured = [
     {
@@ -20,7 +28,7 @@ export default function FeaturedCategoriesSection({
       tamilTitle: 'பால் & நெய் வகைகள்',
       description:
         'Raw unpasteurized A2 cow milk, traditional hand-churned Bilona ghee, and cultured white butter directly from Shoolagiri.',
-      image: '/images/a2_milk_bottle.jpg',
+      image: dairyImg,
       cta: 'Explore Dairy',
     },
     {
@@ -29,7 +37,7 @@ export default function FeaturedCategoriesSection({
       tamilTitle: 'அரிசி & சிறுதானியங்கள்',
       description:
         'Naturally cultivated traditional rice varieties, unpolished barnyard, kodo, and indigenous nutrition-dense millets.',
-      image: '/images/nature_hero_pasture.jpg',
+      image: riceImg,
       cta: 'Explore Grains',
     },
     {
@@ -38,7 +46,7 @@ export default function FeaturedCategoriesSection({
       tamilTitle: 'பருப்பு வகைகள்',
       description:
         'Unpolished protein-rich toor dal, urad dal, and indigenous native legumes cultivated without synthetic chemicals.',
-      image: '/images/bilona_ghee_jar.jpg',
+      image: pulsesImg,
       cta: 'Explore Pulses',
     },
   ];
@@ -69,8 +77,8 @@ export default function FeaturedCategoriesSection({
           {featured.map((item, index) => (
             <div
               key={item.category}
-              className="group flex flex-col bg-white rounded-2xl border border-[#122E1B]/10 overflow-hidden shadow-xs hover:shadow-xl hover:border-[#E58A13]/35 hover:-translate-y-1.5 transition-all duration-300 animate-card-reveal"
-              style={{ animationDelay: `${index * 90}ms` }}
+              className="group reveal-child flex flex-col bg-white rounded-2xl border border-[#122E1B]/10 overflow-hidden shadow-xs hover:shadow-xl hover:border-[#E58A13]/35 hover:-translate-y-1 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+              style={{ transitionDelay: `${index * 90}ms` }}
             >
               {/* Image Container */}
               <div className="w-full aspect-[4/3] bg-[#F2ECE7] overflow-hidden relative">

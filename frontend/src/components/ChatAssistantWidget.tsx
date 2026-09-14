@@ -208,7 +208,7 @@ export default function ChatAssistantWidget() {
           type="button"
           onClick={() => setIsOpen((prev) => !prev)}
           aria-label={isOpen ? 'Close farm AI chat assistant' : 'Open farm AI chat assistant'}
-          className="relative flex items-center justify-center gap-2.5 bg-[#15321E] hover:bg-[#1C3E25] active:scale-95 text-white p-3 sm:px-4 sm:py-3.5 rounded-full shadow-xl hover:shadow-2xl border-2 border-[#E58A13]/80 transition-all duration-200 cursor-pointer min-h-[48px] min-w-[48px] touch-manipulation group"
+          className="relative flex items-center justify-center gap-2.5 bg-[#15321E] hover:bg-[#1C3E25] active:scale-95 text-white p-3 sm:px-4 sm:py-3.5 rounded-full shadow-xl hover:shadow-2xl border-2 border-[#E58A13]/80 transition-all duration-200 cursor-pointer min-h-[48px] min-w-[48px] touch-manipulation group animate-floating-pulse"
         >
           {isOpen ? (
             <X className="w-5 h-5 sm:w-6 sm:h-6 text-[#FAF7F2] transition-transform duration-200 group-hover:rotate-90" />
