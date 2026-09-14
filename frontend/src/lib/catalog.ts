@@ -251,7 +251,9 @@ export async function createOrder(payload: {
  * Used to verify that Row Level Security (RLS) actively blocks unauthorized writes.
  */
 export async function testAnonProductWrite() {
-  console.log('%c[RLS Test] Testing public anon write to "products" table...', 'color: #1B4D2E; font-weight: bold;');
+  if (process.env.NODE_ENV === 'development') {
+    console.log('%c[RLS Test] Testing public anon write to "products" table...', 'color: #1B4D2E; font-weight: bold;');
+  }
   try {
     const { data, error } = await supabase
       .from('products')
@@ -263,22 +265,28 @@ export async function testAnonProductWrite() {
       });
 
     if (error) {
-      console.log(
-        '%c[RLS Test PASSED] Write was successfully blocked by RLS!',
-        'color: green; font-weight: bold;',
-        { code: error.code, message: error.message, details: error.details }
-      );
+      if (process.env.NODE_ENV === 'development') {
+        console.log(
+          '%c[RLS Test PASSED] Write was successfully blocked by RLS!',
+          'color: green; font-weight: bold;',
+          { code: error.code, message: error.message, details: error.details }
+        );
+      }
       return { success: true, blocked: true, error };
     } else {
-      console.error(
-        '%c[RLS Test FAILED] Write succeeded! RLS is not properly restricting public INSERTs on products.',
-        'color: red; font-weight: bold;',
-        data
-      );
+      if (process.env.NODE_ENV === 'development') {
+        console.error(
+          '%c[RLS Test FAILED] Write succeeded! RLS is not properly restricting public INSERTs on products.',
+          'color: red; font-weight: bold;',
+          data
+        );
+      }
       return { success: false, blocked: false, data };
     }
   } catch (err) {
-    console.log('[RLS Test PASSED with exception]:', err);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[RLS Test PASSED with exception]:', err);
+    }
     return { success: true, blocked: true, error: err };
   }
 }

@@ -15,7 +15,6 @@ import {
   Printer,
   Copy,
   Package,
-  ExternalLink,
   Trash2,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';

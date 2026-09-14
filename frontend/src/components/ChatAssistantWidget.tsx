@@ -13,7 +13,7 @@ import {
   User,
   ArrowRight,
 } from 'lucide-react';
-import { WHATSAPP_DISPLAY, WA_GENERAL_ORDER, buildWhatsAppUrl } from '@/lib/whatsapp';
+import { WHATSAPP_DISPLAY, buildWhatsAppUrl } from '@/lib/whatsapp';
 import { useCart } from '@/context/CartContext';
 
 interface Message {
@@ -54,11 +54,6 @@ export default function ChatAssistantWidget() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Do not render chat widget on admin portal
-  if (pathname?.startsWith('/admin')) {
-    return null;
-  }
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -66,9 +61,7 @@ export default function ChatAssistantWidget() {
   useEffect(() => {
     if (isOpen) {
       scrollToBottom();
-      setUnreadNotification(false);
-      // Focus input field on desktop when opened
-      if (window.innerWidth >= 640) {
+      if (typeof window !== 'undefined' && window.innerWidth >= 640) {
         setTimeout(() => inputRef.current?.focus(), 150);
       }
     }
@@ -198,6 +191,11 @@ export default function ChatAssistantWidget() {
     });
   };
 
+  // Do not render chat widget on admin portal
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
+
   return (
     <>
       {/* ── 1. Floating Chat Bubble Launcher ───────────────────────────────── */}
@@ -206,7 +204,10 @@ export default function ChatAssistantWidget() {
       <div className="fixed bottom-[8.5rem] right-4 sm:bottom-22 sm:right-6 z-40">
         <button
           type="button"
-          onClick={() => setIsOpen((prev) => !prev)}
+          onClick={() => {
+            setIsOpen((prev) => !prev);
+            setUnreadNotification(false);
+          }}
           aria-label={isOpen ? 'Close farm AI chat assistant' : 'Open farm AI chat assistant'}
           className="relative flex items-center justify-center gap-2.5 bg-[#15321E] hover:bg-[#1C3E25] active:scale-95 text-white p-3 sm:px-4 sm:py-3.5 rounded-full shadow-xl hover:shadow-2xl border-2 border-[#E58A13]/80 transition-all duration-200 cursor-pointer min-h-[48px] min-w-[48px] touch-manipulation group animate-floating-pulse"
         >

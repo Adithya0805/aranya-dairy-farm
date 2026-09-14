@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ShoppingBag, LayoutGrid, ShoppingCart, Phone, X, ArrowRight } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 
@@ -12,25 +14,19 @@ interface MobileBottomNavProps {
 
 export default function MobileBottomNav({
   onOpenCart,
-  onOpenContact,
+  onOpenContact: _onOpenContact,
   onSelectCategory,
 }: MobileBottomNavProps) {
+  const router = useRouter();
   const { totalItems } = useCart();
   const [sheetOpen, setSheetOpen] = useState(false);
-
-  const scrollToSection = (sectionId: string) => {
-    const el = document.getElementById(sectionId);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   const handleShopClick = () => {
     const el = document.getElementById('products');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     } else {
-      window.location.href = '/products';
+      router.push('/products');
     }
   };
 
@@ -44,7 +40,7 @@ export default function MobileBottomNav({
         return;
       }
     }
-    window.location.href = `/products?category=${encodeURIComponent(cat)}`;
+    router.push(`/products?category=${encodeURIComponent(cat)}`);
   };
 
   return (
@@ -129,14 +125,14 @@ export default function MobileBottomNav({
             </div>
 
             <div className="pt-2 border-t border-white/10">
-              <a
+              <Link
                 href="/products"
                 onClick={() => setSheetOpen(false)}
                 className="w-full py-3 px-4 rounded-full bg-[#E58A13] hover:bg-[#CA7508] active:scale-95 text-white font-sans text-xs uppercase font-bold tracking-wider flex items-center justify-center gap-2 transition-all shadow-md"
               >
                 <span>View All Products Showcase</span>
                 <ArrowRight className="w-4 h-4" />
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -187,14 +183,14 @@ export default function MobileBottomNav({
           </button>
 
           {/* Contact */}
-          <a
+          <Link
             href="/contact"
             className="flex flex-col items-center justify-center py-1 text-[#15321E] hover:text-[#E58A13] active:scale-95 transition-all touch-manipulation min-h-[48px]"
             aria-label="Open contact information"
           >
             <Phone className="w-5 h-5 mb-0.5 text-[#15321E]" />
             <span className="text-[10px] font-sans font-semibold tracking-wider uppercase">Contact</span>
-          </a>
+          </Link>
         </nav>
       </aside>
     </>

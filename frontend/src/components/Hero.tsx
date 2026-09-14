@@ -1,13 +1,14 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { Star, ExternalLink, ArrowRight } from 'lucide-react';
 
 interface HeroProps {
   onShopClick?: () => void;
 }
 
-export default function Hero({ onShopClick }: HeroProps) {
+export default function Hero({ onShopClick: _onShopClick }: HeroProps) {
   return (
     <section className="relative w-full min-h-[76vh] sm:min-h-[82vh] lg:min-h-[88vh] flex items-center justify-start overflow-hidden bg-[#122E1B]">
 
@@ -49,7 +50,7 @@ export default function Hero({ onShopClick }: HeroProps) {
 
           {/* Amber pill CTA button & Justdial rating badge (200ms stagger) */}
           <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center gap-4 animate-hero-cta">
-            <a
+            <Link
               href="/products"
               className="
                 inline-flex items-center justify-center gap-2 text-center
@@ -61,7 +62,7 @@ export default function Hero({ onShopClick }: HeroProps) {
             >
               <span>Explore All Farm Products</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </a>
+            </Link>
 
             {/* Above-the-fold Justdial Social Proof Pill */}
             <a

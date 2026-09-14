@@ -7,7 +7,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** International format, no spaces or symbols. Used in wa.me URLs. */
-export const WHATSAPP_NUMBER = '918825714576';
+export const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '918825714576';
 
 /** Human-readable display label. */
 export const WHATSAPP_DISPLAY = '+91 88257 14576';

@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import TrustBadgesSection from '@/components/TrustBadgesSection';
 import Footer from '@/components/Footer';
@@ -11,6 +13,7 @@ import { ArrowLeft, ArrowRight, Heart, Sparkles, Droplets, ShieldCheck, Sun, Mes
 import { WA_STORY_INQUIRY } from '@/lib/whatsapp';
 
 export default function StoryPage() {
+  const router = useRouter();
   const [cartOpen, setCartOpen] = useState(false);
 
   const pillars = [
@@ -85,13 +88,13 @@ export default function StoryPage() {
             
             {/* Breadcrumb Navigation - Quite Larger with Rich Interaction */}
             <nav aria-label="Breadcrumbs" className="flex items-center flex-wrap gap-2.5 sm:gap-3.5">
-              <a
+              <Link
                 href="/"
                 className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white/90 hover:bg-white text-[#15321E] hover:text-[#E58A13] font-sans text-sm sm:text-base font-semibold border border-[#122E1B]/10 shadow-xs transition-all duration-200 group active:scale-95 cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4 text-[#E58A13] group-hover:-translate-x-1 transition-transform" />
                 <span>Home</span>
-              </a>
+              </Link>
 
               <span className="text-[#E58A13] font-bold text-base sm:text-xl">/</span>
 
@@ -360,7 +363,7 @@ export default function StoryPage() {
       <MobileBottomNav
         onOpenCart={() => setCartOpen(true)}
         onOpenContact={() => {
-          window.location.href = '/contact';
+          router.push('/contact');
         }}
       />
 

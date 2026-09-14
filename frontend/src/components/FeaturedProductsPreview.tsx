@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ShoppingBag, Bell, Plus, Minus, Sparkles, Check, Eye, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import { ShoppingBag, Bell, Plus, Minus, Eye, ArrowRight } from 'lucide-react';
 import { Product, formatPrice } from '@/lib/products';
 import { useCart } from '@/context/CartContext';
 import { WHATSAPP_NUMBER } from '@/lib/whatsapp';
@@ -124,7 +125,11 @@ export default function FeaturedProductsPreview({
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onQuickView ? onQuickView(product) : onSelectProduct?.(product);
+                      if (onQuickView) {
+                        onQuickView(product);
+                      } else {
+                        onSelectProduct?.(product);
+                      }
                     }}
                     className="sm:hidden absolute top-2.5 left-2.5 z-10 flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#FAF7F2]/95 backdrop-blur-xs text-[#15321E] border border-[#122E1B]/15 text-[10px] font-sans font-bold uppercase tracking-wider shadow-sm active:scale-95 transition-all cursor-pointer"
                     aria-label={`Quick view ${product.name}`}
@@ -139,7 +144,11 @@ export default function FeaturedProductsPreview({
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        onQuickView ? onQuickView(product) : onSelectProduct?.(product);
+                        if (onQuickView) {
+                          onQuickView(product);
+                        } else {
+                          onSelectProduct?.(product);
+                        }
                       }}
                       className="pointer-events-auto flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#FAF7F2]/95 backdrop-blur-xs text-[#15321E] border border-[#122E1B]/20 text-xs font-sans font-bold uppercase tracking-wider shadow-lg hover:bg-[#E58A13] hover:text-white hover:border-[#E58A13] active:scale-95 transition-all duration-200 cursor-pointer"
                       aria-label={`Quick view ${product.name}`}
@@ -233,13 +242,13 @@ export default function FeaturedProductsPreview({
 
         {/* Big Important Button to full product showcase */}
         <div className="text-center pt-8">
-          <a
+          <Link
             href="/products"
             className="inline-flex items-center justify-center gap-3 bg-[#E58A13] hover:bg-[#CA7508] active:scale-95 text-white font-sans text-xs sm:text-sm uppercase font-bold tracking-widest px-8 sm:px-10 py-4 sm:py-4.5 rounded-full shadow-xl shadow-[#E58A13]/25 transition-all min-h-[52px] touch-manipulation cursor-pointer group"
           >
             <span>View All Products in Showcase</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-200" />
-          </a>
+          </Link>
         </div>
       </div>
     </section>

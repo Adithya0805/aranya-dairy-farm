@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { ShoppingBag, ChevronDown, ArrowRight } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 
@@ -13,8 +14,6 @@ interface HeaderProps {
 
 export default function Header({
   onOpenCart,
-  onOpenStory,
-  onOpenContact,
   onSelectCategory,
 }: HeaderProps) {
   const { totalItems } = useCart();
@@ -72,7 +71,7 @@ export default function Header({
 
           {/* ── Brand Title + Wordmark on Left ── */}
           <div className="flex items-center">
-            <a href="/" className="flex items-center gap-2.5 sm:gap-3 group py-2">
+            <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group py-2">
               <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full overflow-hidden bg-white border border-[#E58A13]/40 shrink-0 flex items-center justify-center p-0.5 shadow-sm group-hover:scale-105 transition-transform">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -89,18 +88,18 @@ export default function Header({
                   Organic Dairy
                 </span>
               </div>
-            </a>
+            </Link>
           </div>
 
           {/* ── Center Editorial Nav Links (desktop only) ── */}
           <nav className="hidden md:flex items-center gap-8 text-xs font-sans font-medium text-[#FAF7F2] uppercase tracking-wider">
-            <a
+            <Link
               href="/products"
               className="relative hover:text-[#E58A13] transition-colors py-3 min-h-[44px] flex items-center group/nav cursor-pointer"
             >
               <span>Shop</span>
               <span className="absolute bottom-1.5 left-0 right-0 h-0.5 bg-[#E58A13] scale-x-0 group-hover/nav:scale-x-100 transition-transform duration-200 origin-left" />
-            </a>
+            </Link>
 
             {/* ── Categories Interactive Dropdown ── */}
             <div className="relative" ref={dropdownRef}>
@@ -197,33 +196,33 @@ export default function Header({
 
                   {/* All Products Showcase Link */}
                   <div className="pt-2 mt-1 border-t border-white/10">
-                    <a
+                    <Link
                       href="/products"
                       onClick={() => setCategoriesOpen(false)}
                       className="flex items-center justify-between p-2.5 rounded-xl text-xs font-sans font-bold text-[#FAF7F2] hover:bg-[#E58A13] hover:text-white transition-all uppercase tracking-wider"
                     >
                       <span>All Products Showcase</span>
                       <ArrowRight className="w-3.5 h-3.5" />
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </div>
             </div>
 
-            <a
+            <Link
               href="/story"
               className="relative hover:text-[#E58A13] transition-colors py-3 min-h-[44px] flex items-center group/nav cursor-pointer"
             >
               <span>Our Story</span>
               <span className="absolute bottom-1.5 left-0 right-0 h-0.5 bg-[#E58A13] scale-x-0 group-hover/nav:scale-x-100 transition-transform duration-200 origin-left" />
-            </a>
-            <a
+            </Link>
+            <Link
               href="/contact"
               className="relative hover:text-[#E58A13] transition-colors py-3 min-h-[44px] flex items-center group/nav cursor-pointer"
             >
               <span>Contact</span>
               <span className="absolute bottom-1.5 left-0 right-0 h-0.5 bg-[#E58A13] scale-x-0 group-hover/nav:scale-x-100 transition-transform duration-200 origin-left" />
-            </a>
+            </Link>
           </nav>
 
           {/* ── Right Actions (desktop) ── */}

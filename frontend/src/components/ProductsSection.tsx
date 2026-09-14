@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { Plus, Minus, ShoppingBag, Bell, Check, Eye, Sparkles } from 'lucide-react';
-import { PRODUCTS, Product, ProductCategory, CATEGORIES, getProductPriceLabel, formatPrice } from '@/lib/products';
+import { Plus, Minus, ShoppingBag, Bell, Eye, Sparkles } from 'lucide-react';
+import { PRODUCTS, Product, CATEGORIES, formatPrice } from '@/lib/products';
 import { getCategories, getProducts, testAnonProductWrite } from '@/lib/catalog';
 import { supabase } from '@/lib/supabase';
 import { useCart } from '@/context/CartContext';
@@ -34,7 +34,6 @@ export default function ProductsSection({
   // Dynamic Catalog State from Supabase (with fallback defaults)
   const [products, setProducts] = useState<Product[]>(PRODUCTS);
   const [categories, setCategories] = useState<string[]>(CATEGORIES);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Category filter state ('All' or one of the dynamic category names)
   const [selectedCategory, setSelectedCategory] = useState<string>(externalCategory || 'All');
@@ -94,11 +93,9 @@ export default function ProductsSection({
           if (orderStats && orderStats.success) {
             setWeeklyOrderCount(orderStats.count);
           }
-          setIsLoading(false);
         }
       } catch (err) {
         console.error('Error fetching live catalog from Supabase:', err);
-        if (isMounted) setIsLoading(false);
       }
     }
 
@@ -347,7 +344,11 @@ export default function ProductsSection({
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        onQuickView ? onQuickView(product) : onSelectProduct?.(product);
+                        if (onQuickView) {
+                          onQuickView(product);
+                        } else {
+                          onSelectProduct?.(product);
+                        }
                       }}
                       className="sm:hidden absolute top-2.5 left-2.5 z-10 flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#FAF7F2]/95 backdrop-blur-xs text-[#15321E] border border-[#122E1B]/15 text-[10px] font-sans font-bold uppercase tracking-wider shadow-sm active:scale-95 transition-all cursor-pointer"
                       aria-label={`Quick view ${product.name}`}
@@ -362,7 +363,11 @@ export default function ProductsSection({
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          onQuickView ? onQuickView(product) : onSelectProduct?.(product);
+                          if (onQuickView) {
+                            onQuickView(product);
+                          } else {
+                            onSelectProduct?.(product);
+                          }
                         }}
                         className="pointer-events-auto flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#FAF7F2]/95 backdrop-blur-xs text-[#15321E] border border-[#122E1B]/20 text-xs font-sans font-bold uppercase tracking-wider shadow-lg hover:bg-[#E58A13] hover:text-white hover:border-[#E58A13] active:scale-95 transition-all duration-200 cursor-pointer"
                         aria-label={`Quick view ${product.name}`}

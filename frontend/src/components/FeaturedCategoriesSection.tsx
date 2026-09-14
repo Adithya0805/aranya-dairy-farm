@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 import { Product } from '@/lib/products';
@@ -13,7 +14,7 @@ interface FeaturedCategoriesSectionProps {
 
 export default function FeaturedCategoriesSection({
   products,
-  onSelectCategory,
+  onSelectCategory: _onSelectCategory,
 }: FeaturedCategoriesSectionProps) {
   const sectionRef = useScrollReveal<HTMLElement>();
 
@@ -112,13 +113,13 @@ export default function FeaturedCategoriesSection({
 
                 {/* Pill Button */}
                 <div className="pt-2">
-                  <a
+                  <Link
                     href={`/products?category=${encodeURIComponent(item.category)}`}
                     className="w-full inline-flex items-center justify-center gap-2 bg-[#E58A13] hover:bg-[#CA7508] active:scale-95 text-white font-sans text-xs uppercase font-bold tracking-wider py-3.5 px-6 rounded-full shadow-md shadow-[#E58A13]/20 transition-all duration-150 cursor-pointer min-h-[46px] touch-manipulation group/btn"
                   >
                     <span>{item.cta}</span>
                     <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-150" />
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -127,13 +128,13 @@ export default function FeaturedCategoriesSection({
 
         {/* Big Important Button to view all products */}
         <div className="text-center pt-6">
-          <a
+          <Link
             href="/products"
             className="inline-flex items-center justify-center gap-3 bg-[#122E1B] hover:bg-[#1C3E25] active:scale-95 text-[#FAF7F2] hover:text-white font-sans text-xs sm:text-sm uppercase font-bold tracking-widest py-4 px-8 sm:px-10 rounded-full shadow-xl shadow-[#122E1B]/25 transition-all duration-200 border border-[#E58A13]/35 min-h-[52px] touch-manipulation cursor-pointer group"
           >
             <span>Explore Complete Farm Catalog</span>
             <ArrowRight className="w-4 h-4 text-[#E58A13] group-hover:translate-x-1.5 transition-transform duration-200" />
-          </a>
+          </Link>
         </div>
       </div>
     </section>

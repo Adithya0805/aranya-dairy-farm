@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit } from '@/lib/rateLimit';
-import { getLiveProductCatalogSummary, buildSystemPrompt, FARM_KNOWLEDGE_CONTEXT } from '@/lib/farmKnowledge';
-import { WHATSAPP_DISPLAY, WHATSAPP_NUMBER } from '@/lib/whatsapp';
+import { getLiveProductCatalogSummary, buildSystemPrompt } from '@/lib/farmKnowledge';
+import { WHATSAPP_DISPLAY } from '@/lib/whatsapp';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -35,7 +35,7 @@ function checkOrderIntent(text: string): boolean {
  * Intelligent local fallback responder when GEMINI_API_KEY is not configured
  * or the external API is unreachable. Adheres strictly to the same guardrails.
  */
-function generateLocalKnowledgeReply(userMessage: string, catalogSummary: string): string {
+function generateLocalKnowledgeReply(userMessage: string): string {
   const q = userMessage.toLowerCase();
 
   // 1. Order Intent & Purchasing takes precedence when customer wants to buy
@@ -167,7 +167,7 @@ export async function POST(req: NextRequest) {
 
   if (!apiKey) {
     // Graceful fallback to verified farm knowledge engine
-    const replyText = generateLocalKnowledgeReply(sanitizedContent, catalogSummary);
+    const replyText = generateLocalKnowledgeReply(sanitizedContent);
     return NextResponse.json({
       reply: replyText,
       hasOrderIntent: userHasOrderIntent || checkOrderIntent(replyText),
@@ -195,7 +195,7 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const modelName = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+  const modelName = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
   const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
   try {
@@ -248,7 +248,7 @@ export async function POST(req: NextRequest) {
       }
 
       // If Gemini returned an error, fallback gracefully to verified local knowledge
-      const fallbackReply = generateLocalKnowledgeReply(sanitizedContent, catalogSummary);
+      const fallbackReply = generateLocalKnowledgeReply(sanitizedContent);
       return NextResponse.json({
         reply: fallbackReply,
         hasOrderIntent: userHasOrderIntent || checkOrderIntent(fallbackReply),
@@ -260,7 +260,7 @@ export async function POST(req: NextRequest) {
     const generatedReply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!generatedReply) {
-      const fallbackReply = generateLocalKnowledgeReply(sanitizedContent, catalogSummary);
+      const fallbackReply = generateLocalKnowledgeReply(sanitizedContent);
       return NextResponse.json({
         reply: fallbackReply,
         hasOrderIntent: userHasOrderIntent || checkOrderIntent(fallbackReply),
@@ -276,7 +276,7 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error('[Gemini API] Error calling model:', err);
     // Gracefully provide verified knowledge
-    const fallbackReply = generateLocalKnowledgeReply(sanitizedContent, catalogSummary);
+    const fallbackReply = generateLocalKnowledgeReply(sanitizedContent);
     return NextResponse.json({
       reply: fallbackReply,
       hasOrderIntent: userHasOrderIntent || checkOrderIntent(fallbackReply),

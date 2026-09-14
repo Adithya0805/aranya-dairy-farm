@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { LogOut, Package, ShoppingCart, ExternalLink, Shield } from 'lucide-react';
+import { LogOut, Package, ShoppingCart, ExternalLink } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

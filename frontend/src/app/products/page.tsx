@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import Header from '@/components/Header';
 import ProductsSection from '@/components/ProductsSection';
 import TrustBadgesSection from '@/components/TrustBadgesSection';
@@ -131,13 +132,13 @@ function ProductsContent() {
             
             {/* Breadcrumb Navigation - Quite Larger with Rich Interaction */}
             <nav aria-label="Breadcrumbs" className="flex items-center flex-wrap gap-2.5 sm:gap-3.5">
-              <a
+              <Link
                 href="/"
                 className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white/90 hover:bg-white text-[#15321E] hover:text-[#E58A13] font-sans text-sm sm:text-base font-semibold border border-[#122E1B]/10 shadow-xs transition-all duration-200 group active:scale-95 cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4 text-[#E58A13] group-hover:-translate-x-1 transition-transform" />
                 <span>Home</span>
-              </a>
+              </Link>
 
               <span className="text-[#E58A13] font-bold text-base sm:text-xl">/</span>
 
@@ -147,7 +148,7 @@ function ProductsContent() {
                 </span>
                 {selectedCategory === 'All' && (
                   <span className="hidden md:inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-sans font-bold uppercase tracking-wider bg-[#122E1B]/5 text-[#15321E] border border-[#122E1B]/10">
-                    25 Farm Items
+                    {liveProducts.length > 0 ? `${liveProducts.length} Farm Items` : 'Fresh Farm Items'}
                   </span>
                 )}
               </div>

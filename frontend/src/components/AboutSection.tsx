@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { ArrowRight, Heart, Sparkles, Clock } from 'lucide-react';
 import { ModalContent } from './DetailModal';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
@@ -10,37 +11,8 @@ interface AboutSectionProps {
   onOpenStory?: () => void;
 }
 
-export default function AboutSection({ onOpenColdChain, onOpenStory }: AboutSectionProps) {
+export default function AboutSection({ onOpenColdChain: _onOpenColdChain, onOpenStory: _onOpenStory }: AboutSectionProps) {
   const sectionRef = useScrollReveal<HTMLElement>();
-
-  const handleStoryClick = () => {
-    if (onOpenStory) {
-      onOpenStory();
-      return;
-    }
-    if (onOpenColdChain) {
-      onOpenColdChain({
-        title: 'Our 9-Year Heritage Story',
-        subtitle: 'Pure A2 Organic Farming in Shoolagiri',
-        category: 'Our Heritage',
-        image: '/images/nature_hero_pasture.jpg',
-        bodyParagraphs: [
-          'Established in 2017, Aranya Organic Dairy Farm has led the movement for unadulterated, grass-fed A2 dairy in Shoolagiri.',
-          'Our native breed cows graze freely across lush green pastures, living stress-free in harmony with natural rhythms. We strictly prohibit chemical hormones, synthetic growth stimulants, and routine preventative antibiotics.',
-          'Every morning, our raw whole milk and traditional hand-churned Bilona ghee are delivered directly from our farm to your home table.',
-        ],
-        bulletPoints: [
-          '100% Free-roaming Gir & Sahiwal native cows',
-          'Natural organic diet rich in napier grass & herbs',
-          'Ethical calf-first milking philosophy',
-          'Zero plastic contact; 100% eco glass bottle packaging',
-        ],
-        ctaLabel: 'Inquire via WhatsApp',
-        whatsappMessage:
-          'Hello Aranya Dairy Farm, I would like to learn more about your farm story and products.',
-      });
-    }
-  };
 
   const miniFeatures = [
     {
@@ -112,13 +84,13 @@ export default function AboutSection({ onOpenColdChain, onOpenStory }: AboutSect
             </div>
 
             <div className="pt-2">
-              <a
+              <Link
                 href="/story"
                 className="group text-sm font-sans font-bold text-[#15321E] hover:text-[#E58A13] underline underline-offset-8 inline-flex items-center gap-2 transition-all duration-150 cursor-pointer min-h-[44px] touch-manipulation active:scale-95"
               >
                 <span>Read our full 9-year story</span>
                 <ArrowRight className="w-4 h-4 text-[#E58A13] group-hover:translate-x-1.5 transition-transform duration-200" />
-              </a>
+              </Link>
             </div>
           </div>
 

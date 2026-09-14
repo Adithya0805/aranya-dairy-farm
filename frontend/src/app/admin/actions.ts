@@ -109,7 +109,7 @@ export async function updateProductAction(payload: AdminProductPayload, token?: 
 
   try {
     const admin = getAdminClient();
-    const updateData: Record<string, any> = {
+    const updateData: Record<string, unknown> = {
       price: payload.price,
       available: payload.available,
     };

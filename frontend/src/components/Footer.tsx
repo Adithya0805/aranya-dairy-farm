@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { MapPin, Phone, Mail, Clock, ShieldCheck, ExternalLink } from 'lucide-react';
 import { WHATSAPP_TEL, WHATSAPP_DISPLAY } from '@/lib/whatsapp';
 
@@ -9,7 +10,7 @@ interface FooterProps {
   onOpenContact?: () => void;
 }
 
-export default function Footer({ onOpenStory, onOpenContact }: FooterProps) {
+export default function Footer({ onOpenStory: _onOpenStory, onOpenContact: _onOpenContact }: FooterProps) {
   return (
     <footer className="bg-[#122E1B] text-[#FAF7F2] pt-16 pb-12 w-full border-t border-[#E58A13]/25 font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
@@ -49,30 +50,30 @@ export default function Footer({ onOpenStory, onOpenContact }: FooterProps) {
             </h4>
             <ul className="space-y-2.5 text-xs sm:text-sm text-[#D1DDD3]">
               <li>
-                <a href="/products" className="hover:text-[#E58A13] hover:underline underline-offset-4 transition-colors">
+                <Link href="/products" className="hover:text-[#E58A13] hover:underline underline-offset-4 transition-colors">
                   Shop All Provisions
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/products" className="hover:text-[#E58A13] hover:underline underline-offset-4 transition-colors">
+                <Link href="/products" className="hover:text-[#E58A13] hover:underline underline-offset-4 transition-colors">
                   Featured Categories
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   href="/story"
                   className="hover:text-[#E58A13] hover:underline underline-offset-4 transition-colors text-left cursor-pointer"
                 >
                   Our 9-Year Heritage Story
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   href="/contact"
                   className="hover:text-[#E58A13] hover:underline underline-offset-4 transition-colors text-left cursor-pointer"
                 >
                   Location &amp; Farm Visit
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
