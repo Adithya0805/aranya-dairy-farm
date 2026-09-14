@@ -52,7 +52,7 @@ All environment variables are declared and validated in server/client layers. Ne
 | `NEXT_PUBLIC_SUPABASE_URL` | Client & Server | **Yes** | `https://<ref>.supabase.co` | Supabase project API gateway URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Client & Server | **Yes** | `eyJhbGci...` (Anon JWT) | Public anon key for client-side queries protected by RLS |
 | `SUPABASE_SERVICE_ROLE_KEY` | **Server Only** | **Yes** | `eyJhbGci...` (Service JWT) | High-privilege key for admin management. **Never expose to client.** |
-| `NEXT_PUBLIC_WHATSAPP_NUMBER` | Client & Server | **Yes** | `918825714576` | Farm WhatsApp order recipient in international format (no `+` or spaces) |
+| `NEXT_PUBLIC_WHATSAPP_NUMBER` | Client & Server | **Yes** | `919944338612` | Farm WhatsApp order recipient in international format (no `+` or spaces) |
 | `GEMINI_API_KEY` | **Server Only** | Optional | `AIzaSy...` | Google AI Studio API key for customer chat assistant |
 | `GEMINI_MODEL` | **Server Only** | Optional | `gemini-3.6-flash` | Gemini model name (falls back to `gemini-1.5-flash` or local engine) |
 | `ADMIN_EMAILS` | **Server Only** | Optional | `admin@aranyafarm.com,...` | Comma-separated list of authorized administrator email accounts |
@@ -156,7 +156,7 @@ Before purchasing or pointing any custom domain:
 - [x] Server-side runtime isolation enforced for `SUPABASE_SERVICE_ROLE_KEY`.
 - [x] Error toast messages cleaned of any internal environment variable names.
 - [x] Admin authorization checks enforced for `role = admin` and `ADMIN_EMAILS`.
-- [x] WhatsApp phone number confirmed as `+91 88257 14576` (`918825714576`).
+- [x] WhatsApp phone number confirmed as `+91 99443 38612` (`919944338612`).
 - [x] Dynamic sitemap (`/sitemap.xml`) and robots (`/robots.txt`) configured with production metadata.
 
 ---

@@ -12,7 +12,7 @@
 
 🌐 **Live Production App**: [frontend-seven-indol-10.vercel.app](https://frontend-seven-indol-10.vercel.app/)  
 📍 **Farm Location**: Shoolagiri, Hosur, Krishnagiri District, Tamil Nadu, India  
-📞 **Official WhatsApp & Inquiries**: [+91 88257 14576](https://wa.me/918825714576)
+📞 **Official WhatsApp & Inquiries**: [+91 99443 38612](https://wa.me/919944338612)
 
 ---
 
@@ -365,7 +365,7 @@ GEMINI_API_KEY=your-gemini-api-key
 GEMINI_MODEL=gemini-3.6-flash
 
 # WhatsApp Business Communication Number (Country Code + 10 Digits)
-NEXT_PUBLIC_WHATSAPP_NUMBER=918825714576
+NEXT_PUBLIC_WHATSAPP_NUMBER=919944338612
 ```
 
 > **Security Note**: Never commit `.env.local` or sensitive service role keys to Git. The project `.gitignore` strictly ignores `.env*` files with an exception for `.env.example`.
@@ -416,7 +416,7 @@ The application is optimized for deployment on the **Vercel Platform**:
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `GEMINI_API_KEY`
    - `GEMINI_MODEL` (`gemini-3.6-flash`)
-   - `NEXT_PUBLIC_WHATSAPP_NUMBER` (`918825714576`)
+   - `NEXT_PUBLIC_WHATSAPP_NUMBER` (`919944338612`)
 4. **Deploy**:
    Vercel will trigger an automated build using `next build`.
 5. **Custom Domain**:
@@ -429,7 +429,7 @@ The application is optimized for deployment on the **Vercel Platform**:
 ### 🏛️ Farm Address & Contact
 - **Farm Name**: Aranya Organic Dairy Farm (அரண்யா இயற்கை பால் பண்ணை)
 - **Location**: Shoolagiri, Hosur, Krishnagiri District, Tamil Nadu — 635117
-- **Direct Phone / WhatsApp**: [+91 88257 14576](https://wa.me/918825714576)
+- **Direct Phone / WhatsApp**: [+91 99443 38612](https://wa.me/919944338612)
 - **Email**: aranyadairyfarm@gmail.com
 - **Justdial Rating**: [3.6★ (15+ Verified Customer Reviews)](https://www.justdial.com/Hosur/Aranya-Organic-Dairy-Farm-Shoolagiri/9999P4344-4344-200625222032-D9B4_BZDET)
 

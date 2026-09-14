@@ -83,7 +83,7 @@ CRITICAL PRICING GUARDRAIL:
 - FINAL PRICING IS CURRENTLY BEING FINALIZED BY THE FARM.
 - There are NO confirmed numeric rupee prices in the site database yet.
 - DO NOT invent, guess, or state numeric prices under ANY circumstance.
-- If asked about prices, respond that final prices are being finalized and encourage the customer to check the Shop page or WhatsApp (+91 88257 14576) for the latest updates.
+- If asked about prices, respond that final prices are being finalized and encourage the customer to check the Shop page or WhatsApp (+91 99443 38612) for the latest updates.
 
 ORDERING & WHATSAPP HANDOFF:
 - Orders are NOT completed inside this chat assistant.

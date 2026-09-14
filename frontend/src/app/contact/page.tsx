@@ -136,7 +136,7 @@ Message: ${formData.notes || 'Please provide details on daily deliveries and far
             <div className="hidden sm:flex items-center gap-2 text-xs font-sans text-[#5F6E62]">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/80 border border-[#122E1B]/10 shadow-xs backdrop-blur-md">
                 <span className="w-2 h-2 rounded-full bg-[#1B4D2E] animate-pulse" />
-                <span className="font-medium text-[#15321E]">Direct Farm Hotline • +91 88257 14576</span>
+                <span className="font-medium text-[#15321E]">Direct Farm Hotline • {WHATSAPP_DISPLAY}</span>
               </div>
             </div>
 

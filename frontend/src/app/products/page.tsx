@@ -14,7 +14,7 @@ import CartDrawer from '@/components/CartDrawer';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import { Product, getProductPriceLabel } from '@/lib/products';
 import { ArrowLeft, ArrowUp, Sparkles, Droplets, Heart, MessageCircle } from 'lucide-react';
-import { WA_CATALOG_INQUIRY } from '@/lib/whatsapp';
+import { WA_CATALOG_INQUIRY, WHATSAPP_DISPLAY } from '@/lib/whatsapp';
 
 function ProductsContent() {
   const searchParams = useSearchParams();
@@ -105,7 +105,7 @@ function ProductsContent() {
       ],
       bulletPoints: [
         'Location: Shoolagiri, Hosur Highway, Krishnagiri DT, Tamil Nadu 635117',
-        'Phone & WhatsApp: +91 98765 43210',
+        `Phone & WhatsApp: ${WHATSAPP_DISPLAY}`,
         'Email: info@aranyadairyfarm.com',
         'Daily Morning Delivery: 5:30 AM – 7:30 AM',
       ],

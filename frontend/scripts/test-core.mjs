@@ -60,13 +60,13 @@ test('Pricing Helpers: Null price handling & formatPrice', async () => {
 // 2. WhatsApp Helpers Tests
 // ----------------------------------------------------------------------------
 test('WhatsApp Helpers: URL construction & number verification', () => {
-  const WHATSAPP_NUMBER = '918825714576';
+  const WHATSAPP_NUMBER = '919944338612';
   function buildWhatsAppUrl(message) {
     return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
   }
 
   const url = buildWhatsAppUrl('Hello Aranya Farm!');
-  assert.ok(url.startsWith('https://wa.me/918825714576?text='));
+  assert.ok(url.startsWith('https://wa.me/919944338612?text='));
   assert.ok(url.includes('Hello%20Aranya%20Farm!'));
 });
 

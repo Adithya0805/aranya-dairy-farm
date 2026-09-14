@@ -700,7 +700,7 @@ export default function AdminOrdersPage() {
                     ARANYA ORGANIC DAIRY FARM
                   </h1>
                   <p className="text-xs text-[#57655B] font-sans">
-                    Morning Dispatch & Delivery Run Sheet &bull; Salem &bull; Phone: +91 94883 04443
+                    Morning Dispatch & Delivery Run Sheet &bull; Phone: +91 99443 38612
                   </p>
                 </div>
                 <div className="text-right text-xs text-[#1C241E]">
