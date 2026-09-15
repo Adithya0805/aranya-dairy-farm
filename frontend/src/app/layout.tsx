@@ -3,6 +3,7 @@ import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import ChatAssistantWidget from "@/components/ChatAssistantWidget";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { FARM_DOMAIN } from "@/lib/contact";
 
 export const metadata: Metadata = {
@@ -80,6 +81,7 @@ export default function RootLayout({
           <ChatAssistantWidget />
         </CartProvider>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
