@@ -28,6 +28,13 @@ import {
   WA_FARM_INQUIRY,
   buildWhatsAppUrl,
 } from '@/lib/whatsapp';
+import {
+  PRIMARY_FARM_EMAIL,
+  buildGmailComposeUrl,
+  buildMailtoUrl,
+  buildInquiryEmailBody,
+  GMAIL_GENERAL_INQUIRY,
+} from '@/lib/contact';
 
 export default function ContactPage() {
   const [cartOpen, setCartOpen] = useState(false);
@@ -53,6 +60,24 @@ Inquiry Type: ${formData.purpose}
 Delivery Area: ${formData.area || 'Shoolagiri / Hosur'}
 Message: ${formData.notes || 'Please provide details on daily deliveries and farm products.'}`;
     window.open(buildWhatsAppUrl(msg), '_blank');
+  };
+
+  const handleGmailDirect = () => {
+    const body = buildInquiryEmailBody({
+      name: formData.name,
+      phone: formData.phone,
+      purpose: formData.purpose,
+      area: formData.area,
+      notes: formData.notes,
+    });
+    window.open(
+      buildGmailComposeUrl({
+        to: PRIMARY_FARM_EMAIL,
+        subject: `Farm Inquiry: ${formData.purpose} — ${formData.name || 'Customer'}`,
+        body,
+      }),
+      '_blank'
+    );
   };
 
   const contactCards = [
@@ -84,6 +109,16 @@ Message: ${formData.notes || 'Please provide details on daily deliveries and far
       secondaryText: 'Chilled at 4°C in sterilized eco glass bottles across Hosur & Shoolagiri',
       actionLabel: 'Inquire About Route',
       actionUrl: WA_FARM_INQUIRY,
+      isExternal: true,
+    },
+    {
+      icon: Mail,
+      title: 'Email & Gmail',
+      titleTamil: 'மின்னஞ்சல் முகவரி',
+      primaryText: PRIMARY_FARM_EMAIL,
+      secondaryText: 'Instant Gmail web compose for subscriptions, bulk ghee & corporate queries',
+      actionLabel: 'Compose in Gmail',
+      actionUrl: GMAIL_GENERAL_INQUIRY,
       isExternal: true,
     },
     {
@@ -183,7 +218,7 @@ Message: ${formData.notes || 'Please provide details on daily deliveries and far
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {contactCards.map((card) => {
               const Icon = card.icon;
               return (
@@ -274,17 +309,28 @@ Message: ${formData.notes || 'Please provide details on daily deliveries and far
                   </p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#122E1B]/10 space-y-1.5">
+                <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#122E1B]/10 space-y-2">
                   <div className="font-serif font-bold text-base text-[#15321E] flex items-center gap-2">
                     <Mail className="w-4 h-4 text-[#E58A13]" />
                     <span>Email &amp; Business Inquiries</span>
                   </div>
                   <p className="text-xs text-[#5F6E62] leading-relaxed">
                     For corporate gifting, bulk Bilona ghee orders, or school visits, write to{' '}
-                    <a href="mailto:info@aranyadairyfarm.com" className="font-bold text-[#E58A13] hover:underline">
-                      info@aranyadairyfarm.com
+                    <a href={buildMailtoUrl({ to: PRIMARY_FARM_EMAIL })} className="font-bold text-[#E58A13] hover:underline">
+                      {PRIMARY_FARM_EMAIL}
                     </a>
                   </p>
+                  <div>
+                    <a
+                      href={GMAIL_GENERAL_INQUIRY}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs font-sans font-bold text-[#15321E] hover:text-[#E58A13] transition-colors"
+                    >
+                      <span>Compose in Gmail Web</span>
+                      <ArrowRight className="w-3.5 h-3.5 text-[#E58A13]" />
+                    </a>
+                  </div>
                 </div>
               </div>
 
@@ -331,16 +377,23 @@ Message: ${formData.notes || 'Please provide details on daily deliveries and far
                   <div className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-3">
                     <button
                       onClick={handleWhatsAppDirect}
-                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#E58A13] text-white font-sans text-xs uppercase font-bold tracking-wider py-3 px-6 rounded-full hover:bg-[#CA7508] transition-colors"
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#E58A13] hover:bg-[#CA7508] text-white font-sans text-xs uppercase font-bold tracking-wider py-3 px-5 rounded-full transition-colors cursor-pointer min-h-[44px]"
                     >
                       <MessageCircle className="w-4 h-4" />
-                      <span>Forward to WhatsApp Now</span>
+                      <span>Forward to WhatsApp</span>
+                    </button>
+                    <button
+                      onClick={handleGmailDirect}
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#1C3E25] hover:bg-[#244F30] text-[#FAF7F2] font-sans text-xs uppercase font-bold tracking-wider py-3 px-5 rounded-full border border-[#E58A13]/30 transition-colors cursor-pointer min-h-[44px]"
+                    >
+                      <Mail className="w-4 h-4 text-[#E58A13]" />
+                      <span>Forward via Gmail</span>
                     </button>
                     <button
                       onClick={() => setSubmitted(false)}
-                      className="w-full sm:w-auto text-xs font-sans font-semibold text-[#15321E] hover:text-[#E58A13] py-2 px-4 underline"
+                      className="w-full sm:w-auto text-xs font-sans font-semibold text-[#15321E] hover:text-[#E58A13] py-2 px-3 underline cursor-pointer"
                     >
-                      Submit Another Inquiry
+                      Submit Another
                     </button>
                   </div>
                 </div>
@@ -425,18 +478,27 @@ Message: ${formData.notes || 'Please provide details on daily deliveries and far
                   <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
                     <button
                       type="submit"
-                      className="w-full sm:flex-1 inline-flex items-center justify-center gap-2 bg-[#E58A13] hover:bg-[#CA7508] active:scale-95 text-white font-sans text-xs uppercase font-bold tracking-wider py-3.5 px-6 rounded-full shadow-md transition-all cursor-pointer min-h-[48px]"
+                      className="w-full sm:flex-1 inline-flex items-center justify-center gap-2 bg-[#E58A13] hover:bg-[#CA7508] active:scale-95 text-white font-sans text-xs uppercase font-bold tracking-wider py-3.5 px-5 rounded-full shadow-md transition-all cursor-pointer min-h-[48px]"
                     >
                       <span>Submit Inquiry</span>
                       <ArrowRight className="w-4 h-4 text-white" />
                     </button>
                     <button
                       type="button"
-                      onClick={handleWhatsAppDirect}
+                      onClick={handleGmailDirect}
                       className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#1C3E25] hover:bg-[#244F30] active:scale-95 text-[#FAF7F2] font-sans text-xs uppercase font-bold tracking-wider py-3.5 px-5 rounded-full border border-[#E58A13]/30 transition-all cursor-pointer min-h-[48px]"
+                      title="Open inquiry details in Gmail Web Compose"
                     >
-                      <MessageCircle className="w-4 h-4 text-[#E58A13]" />
-                      <span>Chat on WhatsApp</span>
+                      <Mail className="w-4 h-4 text-[#E58A13]" />
+                      <span>Send via Gmail</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleWhatsAppDirect}
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white hover:bg-[#FAF7F2] active:scale-95 text-[#15321E] font-sans text-xs uppercase font-bold tracking-wider py-3.5 px-5 rounded-full border border-[#122E1B]/15 transition-all cursor-pointer min-h-[48px]"
+                    >
+                      <MessageCircle className="w-4 h-4 text-[#1B4D2E]" />
+                      <span>WhatsApp</span>
                     </button>
                   </div>
                 </form>

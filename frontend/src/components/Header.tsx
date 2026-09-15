@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { ShoppingBag, ChevronDown, ArrowRight } from 'lucide-react';
+import { ShoppingBag, ChevronDown, ArrowRight, Mail } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { PRIMARY_FARM_EMAIL, buildGmailComposeUrl } from '@/lib/contact';
 
 interface HeaderProps {
   onOpenCart?: () => void;
@@ -226,7 +227,27 @@ export default function Header({
           </nav>
 
           {/* ── Right Actions (desktop) ── */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-3">
+            {/* Email / Gmail Direct Action Button */}
+            <a
+              href={buildGmailComposeUrl({
+                to: PRIMARY_FARM_EMAIL,
+                subject: 'Inquiry — Aranya Organic Dairy Farm',
+                body: 'Hello Aranya Organic Dairy Farm Team,\n\nI would like to inquire about:',
+              })}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Email us at ${PRIMARY_FARM_EMAIL} via Gmail`}
+              className="inline-flex items-center gap-2 bg-[#1C3E25] hover:bg-[#244F30] border border-[#E58A13]/30 hover:border-[#E58A13]/70 active:scale-95 py-2 px-3.5 rounded-full transition-all duration-150 touch-manipulation min-h-[44px] cursor-pointer text-[#FAF7F2] text-xs font-sans font-semibold group shadow-xs"
+              title="Compose inquiry in Gmail"
+            >
+              <Mail className="w-4 h-4 text-[#E58A13] group-hover:scale-110 transition-transform" />
+              <span className="hidden lg:inline">Email Us</span>
+              <span className="text-[10px] font-bold text-[#E58A13] bg-[#E58A13]/15 px-1.5 py-0.5 rounded uppercase tracking-wider">
+                Gmail
+              </span>
+            </a>
+
             {/* Cart Icon with live amber badge */}
             <button
               onClick={onOpenCart}
@@ -246,8 +267,23 @@ export default function Header({
             </button>
           </div>
 
-          {/* ── Minimal Sticky Mobile Top Header (Logo + Cart only) ── */}
-          <div className="md:hidden flex items-center">
+          {/* ── Minimal Sticky Mobile Top Header (Mail + Cart) ── */}
+          <div className="md:hidden flex items-center gap-1.5">
+            <a
+              href={buildGmailComposeUrl({
+                to: PRIMARY_FARM_EMAIL,
+                subject: 'Mobile Inquiry — Aranya Organic Dairy Farm',
+                body: 'Hello Aranya Organic Dairy Farm Team,\n\nI would like to inquire about:',
+              })}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Email Farm via Gmail"
+              className="w-11 h-11 flex items-center justify-center text-[#FAF7F2] hover:bg-white/10 active:scale-90 touch-manipulation rounded-full transition-all duration-150 cursor-pointer"
+              title="Compose inquiry in Gmail"
+            >
+              <Mail className="w-5 h-5 text-[#E58A13]" />
+            </a>
+
             <button
               onClick={onOpenCart}
               className="relative w-11 h-11 flex items-center justify-center text-[#FAF7F2] hover:bg-white/10 active:scale-90 touch-manipulation rounded-full transition-all duration-150 cursor-pointer"

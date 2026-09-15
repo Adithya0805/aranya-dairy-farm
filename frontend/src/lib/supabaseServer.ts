@@ -44,7 +44,7 @@ export function getAdminClient(): SupabaseClient {
  * Checks:
  * 1. Valid token and active user session.
  * 2. User role in app_metadata or user_metadata is 'admin'.
- * 3. OR user email is contained in ADMIN_EMAILS (or default admin@aranyafarm.com).
+ * 3. OR user email is contained in ADMIN_EMAILS (or default admin@aranyaorganicdairyfarm.com).
  * Any other user is rejected.
  */
 export async function verifyAdminUser(token?: string) {
@@ -64,7 +64,7 @@ export async function verifyAdminUser(token?: string) {
     const userRole = (user.user_metadata?.role as string) || '';
     const isAdminRole = appRole === 'admin' || userRole === 'admin';
 
-    const adminEmailsEnv = process.env.ADMIN_EMAILS || 'admin@aranyafarm.com';
+    const adminEmailsEnv = process.env.ADMIN_EMAILS || 'admin@aranyaorganicdairyfarm.com';
     const allowedEmails = adminEmailsEnv
       .split(',')
       .map((e) => e.trim().toLowerCase())

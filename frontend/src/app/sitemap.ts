@@ -1,7 +1,8 @@
 import type { MetadataRoute } from 'next';
+import { FARM_DOMAIN } from '@/lib/contact';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://aranyadairyfarm.com';
+  const baseUrl = FARM_DOMAIN;
   return [
     {
       url: baseUrl + '/',

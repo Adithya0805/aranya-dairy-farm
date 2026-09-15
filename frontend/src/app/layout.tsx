@@ -3,8 +3,10 @@ import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import ChatAssistantWidget from "@/components/ChatAssistantWidget";
 
+import { FARM_DOMAIN } from "@/lib/contact";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://aranyadairyfarm.com"),
+  metadataBase: new URL(FARM_DOMAIN),
   title: "Aranya Organic Dairy Farm | Fresh A2 Milk & Bilona Ghee in Shoolagiri, Hosur",
   description:
     "9-year established organic dairy farm in Shoolagiri, Hosur, Tamil Nadu. 100% pure raw A2 cow milk, traditional Bilona ghee, paneer, and curd delivered in eco glass bottles.",
@@ -19,7 +21,7 @@ export const metadata: Metadata = {
     title: "Aranya Organic Dairy Farm — Pure A2 Milk & Bilona Ghee",
     description:
       "Ethical pasture-raised cows, 4°C instant chilling, zero preservatives. Delivered fresh in glass bottles.",
-    url: "https://aranyadairyfarm.com",
+    url: FARM_DOMAIN,
     siteName: "Aranya Organic Dairy Farm",
     images: [
       {

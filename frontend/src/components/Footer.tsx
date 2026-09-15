@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { MapPin, Phone, Mail, Clock, ShieldCheck, ExternalLink } from 'lucide-react';
 import { WHATSAPP_TEL, WHATSAPP_DISPLAY } from '@/lib/whatsapp';
+import { PRIMARY_FARM_EMAIL, buildGmailComposeUrl, buildMailtoUrl } from '@/lib/contact';
 
 interface FooterProps {
   onOpenStory?: () => void;
@@ -96,9 +97,24 @@ export default function Footer({ onOpenStory: _onOpenStory, onOpenContact: _onOp
               </div>
               <div className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 text-[#E58A13] shrink-0" />
-                <a href="mailto:info@aranyadairyfarm.com" className="hover:text-[#E58A13] hover:underline underline-offset-4">
-                  info@aranyadairyfarm.com
-                </a>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <a href={buildMailtoUrl({ to: PRIMARY_FARM_EMAIL })} className="hover:text-[#E58A13] hover:underline underline-offset-4">
+                    {PRIMARY_FARM_EMAIL}
+                  </a>
+                  <a
+                    href={buildGmailComposeUrl({
+                      to: PRIMARY_FARM_EMAIL,
+                      subject: 'Inquiry — Aranya Organic Dairy Farm',
+                      body: 'Hello Aranya Organic Dairy Farm Team,\n\nI would like to inquire about:',
+                    })}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[10px] font-bold text-[#E58A13] bg-[#E58A13]/20 hover:bg-[#E58A13] hover:text-white px-2 py-0.5 rounded transition-colors"
+                    title="Compose directly in Gmail"
+                  >
+                    Gmail
+                  </a>
+                </div>
               </div>
               <div className="flex items-center gap-2.5 text-xs text-[#A8B7AA]">
                 <Clock className="w-3.5 h-3.5 text-[#E58A13] shrink-0" />

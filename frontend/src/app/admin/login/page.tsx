@@ -100,7 +100,7 @@ export default function AdminLoginPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@aranyadairyfarm.com"
+                  placeholder="admin@aranyaorganicdairyfarm.com"
                   className="block w-full pl-10 pr-3 py-3 border border-[#1B4D2E]/20 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1B4D2E] text-sm text-[#1C241E] bg-[#FCFAF7]"
                 />
               </div>

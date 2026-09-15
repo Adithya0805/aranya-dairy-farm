@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { FARM_DOMAIN } from '@/lib/contact';
 
 export const metadata: Metadata = {
   title: 'Farm Fresh Products | Aranya Organic Dairy Farm',
@@ -8,7 +9,7 @@ export const metadata: Metadata = {
     title: 'Farm Fresh Products | Aranya Organic Dairy Farm',
     description:
       'Explore 100% pure raw A2 cow milk, Vedic Bilona ghee, unadulterated paneer, curd, fresh butter, and cold-pressed oils.',
-    url: 'https://aranyadairyfarm.com/products',
+    url: `${FARM_DOMAIN}/products`,
     images: [
       {
         url: '/images/nature_hero_pasture.jpg',

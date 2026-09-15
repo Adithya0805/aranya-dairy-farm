@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { FARM_DOMAIN } from '@/lib/contact';
 
 export const metadata: Metadata = {
   title: 'Our Story & Heritage | Aranya Organic Dairy Farm',
@@ -8,7 +9,7 @@ export const metadata: Metadata = {
     title: 'Our Story & Heritage | Aranya Organic Dairy Farm',
     description:
       'Discover our 9-year journey of ethical dairy farming in Shoolagiri, Hosur. Native Gir & Sahiwal cows, calf-first milking, and traditional Vedic Bilona ghee.',
-    url: 'https://aranyadairyfarm.com/story',
+    url: `${FARM_DOMAIN}/story`,
     images: [
       {
         url: '/images/nature_hero_pasture.jpg',

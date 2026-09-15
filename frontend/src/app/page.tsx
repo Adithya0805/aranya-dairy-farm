@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
+import { WHATSAPP_DISPLAY } from '@/lib/whatsapp';
+import { PRIMARY_FARM_EMAIL } from '@/lib/contact';
 import TrustBadgesSection from '@/components/TrustBadgesSection';
 import FeaturedCategoriesSection from '@/components/FeaturedCategoriesSection';
 import FeaturedProductsPreview from '@/components/FeaturedProductsPreview';
@@ -17,7 +19,6 @@ import CartDrawer from '@/components/CartDrawer';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import { Product, getProductPriceLabel, PRODUCTS } from '@/lib/products';
 import { getProducts } from '@/lib/catalog';
-import { WHATSAPP_DISPLAY } from '@/lib/whatsapp';
 
 export default function Home() {
   // ── Detail Drawer (Our Story, Cold-Chain, Product details) ─────────────────
@@ -111,7 +112,7 @@ export default function Home() {
       bulletPoints: [
         'Location: Shoolagiri, Hosur Highway, Krishnagiri DT, Tamil Nadu 635117',
         `Phone & WhatsApp: ${WHATSAPP_DISPLAY}`,
-        'Email: info@aranyadairyfarm.com',
+        `Email: ${PRIMARY_FARM_EMAIL}`,
         'Daily Morning Delivery: 5:30 AM – 7:30 AM',
       ],
       ctaLabel: 'Contact on WhatsApp',

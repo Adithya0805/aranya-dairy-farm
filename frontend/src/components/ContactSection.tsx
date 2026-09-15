@@ -1,9 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Mail, ExternalLink } from 'lucide-react';
 import { WHATSAPP_TEL, WHATSAPP_DISPLAY } from '@/lib/whatsapp';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
+import {
+  PRIMARY_FARM_EMAIL,
+  buildGmailComposeUrl,
+  buildMailtoUrl,
+  buildInquiryEmailBody,
+} from '@/lib/contact';
 
 export default function ContactSection() {
   const sectionRef = useScrollReveal<HTMLElement>();
@@ -59,9 +65,29 @@ export default function ContactSection() {
                 <a href={WHATSAPP_TEL} className="text-[#B84A28] text-xs font-semibold hover:underline block mt-1 py-1 min-h-[44px] inline-flex items-center touch-manipulation">
                   Phone / WhatsApp: {WHATSAPP_DISPLAY}
                 </a>
-                <a href="mailto:info@aranyadairyfarm.com" className="text-[#5F6E62] text-xs hover:underline block mt-0.5 py-1 min-h-[44px] inline-flex items-center touch-manipulation">
-                  info@aranyadairyfarm.com
-                </a>
+                <div className="flex flex-wrap items-center gap-2 mt-0.5">
+                  <a
+                    href={buildMailtoUrl({ to: PRIMARY_FARM_EMAIL })}
+                    className="text-[#5F6E62] text-xs hover:underline py-1 min-h-[44px] inline-flex items-center touch-manipulation"
+                  >
+                    <Mail className="w-3.5 h-3.5 text-[#E58A13] mr-1.5 shrink-0" />
+                    <span>{PRIMARY_FARM_EMAIL}</span>
+                  </a>
+                  <a
+                    href={buildGmailComposeUrl({
+                      to: PRIMARY_FARM_EMAIL,
+                      subject: 'Inquiry — Aranya Organic Dairy Farm',
+                      body: 'Hello Aranya Organic Dairy Farm Team,\n\nI would like to inquire about:',
+                    })}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-[11px] font-sans font-bold text-[#E58A13] hover:text-white bg-[#E58A13]/10 hover:bg-[#E58A13] px-2.5 py-1 rounded-full transition-all duration-150 touch-manipulation"
+                    title="Compose directly in Gmail web"
+                  >
+                    <span>Open in Gmail</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
               </div>
 
               <div>
@@ -88,18 +114,40 @@ export default function ContactSection() {
             </p>
 
             {submitted ? (
-              <div className="bg-[#FAF7F2] p-8 rounded-2xl border border-[#122E1B]/20 text-center space-y-3">
+              <div className="bg-[#FAF7F2] p-8 rounded-2xl border border-[#122E1B]/20 text-center space-y-4">
                 <CheckCircle2 className="w-10 h-10 text-[#E58A13] mx-auto" />
                 <h4 className="text-xl font-serif font-bold text-[#15321E]">Inquiry Received</h4>
-                <p className="text-xs text-[#5F6E62]">
-                  Thank you! We will reach out to <span className="font-bold text-[#15321E]">{formData.phone}</span> shortly.
+                <p className="text-xs text-[#5F6E62] leading-relaxed">
+                  Thank you, <span className="font-bold text-[#15321E]">{formData.name || 'Valued Patron'}</span>! We will reach out to <span className="font-bold text-[#15321E]">{formData.phone}</span> shortly regarding deliveries in <span className="font-semibold text-[#15321E]">{formData.location || 'Hosur / Shoolagiri'}</span>.
                 </p>
-                <button
-                  onClick={() => setSubmitted(false)}
-                  className="link-editorial mt-2 min-h-[44px] inline-flex items-center touch-manipulation"
-                >
-                  <span>Submit Another Inquiry →</span>
-                </button>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                  <a
+                    href={buildGmailComposeUrl({
+                      to: PRIMARY_FARM_EMAIL,
+                      subject: `Delivery Inquiry — ${formData.name || 'Customer'} (${formData.location || 'Hosur'})`,
+                      body: buildInquiryEmailBody({
+                        name: formData.name,
+                        phone: formData.phone,
+                        purpose: 'Daily Delivery Inquiry',
+                        area: formData.location,
+                        notes: formData.notes,
+                      }),
+                    })}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#1C3E25] hover:bg-[#244F30] text-[#FAF7F2] font-sans text-xs uppercase font-bold tracking-wider py-3.5 px-6 rounded-full border border-[#E58A13]/30 transition-all min-h-[46px] shadow-sm"
+                    title="Open this inquiry directly in Gmail"
+                  >
+                    <Mail className="w-4 h-4 text-[#E58A13]" />
+                    <span>Send via Gmail Now</span>
+                  </a>
+                  <button
+                    onClick={() => setSubmitted(false)}
+                    className="w-full sm:w-auto link-editorial min-h-[44px] inline-flex items-center justify-center touch-manipulation text-xs"
+                  >
+                    <span>Submit Another Inquiry →</span>
+                  </button>
+                </div>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -160,13 +208,36 @@ export default function ContactSection() {
                   />
                 </div>
 
-                <button
-                  type="submit"
-                  className="w-full inline-flex items-center justify-center gap-2 bg-[#E58A13] hover:bg-[#CA7508] active:scale-95 text-white font-sans text-xs uppercase font-bold tracking-wider py-4 px-6 rounded-full shadow-lg shadow-[#E58A13]/25 transition-all duration-150 cursor-pointer min-h-[48px] touch-manipulation"
-                >
-                  <span>Submit Order Inquiry</span>
-                  <ArrowRight className="w-4 h-4 text-white" />
-                </button>
+                <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
+                  <button
+                    type="submit"
+                    className="w-full sm:flex-1 inline-flex items-center justify-center gap-2 bg-[#E58A13] hover:bg-[#CA7508] active:scale-95 text-white font-sans text-xs uppercase font-bold tracking-wider py-3.5 px-6 rounded-full shadow-lg shadow-[#E58A13]/25 transition-all duration-150 cursor-pointer min-h-[48px] touch-manipulation"
+                  >
+                    <span>Submit Order Inquiry</span>
+                    <ArrowRight className="w-4 h-4 text-white" />
+                  </button>
+
+                  <a
+                    href={buildGmailComposeUrl({
+                      to: PRIMARY_FARM_EMAIL,
+                      subject: `Delivery Inquiry — ${formData.name || 'Customer'} (${formData.location || 'Hosur'})`,
+                      body: buildInquiryEmailBody({
+                        name: formData.name,
+                        phone: formData.phone,
+                        purpose: 'Delivery Inquiry',
+                        area: formData.location,
+                        notes: formData.notes,
+                      }),
+                    })}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#1C3E25] hover:bg-[#244F30] active:scale-95 text-[#FAF7F2] font-sans text-xs uppercase font-bold tracking-wider py-3.5 px-5 rounded-full border border-[#E58A13]/30 transition-all cursor-pointer min-h-[48px] touch-manipulation shadow-xs"
+                    title="Send this delivery inquiry directly using Gmail web"
+                  >
+                    <Mail className="w-4 h-4 text-[#E58A13]" />
+                    <span>Send via Gmail</span>
+                  </a>
+                </div>
               </form>
             )}
           </div>
