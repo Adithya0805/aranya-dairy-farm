@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import ChatAssistantWidget from "@/components/ChatAssistantWidget";
-
+import { Analytics } from "@vercel/analytics/next";
 import { FARM_DOMAIN } from "@/lib/contact";
 
 export const metadata: Metadata = {
@@ -79,6 +79,7 @@ export default function RootLayout({
           {children}
           <ChatAssistantWidget />
         </CartProvider>
+        <Analytics />
       </body>
     </html>
   );
