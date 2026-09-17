@@ -55,11 +55,15 @@ interface AdminProduct {
   available: boolean;
   featured?: boolean;
   description: string | null;
+  stock?: number | null;
+  low_stock_threshold?: number | null;
+  low_stock_alert_sent_at?: string | null;
   categories?: {
     id: string;
     name: string;
   } | null;
 }
+
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<AdminProduct[]>([]);
@@ -103,12 +107,15 @@ export default function AdminProductsPage() {
   const [editCategoryName, setEditCategoryName] = useState<string>('');
   const [editUnit, setEditUnit] = useState<string>('');
   const [editDescription, setEditDescription] = useState<string>('');
+  const [editStock, setEditStock] = useState<string>('');
+  const [editThreshold, setEditThreshold] = useState<string>('5');
   const [newImageFile, setNewImageFile] = useState<File | null>(null);
   const [newImagePreview, setNewImagePreview] = useState<string | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
 
   // User feedback toast/alert
   const [feedback, setFeedback] = useState<{
@@ -128,7 +135,7 @@ export default function AdminProductsPage() {
         // Fallback: public select is allowed by RLS on products table
         const { data, error } = await supabase
           .from('products')
-          .select('id, name, name_tamil, category_id, price, unit, image_url, available, featured, description, created_at, categories(id, name)')
+          .select('id, name, name_tamil, category_id, price, unit, image_url, available, featured, description, stock, low_stock_threshold, low_stock_alert_sent_at, created_at, categories(id, name)')
           .order('created_at', { ascending: true });
 
         if (!error && data) {
@@ -204,6 +211,8 @@ export default function AdminProductsPage() {
     setEditCategoryName('');
     setEditUnit('');
     setEditDescription('');
+    setEditStock('');
+    setEditThreshold('5');
     setNewImageFile(null);
     setNewImagePreview(null);
     setImageError(null);
@@ -225,6 +234,8 @@ export default function AdminProductsPage() {
     setEditCategoryName(catName);
     setEditUnit(product.unit || '');
     setEditDescription(product.description || '');
+    setEditStock(product.stock !== null && product.stock !== undefined ? String(product.stock) : '');
+    setEditThreshold(product.low_stock_threshold !== null && product.low_stock_threshold !== undefined ? String(product.low_stock_threshold) : '5');
 
     // Ensure current product's category exists in availableCategories
     if (catId && catName && !availableCategories.some((c) => c.id === catId)) {
@@ -237,6 +248,7 @@ export default function AdminProductsPage() {
     setIsDragging(false);
     setFeedback(null);
   };
+
 
   // Validate and stage newly selected image file for Edit
   const handleFileValidationAndSelect = (file: File) => {
@@ -312,6 +324,9 @@ export default function AdminProductsPage() {
       return;
     }
 
+    const parsedStock = editStock.trim() === '' ? null : Math.floor(Number(editStock));
+    const parsedThreshold = editThreshold.trim() === '' ? 5 : Math.floor(Number(editThreshold));
+
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
@@ -330,6 +345,8 @@ export default function AdminProductsPage() {
       );
       formData.append('unit', editUnit);
       formData.append('description', editDescription);
+      formData.append('stock', editStock);
+      formData.append('low_stock_threshold', String(parsedThreshold));
       if (token) formData.append('token', token);
       if (newImageFile) formData.append('image', newImageFile);
 
@@ -364,6 +381,8 @@ export default function AdminProductsPage() {
                   description: editDescription.trim() || null,
                   categories: finalCategoryObj,
                   image_url: res.imageUrl || p.image_url,
+                  stock: parsedStock,
+                  low_stock_threshold: parsedThreshold,
                 }
               : p
           )
@@ -395,6 +414,7 @@ export default function AdminProductsPage() {
       setSaving(false);
     }
   };
+
 
   // Delete product and free up storage
   const handleDeleteProduct = async (productId: string) => {
@@ -939,8 +959,13 @@ export default function AdminProductsPage() {
                             />
                           </div>
                           <div>
-                            <div className="font-serif font-bold text-[#1C241E]">
+                            <div className="font-serif font-bold text-[#1C241E] flex items-center gap-1.5 flex-wrap">
                               {p.name}
+                              {typeof p.stock === 'number' && p.stock !== null && p.stock <= (p.low_stock_threshold ?? 5) && (
+                                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide bg-red-100 text-red-700 border border-red-200 shrink-0">
+                                  ⚠️ Low Stock ({p.stock})
+                                </span>
+                              )}
                             </div>
                             {resolvedTamil && (
                               <div className="text-xs text-[#1B4D2E] font-medium font-sans">
@@ -950,6 +975,7 @@ export default function AdminProductsPage() {
                           </div>
                         </div>
                       </td>
+
 
                       {/* Category */}
                       <td className="py-3.5 px-4">
@@ -1427,6 +1453,66 @@ export default function AdminProductsPage() {
                 />
                 <p className="text-[11px] text-[#8A7B6E] mt-1">
                   Optional. Displayed in customer product details &amp; quick-view modals across the website.
+                </p>
+              </div>
+
+              {/* ── Stock Tracking ────────────────────────────────────── */}
+              <div className="border border-[#1B4D2E]/10 rounded-md p-4 bg-[#F5F9F6] space-y-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full bg-[#1B4D2E]/10 flex items-center justify-center shrink-0">
+                    <span className="text-[10px] font-bold text-[#1B4D2E]">📦</span>
+                  </div>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#1C241E]">
+                    Stock Tracking &amp; Low-Stock Alert
+                  </h4>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Current Stock */}
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-[#57655B] mb-1">
+                      Current Stock (units)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={editStock}
+                      onChange={(e) => setEditStock(e.target.value)}
+                      placeholder="e.g. 20"
+                      className="w-full px-3 py-2 text-sm bg-white border border-[#1B4D2E]/20 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1B4D2E] text-[#1C241E]"
+                    />
+                  </div>
+
+                  {/* Low Stock Threshold */}
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-[#57655B] mb-1">
+                      Alert Threshold
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      step="1"
+                      value={editThreshold}
+                      onChange={(e) => setEditThreshold(e.target.value)}
+                      placeholder="5"
+                      className="w-full px-3 py-2 text-sm bg-white border border-[#1B4D2E]/20 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1B4D2E] text-[#1C241E]"
+                    />
+                  </div>
+                </div>
+
+                {/* Low-stock warning badge */}
+                {editStock !== '' && !isNaN(Number(editStock)) && Number(editStock) <= (Number(editThreshold) || 5) && Number(editStock) >= 0 && (
+                  <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-md px-3 py-2">
+                    <span className="text-sm">⚠️</span>
+                    <p className="text-xs font-semibold text-red-700">
+                      Low stock! This product is at or below the alert threshold. An alert will be sent when saved.
+                    </p>
+                  </div>
+                )}
+
+                <p className="text-[11px] text-[#8A7B6E]">
+                  Leave stock blank if not tracking. An alert fires once per product per 24 hours when stock ≤ threshold.
                 </p>
               </div>
 

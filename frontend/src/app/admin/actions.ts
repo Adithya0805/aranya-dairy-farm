@@ -12,7 +12,89 @@ export interface AdminProductPayload {
   category_id?: string | null;
   unit?: string | null;
   description?: string | null;
+  stock?: number | null;
+  low_stock_threshold?: number | null;
 }
+
+// ── Low-Stock Alert Helper ────────────────────────────────────────────────────
+
+/**
+ * Checks if a low-stock alert should be sent for the given product and,
+ * if so, fires the alert (email via Resend if configured, plus server log)
+ * and updates the last-alert timestamp in the database.
+ *
+ * Anti-spam: only fires once per product per 24 hours.
+ */
+async function checkAndSendLowStockAlert(opts: {
+  productId: string;
+  productName: string;
+  stock: number;
+  threshold: number;
+  lastAlertAt: string | null;
+}): Promise<void> {
+  const { productId, productName, stock, threshold, lastAlertAt } = opts;
+
+  // Only alert if stock is at or below threshold
+  if (stock > threshold) return;
+
+  // Anti-spam: skip if an alert was sent in the last 24 hours
+  if (lastAlertAt) {
+    const lastAlert = new Date(lastAlertAt).getTime();
+    const now = Date.now();
+    const twentyFourHours = 24 * 60 * 60 * 1000;
+    if (now - lastAlert < twentyFourHours) {
+      console.info(`[LowStockAlert] Skipping alert for "${productName}" — already alerted within 24h.`);
+      return;
+    }
+  }
+
+  const alertMessage = `⚠️ LOW STOCK ALERT: "${productName}" is running low — ${stock} unit${stock === 1 ? '' : 's'} left. Please restock soon.`;
+
+  // 1. Always log prominently to server console
+  console.warn(`[LowStockAlert] ${alertMessage}`);
+
+  // 2. Send email via Resend if configured
+  const resendKey = process.env.RESEND_API_KEY;
+  const alertEmail = process.env.ALERT_EMAIL || process.env.NEXT_PUBLIC_FARM_EMAIL;
+  if (resendKey && alertEmail) {
+    try {
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${resendKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: 'alerts@aranyaorganicdairyfarm.com',
+          to: [alertEmail],
+          subject: `⚠️ Low Stock Alert: ${productName}`,
+          text: `${alertMessage}\n\nLog in to your admin panel to update stock levels:\nhttps://aranyaorganicdairyfarm.com/admin/products`,
+          html: `<p><strong>${alertMessage}</strong></p><p>Log in to your admin panel to update stock levels.</p>`,
+        }),
+      });
+      if (response.ok) {
+        console.info(`[LowStockAlert] Email alert sent to ${alertEmail} for "${productName}".`);
+      } else {
+        console.warn(`[LowStockAlert] Email send failed (${response.status}) for "${productName}".`);
+      }
+    } catch (emailErr) {
+      console.warn('[LowStockAlert] Email send exception:', emailErr);
+    }
+  }
+
+  // 3. Update the last-alert timestamp in the database
+  try {
+    const admin = getAdminClient();
+    await admin
+      .from('products')
+      .update({ low_stock_alert_sent_at: new Date().toISOString() })
+      .eq('id', productId);
+  } catch (updateErr) {
+    console.warn('[LowStockAlert] Failed to update last-alert timestamp:', updateErr);
+  }
+}
+
+
 
 /**
  * Server Action: Fetches all 32 products for the Admin panel.
@@ -27,7 +109,7 @@ export async function getAdminProductsAction(token?: string) {
     const admin = getAdminClient();
     const { data, error } = await admin
       .from('products')
-      .select('id, name, name_tamil, category_id, price, unit, image_url, available, featured, description, created_at, categories(id, name)')
+      .select('id, name, name_tamil, category_id, price, unit, image_url, available, featured, description, stock, low_stock_threshold, low_stock_alert_sent_at, created_at, categories(id, name)')
       .order('created_at', { ascending: true });
 
     if (error) {
@@ -118,6 +200,10 @@ export async function updateProductAction(payload: AdminProductPayload, token?: 
     if (payload.unit !== undefined) updateData.unit = payload.unit ? payload.unit.trim() : null;
     if (payload.description !== undefined) updateData.description = payload.description ? payload.description.trim() : null;
     if (payload.featured !== undefined) updateData.featured = Boolean(payload.featured);
+    if (payload.stock !== undefined) updateData.stock = payload.stock;
+    if (payload.low_stock_threshold !== undefined && payload.low_stock_threshold !== null) {
+      updateData.low_stock_threshold = payload.low_stock_threshold;
+    }
 
     const { error } = await admin
       .from('products')
@@ -137,12 +223,42 @@ export async function updateProductAction(payload: AdminProductPayload, token?: 
       console.warn('[Admin] revalidatePath warning:', revErr);
     }
 
+    // Check for low-stock condition and send alert if warranted
+    if (typeof payload.stock === 'number' && payload.stock !== null) {
+      try {
+        const { data: currentProduct } = await admin
+          .from('products')
+          .select('name, low_stock_threshold, low_stock_alert_sent_at')
+          .eq('id', payload.id)
+          .single();
+
+        if (currentProduct) {
+          const threshold =
+            typeof payload.low_stock_threshold === 'number'
+              ? payload.low_stock_threshold
+              : (currentProduct.low_stock_threshold ?? 5);
+
+          await checkAndSendLowStockAlert({
+            productId: payload.id,
+            productName: currentProduct.name,
+            stock: payload.stock,
+            threshold,
+            lastAlertAt: currentProduct.low_stock_alert_sent_at,
+          });
+        }
+      } catch (alertErr) {
+        console.warn('[Admin] Low-stock alert check failed:', alertErr);
+      }
+    }
+
     return { success: true };
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
     return { success: false, error: message };
   }
 }
+
+
 
 /**
  * Server Action: Updates a product's price, availability, category, unit, description, and optionally uploads a new image.
@@ -168,6 +284,8 @@ export async function updateProductWithImageAction(formData: FormData) {
   const unit = formData.get('unit') as string | null;
   const description = formData.get('description') as string | null;
   const imageFile = formData.get('image') as File | null;
+  const rawStock = formData.get('stock') as string | null;
+  const rawThreshold = formData.get('low_stock_threshold') as string | null;
 
   let parsedPrice: number | null = null;
   if (rawPrice !== null && rawPrice !== undefined && rawPrice.trim() !== '') {
@@ -176,6 +294,22 @@ export async function updateProductWithImageAction(formData: FormData) {
       return { success: false, error: 'Price must be a positive number or left blank.' };
     }
     parsedPrice = num;
+  }
+
+  let parsedStock: number | null = null;
+  if (rawStock !== null && rawStock !== undefined && rawStock.trim() !== '') {
+    const num = Math.floor(Number(rawStock));
+    if (!isNaN(num) && num >= 0) {
+      parsedStock = num;
+    }
+  }
+
+  let parsedThreshold: number | null = null;
+  if (rawThreshold !== null && rawThreshold !== undefined && rawThreshold.trim() !== '') {
+    const num = Math.floor(Number(rawThreshold));
+    if (!isNaN(num) && num >= 0) {
+      parsedThreshold = num;
+    }
   }
 
   const isAvailable = rawAvailable === 'true';
@@ -258,6 +392,8 @@ export async function updateProductWithImageAction(formData: FormData) {
       category_id?: string;
       unit?: string | null;
       description?: string | null;
+      stock?: number | null;
+      low_stock_threshold?: number;
     } = {
       price: parsedPrice,
       available: isAvailable,
@@ -275,6 +411,12 @@ export async function updateProductWithImageAction(formData: FormData) {
     }
     if (description !== null && description !== undefined) {
       updatePayload.description = description.trim() || null;
+    }
+    if (rawStock !== null && rawStock !== undefined) {
+      updatePayload.stock = parsedStock;
+    }
+    if (parsedThreshold !== null) {
+      updatePayload.low_stock_threshold = parsedThreshold;
     }
 
     if (newImageUrl) {
@@ -299,12 +441,38 @@ export async function updateProductWithImageAction(formData: FormData) {
       console.warn('[Admin] revalidatePath warning:', revErr);
     }
 
+    // Check for low-stock condition and send alert if warranted
+    if (typeof parsedStock === 'number') {
+      try {
+        const { data: productForAlert } = await admin
+          .from('products')
+          .select('name, low_stock_threshold, low_stock_alert_sent_at')
+          .eq('id', id)
+          .single();
+
+        if (productForAlert) {
+          const threshold = parsedThreshold ?? (productForAlert.low_stock_threshold ?? 5);
+          await checkAndSendLowStockAlert({
+            productId: id,
+            productName: productForAlert.name,
+            stock: parsedStock,
+            threshold,
+            lastAlertAt: productForAlert.low_stock_alert_sent_at,
+          });
+        }
+      } catch (alertErr) {
+        console.warn('[Admin] Low-stock alert check failed:', alertErr);
+      }
+    }
+
     return { success: true, imageUrl: newImageUrl };
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
     return { success: false, error: message };
   }
 }
+
+
 
 /**
  * Server Action: Fetches all customer orders for the Admin panel.

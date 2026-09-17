@@ -32,10 +32,22 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
       whatsapp_message: message,
     };
 
-    // Asynchronously log the order to Supabase (Server Action with client fallback)
+    // Log the order to Supabase (Server Action with client fallback).
+    // If successful, append the Order ID + tracking link to the WhatsApp message
+    // so the customer receives it in their conversation with the farm.
+    let finalMessage = message;
     try {
       const res = await submitOrderAction(orderPayload);
-      if (!res.success) {
+      if (res.success && res.orderId) {
+        const siteUrl =
+          typeof window !== 'undefined'
+            ? window.location.origin
+            : (process.env.NEXT_PUBLIC_SITE_URL || '');
+        const trackingLink = `${siteUrl}/track-order?id=${res.orderId}`;
+        finalMessage =
+          message +
+          `\n\n─────────────────────\n📦 Order ID: ${res.orderId}\n🔗 Track your order: ${trackingLink}\n─────────────────────`;
+      } else if (!res.success) {
         await createOrder(orderPayload);
       }
     } catch {
@@ -46,7 +58,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
       }
     }
 
-    const url = buildWhatsAppUrl(message);
+    const url = buildWhatsAppUrl(finalMessage);
     window.open(url, '_blank', 'noopener,noreferrer');
     clearCart();
     setOrderSent(true);
