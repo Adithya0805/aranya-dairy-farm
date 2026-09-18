@@ -914,3 +914,119 @@ export async function deleteProductAction(productId: string, token?: string) {
     return { success: false, error: message };
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FARM VISIT REQUEST ACTIONS
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface AdminVisitRequest {
+  id: string;
+  name: string;
+  phone: string;
+  preferred_date: string;
+  time_slot: string;
+  num_visitors: number;
+  notes: string | null;
+  status: 'pending' | 'confirmed' | 'declined' | string;
+  created_at: string;
+}
+
+/**
+ * Server Action: Fetches all farm visit requests for the Admin portal,
+ * sorted by soonest requested date first (preferred_date ASC).
+ */
+export async function getAdminVisitsAction(token?: string) {
+  const auth = await verifyAdminUser(token);
+  if (!auth.authorized) {
+    return { success: false, error: auth.error || 'Unauthorized', visits: [] };
+  }
+
+  try {
+    const admin = getAdminClient();
+    const { data, error } = await admin
+      .from('farm_visit_requests')
+      .select('id, name, phone, preferred_date, time_slot, num_visitors, notes, status, created_at')
+      .order('preferred_date', { ascending: true })
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      return { success: false, error: error.message, visits: [] };
+    }
+
+    return { success: true, visits: (data || []) as AdminVisitRequest[] };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { success: false, error: message, visits: [] };
+  }
+}
+
+/**
+ * Server Action: Updates a visit request status (e.g. 'pending', 'confirmed', 'declined').
+ */
+export async function updateVisitStatusAction(
+  id: string,
+  status: 'pending' | 'confirmed' | 'declined' | string,
+  token?: string
+) {
+  const auth = await verifyAdminUser(token);
+  if (!auth.authorized) {
+    return { success: false, error: auth.error || 'Unauthorized' };
+  }
+
+  try {
+    const admin = getAdminClient();
+    const { error } = await admin
+      .from('farm_visit_requests')
+      .update({ status: status.toLowerCase() })
+      .eq('id', id);
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    try {
+      revalidatePath('/admin/visits');
+    } catch (revErr) {
+      console.warn('[Admin] revalidatePath warning:', revErr);
+    }
+
+    return { success: true };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { success: false, error: message };
+  }
+}
+
+/**
+ * Server Action: Deletes a specific farm visit request.
+ */
+export async function deleteVisitAction(id: string, token?: string) {
+  const auth = await verifyAdminUser(token);
+  if (!auth.authorized) {
+    return { success: false, error: auth.error || 'Unauthorized' };
+  }
+
+  try {
+    const admin = getAdminClient();
+    const { error } = await admin
+      .from('farm_visit_requests')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    try {
+      revalidatePath('/admin/visits');
+    } catch (revErr) {
+      console.warn('[Admin] revalidatePath warning:', revErr);
+    }
+
+    return { success: true };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { success: false, error: message };
+  }
+}
+

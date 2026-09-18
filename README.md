@@ -1,4 +1,4 @@
-﻿# 🌿 Aranya Organic Dairy Farm (அரண்யா இயற்கை பால் பண்ணை)
+# 🌿 Aranya Organic Dairy Farm (அரண்யா இயற்கை பால் பண்ணை)
 
 [![Next.js](https://img.shields.io/badge/Next.js-16.3-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19.0-blue?style=for-the-badge&logo=react)](https://react.dev/)
@@ -65,7 +65,12 @@
 - **Itemized Breakdown**: Displays ordered items, quantities, pricing, order date, and instant WhatsApp support link.
 - **Zero Enumeration Security**: Powered by `/api/track-order` server route using strict single UUID primary-key lookup. Public direct table querying remains blocked.
 
-### 4. 🛡️ Admin Management Portal (`/admin`)
+### 4. 🌾 Farm Visit Booking System (`/contact#book-visit`)
+- **Interactive Booking Form**: Patrons schedule visits with customizable date picker (future dates only), time slot selection (*Morning 8–10 AM* or *Afternoon 2–4 PM*), and headcount.
+- **Immediate WhatsApp Routing**: Automatically triggers an instant, structured booking notification to the farm manager's WhatsApp number.
+- **Privacy & Security**: Visitor booking data is inserted with Row Level Security protection (public insert only, no public enumeration).
+
+### 5. 🛡️ Admin Management Portal (`/admin`)
 - **Supabase Auth Protection**: Role-based access control redirecting unauthorized visitors to `/admin/login`.
 - **Product Management (`/admin/products`)**:
   - Live price editing (₹) and packaging unit updates.
@@ -74,8 +79,12 @@
 - **Order Pipeline (`/admin/orders`)**:
   - Status pipeline: **Pending** ➔ **Confirmed** ➔ **Delivered**.
   - One-click customer WhatsApp communication triggers with pre-populated order status messages.
+- **Farm Visit Requests (`/admin/visits`)**:
+  - Full pipeline management for visitor bookings (**Pending** ➔ **Confirmed** ➔ **Declined**).
+  - Direct WhatsApp reply triggers to confirm visitor appointment slots.
+  - Sorted by soonest requested date with headcount and visitor notes.
 
-### 5. ⚠️ Inventory & Low-Stock Alerts
+### 6. ⚠️ Inventory & Low-Stock Alerts
 - **Configurable Thresholds**: Product-level `stock` and `low_stock_threshold` (default: 5 units).
 - **Automated Alerts**: Triggered when product stock drops below threshold during admin updates.
 - **24-Hour Anti-Spam Protection**: Tracks `low_stock_alert_sent_at` in the database to guarantee only one alert per product per day.
@@ -83,7 +92,7 @@
   - Prominent visual `⚠️ Low Stock` badges in the Admin panel.
   - Transactional email dispatch via **Resend** (when configured) or server-side logging.
 
-### 6. 🤖 Aranya AI Farm Assistant
+### 7. 🤖 Aranya AI Farm Assistant
 - **Gemini 3.6 Flash Engine**: High-speed conversational AI in [ChatAssistantWidget.tsx](frontend/src/components/ChatAssistantWidget.tsx).
 - **Dynamic Catalog Context**: Real-time catalog and pricing injected directly into prompt context.
 - **Intent Detection & WhatsApp Handoff**: Identifies purchasing intent and generates one-click WhatsApp action buttons.
@@ -113,10 +122,11 @@ The database schema is managed via Supabase SQL migrations in `supabase/migratio
 1. **`categories`**: `id` (UUID, PK), `name` (Text, Unique).
 2. **`products`**: `id` (UUID, PK), `name`, `name_tamil`, `category_id` (FK), `price`, `unit`, `image_url`, `available`, `featured`, `description`, `stock`, `low_stock_threshold`, `low_stock_alert_sent_at`.
 3. **`orders`**: `id` (UUID, PK), `items` (JSONB), `total` (Numeric), `status` (Text), `whatsapp_message` (Text), `created_at` (Timestamptz).
+4. **`farm_visit_requests`**: `id` (UUID, PK), `name`, `phone`, `preferred_date` (Date), `time_slot`, `num_visitors`, `notes`, `status` (Text), `created_at` (Timestamptz).
 
 ### Row Level Security (RLS) Model
 - **`products` & `categories`**: Public `SELECT` allowed. Write mutations restricted to authenticated admin / service role.
-- **`orders`**: Public `INSERT` only (customers can submit orders). Public `SELECT`/`UPDATE`/`DELETE` blocked.
+- **`orders` & `farm_visit_requests`**: Public `INSERT` only (customers can submit orders and visit requests). Public `SELECT`/`UPDATE`/`DELETE` blocked.
 - **Order Tracking**: Server route (`/api/track-order`) uses `service_role` to fetch orders strictly by exact UUID, preventing unauthorized catalog enumeration.
 
 ---
@@ -131,7 +141,8 @@ aranya-dairy-farm/
 │   └── migrations/                # Database migrations
 │       ├── 20260914000001_initial_schema.sql
 │       ├── 20260914000002_seed_catalog.sql
-│       └── 20260917000001_order_tracking_and_low_stock.sql
+│       ├── 20260917000001_order_tracking_and_low_stock.sql
+│       └── 20260918000001_farm_visit_requests.sql
 └── frontend/                      # Next.js 16 Web Application
     ├── package.json
     ├── next.config.ts
@@ -144,10 +155,11 @@ aranya-dairy-farm/
         │   ├── track-order/       # Order tracking public page
         │   ├── products/          # Catalog & category browser
         │   ├── story/             # Heritage & Vedic farming philosophy
-        │   ├── contact/           # Farm visit & subscription booking
+        │   ├── contact/           # Farm visit booking & delivery inquiry
         │   ├── admin/             # Authenticated store management
         │   │   ├── products/      # Inventory, prices, stock & photo uploads
-        │   │   └── orders/        # Order pipeline & status management
+        │   │   ├── orders/        # Order pipeline & status management
+        │   │   └── visits/        # Farm visit requests & confirmations
         │   └── api/
         │       ├── chat/          # Gemini AI chat route
         │       └── track-order/   # Secure order tracking endpoint
@@ -157,6 +169,7 @@ aranya-dairy-farm/
 ```
 
 ---
+
 
 ## 🚀 Getting Started
 

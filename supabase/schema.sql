@@ -45,6 +45,18 @@ create table orders (
   created_at timestamp default now()
 );
 
+create table farm_visit_requests (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  phone text not null,
+  preferred_date date not null,
+  time_slot text not null,      -- e.g. "Morning (8-10 AM)", "Afternoon (2-4 PM)"
+  num_visitors integer not null default 1,
+  notes text,
+  status text not null default 'pending', -- pending / confirmed / declined
+  created_at timestamptz not null default now()
+);
+
 -- ----------------------------------------------------------------------------
 -- 3. GRANT PERMISSIONS TO ROLES
 -- In PostgreSQL/Supabase, RLS policies require base table-level GRANTS.
@@ -55,8 +67,9 @@ grant usage on schema public to anon, authenticated, service_role;
 grant select on table categories to anon, authenticated;
 grant select on table products to anon, authenticated;
 
--- Orders: Insert only for public/anon (no select/update/delete)
+-- Orders & Visits: Insert only for public/anon (no select/update/delete)
 grant insert on table orders to anon, authenticated;
+grant insert on table farm_visit_requests to anon, authenticated;
 
 -- Service Role: Full access for server-side admin management
 grant all on all tables in schema public to service_role;
@@ -69,6 +82,7 @@ grant all on all routines in schema public to service_role;
 alter table categories enable row level security;
 alter table products enable row level security;
 alter table orders enable row level security;
+alter table farm_visit_requests enable row level security;
 
 -- Categories: Public read-only
 drop policy if exists "Allow public read access on categories" on categories;
@@ -90,6 +104,21 @@ create policy "Allow public insert on orders"
   on orders for insert
   to public
   with check (true);
+
+-- Farm Visit Requests: Public insert only
+drop policy if exists "Allow public insert on farm_visit_requests" on farm_visit_requests;
+create policy "Allow public insert on farm_visit_requests"
+  on farm_visit_requests for insert
+  to public
+  with check (true);
+
+-- Authenticated / Admin full access on farm_visit_requests
+drop policy if exists "Admin full access to visit requests" on farm_visit_requests;
+create policy "Admin full access to visit requests"
+  on farm_visit_requests for all
+  to authenticated
+  using (true);
+
 
 -- ----------------------------------------------------------------------------
 -- 5. STORAGE BUCKET: product-images & POLICIES

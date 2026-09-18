@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { LogOut, Package, ShoppingCart, ExternalLink } from 'lucide-react';
+import { LogOut, Package, ShoppingCart, Calendar, ExternalLink } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -81,6 +81,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const isProducts = pathname.startsWith('/admin/products');
   const isOrders = pathname.startsWith('/admin/orders');
+  const isVisits = pathname.startsWith('/admin/visits');
 
   return (
     <div className="min-h-screen bg-[#F7F4F0] flex flex-col font-sans text-[#1C241E]">
@@ -132,6 +133,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               >
                 <ShoppingCart className="w-4 h-4" />
                 <span>Orders</span>
+              </Link>
+
+              <Link
+                href="/admin/visits"
+                className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-semibold uppercase tracking-wider transition-colors ${
+                  isVisits
+                    ? 'bg-[#1B4D2E] text-white'
+                    : 'text-[#57655B] hover:bg-[#F2ECE7] hover:text-[#1C241E]'
+                }`}
+              >
+                <Calendar className="w-4 h-4" />
+                <span>Visits</span>
               </Link>
             </nav>
 
@@ -193,6 +206,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             >
               <ShoppingCart className="w-3.5 h-3.5" />
               <span>Orders</span>
+            </Link>
+
+            <Link
+              href="/admin/visits"
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded text-xs font-bold uppercase tracking-wider transition-colors ${
+                isVisits
+                  ? 'bg-[#1B4D2E] text-white'
+                  : 'bg-[#F2ECE7] text-[#1C241E]'
+              }`}
+            >
+              <Calendar className="w-3.5 h-3.5" />
+              <span>Visits</span>
             </Link>
           </div>
         </div>
