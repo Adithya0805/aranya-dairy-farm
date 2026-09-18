@@ -38,12 +38,14 @@ create table products (
 
 create table orders (
   id uuid primary key default gen_random_uuid(),
+  order_code text unique,      -- e.g. "0A3E78AD" (8-char uppercase alphanumeric)
   items jsonb not null,        -- array of {product_id, name, qty, price}
   total numeric,
   status text default 'pending',  -- pending / confirmed / delivered
   whatsapp_message text,
   created_at timestamp default now()
 );
+
 
 create table farm_visit_requests (
   id uuid primary key default gen_random_uuid(),

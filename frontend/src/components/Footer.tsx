@@ -76,6 +76,14 @@ export default function Footer({ onOpenStory: _onOpenStory, onOpenContact: _onOp
                   Location &amp; Farm Visit
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/track-order"
+                  className="hover:text-[#E58A13] hover:underline underline-offset-4 transition-colors text-left cursor-pointer"
+                >
+                  Track Your Order
+                </Link>
+              </li>
             </ul>
           </div>
 

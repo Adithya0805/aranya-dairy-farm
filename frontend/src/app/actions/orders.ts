@@ -1,5 +1,6 @@
 'use server';
 
+import crypto from 'crypto';
 import { getAdminClient } from '@/lib/supabaseServer';
 
 export interface OrderItemPayload {
@@ -18,7 +19,15 @@ export interface SubmitOrderPayload {
 export interface SubmitOrderResult {
   success: boolean;
   orderId?: string;
+  orderCode?: string;
   error?: string;
+}
+
+/**
+ * Generates an 8-character uppercase alphanumeric order code (e.g. "0A3E78AD").
+ */
+function generateOrderCode(): string {
+  return crypto.randomBytes(4).toString('hex').toUpperCase();
 }
 
 /**
@@ -80,27 +89,59 @@ export async function submitOrderAction(payload: SubmitOrderPayload): Promise<Su
       ? null
       : Math.round(calculatedTotal * 100) / 100;
 
+    const orderCode = generateOrderCode();
     const admin = getAdminClient();
+
     const { data, error } = await admin
       .from('orders')
       .insert({
+        order_code: orderCode,
         items: sanitizedItems,
         total: finalTotal,
         status: 'pending',
         whatsapp_message: sanitizedMessage,
       })
-      .select('id')
+      .select('id, order_code')
       .single();
 
     if (error) {
+      // Graceful fallback if order_code column not yet present
+      if (error.message && error.message.includes('order_code')) {
+        const fallbackRes = await admin
+          .from('orders')
+          .insert({
+            items: sanitizedItems,
+            total: finalTotal,
+            status: 'pending',
+            whatsapp_message: sanitizedMessage,
+          })
+          .select('id')
+          .single();
+
+        if (fallbackRes.error) {
+          return { success: false, error: fallbackRes.error.message };
+        }
+
+        const fallbackCode = fallbackRes.data?.id
+          ? fallbackRes.data.id.replace(/-/g, '').slice(0, 8).toUpperCase()
+          : orderCode;
+
+        return { success: true, orderId: fallbackRes.data?.id, orderCode: fallbackCode };
+      }
+
       console.warn('[OrdersAction] Database insert error:', error.message);
       return { success: false, error: error.message };
     }
 
-    return { success: true, orderId: data?.id };
+    return {
+      success: true,
+      orderId: data?.id,
+      orderCode: data?.order_code || orderCode,
+    };
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
     console.warn('[OrdersAction] Exception during order submission:', message);
     return { success: false, error: message };
   }
 }
+

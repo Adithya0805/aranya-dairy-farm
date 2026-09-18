@@ -33,20 +33,21 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     };
 
     // Log the order to Supabase (Server Action with client fallback).
-    // If successful, append the Order ID + tracking link to the WhatsApp message
+    // If successful, append the 8-character Order Code + tracking link to the WhatsApp message
     // so the customer receives it in their conversation with the farm.
     let finalMessage = message;
     try {
       const res = await submitOrderAction(orderPayload);
-      if (res.success && res.orderId) {
+      if (res.success && (res.orderCode || res.orderId)) {
         const siteUrl =
           typeof window !== 'undefined'
             ? window.location.origin
             : (process.env.NEXT_PUBLIC_SITE_URL || '');
-        const trackingLink = `${siteUrl}/track-order?id=${res.orderId}`;
+        const code = res.orderCode || (res.orderId ? res.orderId.replace(/-/g, '').slice(0, 8).toUpperCase() : '');
+        const trackingLink = `${siteUrl}/track-order?code=${code}`;
         finalMessage =
           message +
-          `\n\n─────────────────────\n📦 Order ID: ${res.orderId}\n🔗 Track your order: ${trackingLink}\n─────────────────────`;
+          `\n\n─────────────────────\n📦 Order Code: #${code}\n🔗 Track your order: ${trackingLink}\n─────────────────────`;
       } else if (!res.success) {
         await createOrder(orderPayload);
       }

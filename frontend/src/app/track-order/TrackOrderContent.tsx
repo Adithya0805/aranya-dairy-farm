@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -15,6 +15,7 @@ interface OrderItem {
 
 interface TrackedOrder {
   id: string;
+  order_code?: string;
   created_at: string;
   items: OrderItem[];
   total: number | null;
@@ -80,8 +81,8 @@ export default function TrackOrderContent() {
   const [order, setOrder] = useState<TrackedOrder | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const fetchOrder = useCallback(async (orderId: string) => {
-    const trimmed = orderId.trim();
+  const fetchOrder = useCallback(async (codeOrId: string) => {
+    const trimmed = codeOrId.trim().replace(/^#+/, '').trim();
     if (!trimmed) return;
 
     setFetchState('loading');
@@ -89,7 +90,7 @@ export default function TrackOrderContent() {
     setErrorMessage('');
 
     try {
-      const res = await fetch(`/api/track-order?id=${encodeURIComponent(trimmed)}`);
+      const res = await fetch(`/api/track-order?code=${encodeURIComponent(trimmed)}`);
       const data = await res.json();
 
       if (res.ok && data.order) {
@@ -108,24 +109,25 @@ export default function TrackOrderContent() {
     }
   }, []);
 
-  // Auto-fetch when ?id= is in the URL
+  // Auto-fetch when ?code= or ?id= is in the URL
   useEffect(() => {
-    const idFromUrl = searchParams.get('id');
-    if (idFromUrl) {
-      setInputId(idFromUrl);
-      fetchOrder(idFromUrl);
+    const codeFromUrl = searchParams.get('code') || searchParams.get('id');
+    if (codeFromUrl) {
+      setInputId(codeFromUrl);
+      fetchOrder(codeFromUrl);
     }
   }, [searchParams, fetchOrder]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const trimmed = inputId.trim();
+    const trimmed = inputId.trim().replace(/^#+/, '').trim();
     if (!trimmed) return;
-    router.push(`/track-order?id=${encodeURIComponent(trimmed)}`);
+    router.push(`/track-order?code=${encodeURIComponent(trimmed)}`);
     fetchOrder(trimmed);
   };
 
   const statusIndex = order ? getStatusIndex(order.status) : -1;
+  const displayCode = order?.order_code || (order?.id ? order.id.replace(/-/g, '').slice(0, 8).toUpperCase() : '');
 
   return (
     <div className="min-h-screen bg-[#FAF7F2] flex flex-col">
@@ -165,7 +167,7 @@ export default function TrackOrderContent() {
               Order Tracking
             </h1>
             <p className="text-sm text-[#57655B] leading-relaxed">
-              Enter the Order ID from your WhatsApp confirmation message to check your order status.
+              Enter your 8-character Order Code from your WhatsApp confirmation message to check your order status.
             </p>
           </div>
 
@@ -178,11 +180,12 @@ export default function TrackOrderContent() {
                 type="text"
                 value={inputId}
                 onChange={(e) => setInputId(e.target.value)}
-                placeholder="e.g. 3f9e2a4b-1c7d-..."
-                className="w-full pl-10 pr-4 py-3 border border-[#1B4D2E]/20 rounded-xl text-sm text-[#1C241E] placeholder-[#8A7B6E] focus:outline-none focus:ring-2 focus:ring-[#1B4D2E]/30 focus:border-[#1B4D2E]/40 bg-[#FAF7F2] transition-colors font-mono"
+                placeholder="e.g. 0A3E78AD"
+                autoCapitalize="characters"
+                className="w-full pl-10 pr-4 py-3 border border-[#1B4D2E]/20 rounded-xl text-sm text-[#1C241E] placeholder-[#8A7B6E] focus:outline-none focus:ring-2 focus:ring-[#1B4D2E]/30 focus:border-[#1B4D2E]/40 bg-[#FAF7F2] transition-colors font-mono uppercase"
                 spellCheck={false}
                 autoComplete="off"
-                aria-label="Order ID"
+                aria-label="Order Code"
               />
             </div>
             <button
@@ -223,7 +226,7 @@ export default function TrackOrderContent() {
                 </h2>
                 <p className="text-sm text-[#57655B] leading-relaxed">
                   {fetchState === 'not_found'
-                    ? "We couldn't find an order with that ID. Please double-check the Order ID from your WhatsApp confirmation message."
+                    ? "We couldn't find an order with that Order Code. Please double-check the 8-character code from your WhatsApp confirmation message."
                     : errorMessage}
                 </p>
                 <div className="pt-2">
@@ -305,7 +308,7 @@ export default function TrackOrderContent() {
               <div className="flex items-start justify-between gap-4 mb-5 flex-wrap">
                 <div>
                   <h2 className="font-serif text-lg text-[#1C241E] font-bold">Order Details</h2>
-                  <p className="text-xs text-[#8A7B6E] mt-0.5 font-mono break-all">{order.id}</p>
+                  <p className="text-xs text-[#8A7B6E] mt-0.5 font-mono font-bold">#{displayCode}</p>
                 </div>
                 <div className="text-right shrink-0">
                   <p className="text-xs text-[#8A7B6E] uppercase tracking-wider font-semibold">Placed on</p>
@@ -349,7 +352,7 @@ export default function TrackOrderContent() {
                 <p className="text-xs text-[#57655B]">Our farm team is available on WhatsApp.</p>
               </div>
               <a
-                href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Hello! I need help with Order ID: ${order.id}`)}`}
+                href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Hello! I need help with Order #${displayCode}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 text-xs font-bold text-[#25D366] hover:text-[#1FB055] transition-colors shrink-0"
@@ -364,7 +367,7 @@ export default function TrackOrderContent() {
         {/* Idle hint */}
         {fetchState === 'idle' && (
           <p className="text-center text-xs text-[#8A7B6E]">
-            Your Order ID is included in the WhatsApp confirmation message sent when you placed your order.
+            Your 8-character Order Code is included in the WhatsApp confirmation message sent when you placed your order.
           </p>
         )}
       </main>

@@ -34,6 +34,7 @@ interface OrderItem {
 
 interface AdminOrder {
   id: string;
+  order_code?: string | null;
   items: OrderItem[];
   total: number | null;
   status: 'pending' | 'confirmed' | 'delivered' | string;
@@ -67,6 +68,10 @@ const STATUS_CONFIG: Record<
     icon: Truck,
   },
 };
+
+function getOrderCode(order: AdminOrder): string {
+  return order.order_code || order.id.replace(/-/g, '').slice(0, 8).toUpperCase();
+}
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<AdminOrder[]>([]);
@@ -147,12 +152,10 @@ export default function AdminOrdersPage() {
     }
   };
 
-  const handleCopyOrder = (order: AdminOrder) => {
-    const itemsSummary = (order.items || [])
-      .map((i) => `• ${i.name} × ${i.qty}`)
-      .join('\n');
-    const text = `Order #${order.id.slice(0, 8)}\nDate: ${formatDate(order.created_at)}\nStatus: ${order.status.toUpperCase()}\nItems:\n${itemsSummary}\nTotal: ₹${order.total ?? 0}`;
-    navigator.clipboard.writeText(text);
+  const handleCopyOrder = (e: React.MouseEvent, order: AdminOrder) => {
+    e.stopPropagation();
+    const code = getOrderCode(order);
+    navigator.clipboard.writeText(code);
     setCopiedId(order.id);
     setTimeout(() => setCopiedId(null), 2000);
   };
@@ -482,12 +485,12 @@ export default function AdminOrdersPage() {
                       <td className="py-4 px-4 sm:px-6 align-top">
                         <div className="flex items-center gap-1.5">
                           <span className="font-mono text-xs font-bold text-[#1C241E]">
-                            #{order.id.slice(0, 8)}
+                            #{getOrderCode(order)}
                           </span>
                           <button
-                            onClick={() => handleCopyOrder(order)}
+                            onClick={(e) => handleCopyOrder(e, order)}
                             className="text-[#8A7B6E] hover:text-[#1B4D2E] p-0.5 rounded cursor-pointer transition-colors"
-                            title="Copy Order Summary"
+                            title="Copy Order Code"
                           >
                             {copiedId === order.id ? (
                               <Check className="w-3 h-3 text-[#1B4D2E]" />
@@ -622,7 +625,7 @@ export default function AdminOrdersPage() {
 
             <div className="p-6 space-y-4">
               <div className="text-xs text-[#8A7B6E] flex justify-between border-b border-[#1B4D2E]/10 pb-2">
-                <span>Order #{viewingMessage.id.slice(0, 8)}</span>
+                <span>Order #{getOrderCode(viewingMessage)}</span>
                 <span>{formatDate(viewingMessage.created_at)}</span>
               </div>
 
@@ -744,7 +747,7 @@ export default function AdminOrdersPage() {
                       <tr key={order.id} className="align-top">
                         <td className="py-3 px-3 font-bold font-mono">{idx + 1}</td>
                         <td className="py-3 px-3 font-mono">
-                          <span className="font-bold">#{order.id.slice(0, 8)}</span>
+                          <span className="font-bold">#{getOrderCode(order)}</span>
                           <span className="block text-[10px] text-[#8A7B6E]">
                             {new Date(order.created_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}
                           </span>
