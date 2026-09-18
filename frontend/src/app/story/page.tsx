@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import TrustBadgesSection from '@/components/TrustBadgesSection';
 import Footer from '@/components/Footer';
-import CartDrawer from '@/components/CartDrawer';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import PhotoLightboxModal from '@/components/PhotoLightboxModal';
 import { ArrowLeft, ArrowRight, Heart, Sparkles, Droplets, ShieldCheck, Sun, MessageCircle, ZoomIn } from 'lucide-react';
@@ -14,7 +13,6 @@ import { WA_STORY_INQUIRY } from '@/lib/whatsapp';
 
 export default function StoryPage() {
   const router = useRouter();
-  const [cartOpen, setCartOpen] = useState(false);
   const [lightbox, setLightbox] = useState<{
     isOpen: boolean;
     imageSrc: string;
@@ -88,9 +86,7 @@ export default function StoryPage() {
   return (
     <main className="min-h-screen bg-[#FDFBF7] font-sans antialiased text-[#3E4B41] flex flex-col selection:bg-[#D48B16] selection:text-white pb-16 md:pb-0">
       {/* 1. Header Bar */}
-      <Header
-        onOpenCart={() => setCartOpen(true)}
-      />
+      <Header />
 
       {/* ── Prominent Larger Breadcrumb Bar with Glassmorphic Effect ── */}
       <section className="bg-[#FAF7F2]/90 backdrop-blur-xl border-b border-[#122E1B]/10 py-4 sm:py-5 shadow-xs transition-all">
@@ -431,16 +427,12 @@ export default function StoryPage() {
 
       {/* 6. Mobile Bottom Navigation */}
       <MobileBottomNav
-        onOpenCart={() => setCartOpen(true)}
         onOpenContact={() => {
           router.push('/contact');
         }}
       />
 
-      {/* 8. Shopping Cart Drawer */}
-      <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
-
-      {/* 9. Photo Lightbox Modal */}
+      {/* 7. Photo Lightbox Modal */}
       <PhotoLightboxModal
         isOpen={lightbox.isOpen}
         onClose={() => setLightbox((prev) => ({ ...prev, isOpen: false }))}

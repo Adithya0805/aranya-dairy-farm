@@ -4,6 +4,7 @@ import React, {
   createContext,
   useContext,
   useReducer,
+  useState,
   useEffect,
   useCallback,
   ReactNode,
@@ -106,6 +107,10 @@ interface CartContextValue {
   totalItems: number;
   totalPrice: number;
   totalPriceLabel: string;
+  isCartOpen: boolean;
+  openCart: () => void;
+  closeCart: () => void;
+  toggleCart: () => void;
   addItem: (product: Product) => void;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
@@ -123,6 +128,7 @@ const STORAGE_KEY = 'aranya_cart_v1';
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(cartReducer, { items: [] });
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   // Hydrate from localStorage on mount (client-only)
   useEffect(() => {
@@ -157,6 +163,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const totalPriceLabel = hasPendingPrices && totalPrice === 0
     ? 'Price updating soon'
     : formatPrice(totalPrice);
+
+  const openCart = useCallback(() => {
+    setIsCartOpen(true);
+  }, []);
+
+  const closeCart = useCallback(() => {
+    setIsCartOpen(false);
+  }, []);
+
+  const toggleCart = useCallback(() => {
+    setIsCartOpen((prev) => !prev);
+  }, []);
 
   const addItem = useCallback((product: Product) => {
     dispatch({ type: 'ADD_ITEM', product });
@@ -210,6 +228,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
         totalItems,
         totalPrice,
         totalPriceLabel,
+        isCartOpen,
+        openCart,
+        closeCart,
+        toggleCart,
         addItem,
         removeItem,
         updateQuantity,

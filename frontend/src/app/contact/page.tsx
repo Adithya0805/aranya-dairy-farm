@@ -5,7 +5,6 @@ import Link from 'next/link';
 import Header from '@/components/Header';
 import SlimTrustLine from '@/components/SlimTrustLine';
 import Footer from '@/components/Footer';
-import CartDrawer from '@/components/CartDrawer';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import {
   ArrowLeft,
@@ -40,7 +39,6 @@ import {
 import { submitVisitRequestAction } from '@/app/actions/visits';
 
 export default function ContactPage() {
-  const [cartOpen, setCartOpen] = useState(false);
   const [activeFormTab, setActiveFormTab] = useState<'visit' | 'inquiry'>('visit');
 
   // Visit Booking Form State
@@ -218,7 +216,7 @@ Message: ${inquiryData.notes || 'Please provide details on daily deliveries and 
   return (
     <main className="min-h-screen bg-[#FDFBF7] font-sans antialiased text-[#3E4B41] flex flex-col selection:bg-[#E58A13] selection:text-white pb-16 md:pb-0">
       {/* 1. Header Bar */}
-      <Header onOpenCart={() => setCartOpen(true)} />
+      <Header />
 
       {/* ── Breadcrumb Bar ── */}
       <section className="bg-[#FAF7F2]/90 backdrop-blur-xl border-b border-[#122E1B]/10 py-4 sm:py-5 shadow-xs transition-all">
@@ -806,13 +804,7 @@ Message: ${inquiryData.notes || 'Please provide details on daily deliveries and 
       <Footer />
 
       {/* 7. Mobile Bottom Navigation */}
-      <MobileBottomNav
-        onOpenCart={() => setCartOpen(true)}
-        onOpenContact={() => {}}
-      />
-
-      {/* 9. Shopping Cart Drawer */}
-      <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
+      <MobileBottomNav />
     </main>
   );
 }

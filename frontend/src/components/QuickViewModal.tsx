@@ -21,13 +21,18 @@ export default function QuickViewModal({
   const [qty, setQty] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
 
-  // Reset state whenever a new product is selected
+  // Cached product to allow graceful exit animation
+  const [cachedProduct, setCachedProduct] = useState<Product | null>(product);
+
   useEffect(() => {
     if (product) {
+      setCachedProduct(product);
       setQty(1);
       setIsAdded(false);
     }
-  }, [product, isOpen]);
+  }, [product]);
+
+  const activeProduct = product || cachedProduct;
 
   // Lock body scroll while modal is open to prevent background double-scrolling
   useEffect(() => {
@@ -54,17 +59,16 @@ export default function QuickViewModal({
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen || !product) return null;
+  if (!activeProduct) return null;
 
-  const hasPrice = product.price !== null;
+  const hasPrice = activeProduct.price !== null;
 
   const handleAddToCart = () => {
     if (!hasPrice) return;
     for (let i = 0; i < qty; i++) {
-      addItem(product);
+      addItem(activeProduct);
     }
     setIsAdded(true);
-    // Provide brief visual confirmation, then auto-close smoothly back to the grid
     setTimeout(() => {
       setIsAdded(false);
       onClose();
@@ -73,40 +77,46 @@ export default function QuickViewModal({
 
   const handleNotifyMe = () => {
     const text = encodeURIComponent(
-      `Hello Aranya Dairy Farm, please notify me when pricing for ${product.name} (${product.nameTamil}) [${product.unit}] is available.`
+      `Hello Aranya Dairy Farm, please notify me when pricing for ${activeProduct.name} (${activeProduct.nameTamil}) [${activeProduct.unit}] is available.`
     );
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`, '_blank', 'noopener,noreferrer');
   };
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-xs transition-opacity duration-300"
+      className={`fixed inset-0 z-[90] flex items-end sm:items-center justify-center transition-opacity duration-300 ${
+        isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+      }`}
       role="dialog"
       aria-modal="true"
       aria-labelledby="quick-view-title"
     >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 cursor-pointer"
+        className="absolute inset-0 bg-black/50 backdrop-blur-xs cursor-pointer"
         onClick={onClose}
         aria-label="Close modal backdrop"
       />
 
       {/* Modal Dialog (Bottom sheet on mobile, centered card on desktop) */}
-      <div className="relative w-full sm:max-w-xl max-h-[90vh] sm:max-h-[85vh] bg-[#FAF7F2] rounded-t-3xl sm:rounded-2xl shadow-2xl border border-[#122E1B]/15 overflow-y-auto flex flex-col z-10 animate-in slide-in-from-bottom sm:slide-in-from-bottom-4 duration-300">
+      <div
+        className={`relative z-[100] w-full sm:max-w-2xl max-h-[90vh] sm:max-h-[85vh] bg-[#FAF7F2] rounded-t-3xl sm:rounded-3xl shadow-2xl border border-[#122E1B]/15 overflow-y-auto flex flex-col transform transition-transform duration-300 ease-out ${
+          isOpen ? 'translate-y-0 scale-100' : 'translate-y-6 sm:translate-y-0 sm:scale-95'
+        }`}
+      >
         {/* Mobile top pull indicator */}
         <div className="pt-3 pb-1 flex justify-center sm:hidden">
           <div className="w-12 h-1.5 rounded-full bg-[#122E1B]/20" />
         </div>
 
         {/* Header with Category Tag and Close Button */}
-        <div className="px-5 sm:px-6 pt-3 pb-2 flex items-center justify-between border-b border-[#122E1B]/10">
-          <span className="text-[11px] font-sans uppercase font-bold tracking-widest text-[#B84A28]">
-            {product.category}
+        <div className="px-6 sm:px-8 pt-4 pb-3 flex items-center justify-between border-b border-[#122E1B]/10">
+          <span className="text-xs font-sans uppercase font-bold tracking-widest text-[#B84A28]">
+            {activeProduct.category}
           </span>
           <button
             onClick={onClose}
-            className="min-w-[40px] min-h-[40px] flex items-center justify-center text-[#15321E] hover:text-[#E58A13] hover:bg-[#122E1B]/5 rounded-full transition-all cursor-pointer active:scale-95"
+            className="min-w-[40px] min-h-[40px] flex items-center justify-center text-[#15321E] hover:text-[#E58A13] hover:bg-[#122E1B]/5 rounded-full transition-all cursor-pointer active:scale-95 ml-auto"
             aria-label="Close Quick View"
           >
             <X className="w-5 h-5" />
@@ -114,14 +124,14 @@ export default function QuickViewModal({
         </div>
 
         {/* Modal Body */}
-        <div className="p-5 sm:p-7 space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6 items-center">
+        <div className="p-6 sm:p-8 space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
             {/* Product Image */}
-            <div className="aspect-square bg-[#F4EFEA] rounded-xl overflow-hidden p-3 border border-[#122E1B]/10 flex items-center justify-center">
+            <div className="aspect-square bg-[#F4EFEA] rounded-2xl overflow-hidden p-3 border border-[#122E1B]/10 flex items-center justify-center shadow-2xs">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={product.image}
-                alt={product.name}
+                src={activeProduct.image}
+                alt={activeProduct.name}
                 className="w-full h-full object-contain hover:scale-105 transition-transform duration-300"
                 onError={(e) => {
                   const target = e.currentTarget;
@@ -133,32 +143,32 @@ export default function QuickViewModal({
             </div>
 
             {/* Product Core Info */}
-            <div className="space-y-2.5">
+            <div className="space-y-3">
               <div>
                 <h3
                   id="quick-view-title"
-                  className="text-xl sm:text-2xl font-serif font-bold text-[#15321E] leading-tight"
+                  className="text-2xl sm:text-3xl font-serif font-bold text-[#15321E] leading-tight"
                 >
-                  {product.name}
+                  {activeProduct.name}
                 </h3>
-                <p className="text-sm font-sans text-[#122E1B]/75 font-medium mt-0.5">
-                  {product.nameTamil}
+                <p className="text-sm font-sans text-[#122E1B]/75 font-medium mt-1">
+                  {activeProduct.nameTamil}
                 </p>
               </div>
 
               <p className="text-xs text-[#8A7B6E] font-sans">
-                Pack Size: <span className="text-[#15321E] font-semibold">{product.unit}</span>
+                Pack Size: <span className="text-[#15321E] font-semibold">{activeProduct.unit}</span>
               </p>
 
               {/* Price or Updating State */}
-              <div className="pt-1">
+              <div className="pt-0.5">
                 {hasPrice ? (
                   <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-sans font-bold text-[#15321E]">
-                      {formatPrice(product.price!)}
+                    <span className="text-2xl sm:text-3xl font-sans font-bold text-[#15321E]">
+                      {formatPrice(activeProduct.price!)}
                     </span>
-                    <span className="text-xs text-[#5F6E62] font-sans">
-                      ({product.unit})
+                    <span className="text-xs text-[#5F6E62] font-sans font-medium">
+                      ({activeProduct.unit})
                     </span>
                   </div>
                 ) : (
@@ -171,19 +181,19 @@ export default function QuickViewModal({
 
               {/* Description */}
               <p className="text-xs sm:text-sm text-[#5F6E62] font-sans leading-relaxed pt-1">
-                {product.description ||
-                  `Farm-fresh ${product.name} (${product.nameTamil}), direct from Aranya Organic Dairy Farm in Shoolagiri. Free from chemical preservatives, synthetic additives, and artificial processing.`}
+                {activeProduct.description ||
+                  `Farm-fresh ${activeProduct.name} (${activeProduct.nameTamil}), direct from Aranya Organic Dairy Farm in Shoolagiri. Free from chemical preservatives, synthetic additives, and artificial processing.`}
               </p>
             </div>
           </div>
 
           {/* Standards & Trust Bullet Points */}
-          <div className="bg-white/60 border border-[#122E1B]/10 rounded-xl p-3.5 space-y-2 text-xs font-sans text-[#15321E]">
-            <div className="flex items-center gap-2">
+          <div className="bg-white/80 border border-[#122E1B]/10 rounded-2xl p-4 space-y-2.5 text-xs font-sans text-[#15321E]">
+            <div className="flex items-center gap-2.5">
               <span className="w-2 h-2 rounded-full bg-[#E58A13] shrink-0" />
-              <span>100% natural, farm-sourced & cold-chain handled</span>
+              <span>100% natural, farm-sourced &amp; cold-chain handled</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               <span className="w-2 h-2 rounded-full bg-[#E58A13] shrink-0" />
               <span>Doorstep morning delivery for orders placed before 8 PM</span>
             </div>
@@ -222,7 +232,7 @@ export default function QuickViewModal({
                   type="button"
                   onClick={handleAddToCart}
                   disabled={isAdded}
-                  className={`flex-1 min-h-[46px] rounded-full text-white font-sans text-xs uppercase font-bold tracking-wider px-5 py-3 flex items-center justify-center gap-2 shadow-md transition-all active:scale-[0.98] cursor-pointer ${
+                  className={`flex-1 min-h-[48px] rounded-full text-white font-sans text-xs uppercase font-bold tracking-wider px-6 py-3.5 flex items-center justify-center gap-2.5 shadow-lg transition-all active:scale-[0.98] cursor-pointer ${
                     isAdded
                       ? 'bg-[#15321E] text-[#FAF7F2] shadow-none'
                       : 'bg-[#E58A13] hover:bg-[#CA7508] shadow-[#E58A13]/25'
@@ -237,7 +247,7 @@ export default function QuickViewModal({
                     <>
                       <ShoppingBag className="w-4 h-4" />
                       <span>
-                        Add to Cart • {formatPrice((product.price ?? 0) * qty)}
+                        ADD TO CART • {formatPrice((activeProduct.price ?? 0) * qty)}
                       </span>
                     </>
                   )}
@@ -247,7 +257,7 @@ export default function QuickViewModal({
               <button
                 type="button"
                 onClick={handleNotifyMe}
-                className="w-full min-h-[46px] rounded-full bg-[#E58A13] hover:bg-[#CA7508] active:scale-[0.98] text-white font-sans text-xs uppercase font-bold tracking-wider px-5 py-3 flex items-center justify-center gap-2 shadow-md shadow-[#E58A13]/20 transition-all cursor-pointer"
+                className="w-full min-h-[48px] rounded-full bg-[#E58A13] hover:bg-[#CA7508] active:scale-[0.98] text-white font-sans text-xs uppercase font-bold tracking-wider px-6 py-3.5 flex items-center justify-center gap-2 shadow-lg shadow-[#E58A13]/20 transition-all cursor-pointer"
               >
                 <MessageSquare className="w-4 h-4" />
                 <span>Inquire on WhatsApp</span>

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
+import CartDrawer from "@/components/CartDrawer";
+import WhatsAppCTA from "@/components/WhatsAppCTA";
 import ChatAssistantWidget from "@/components/ChatAssistantWidget";
-import UnifiedFloatingActionButton from "@/components/UnifiedFloatingActionButton";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { FARM_DOMAIN } from "@/lib/contact";
@@ -79,8 +80,9 @@ export default function RootLayout({
         {/* CartProvider wraps the entire app so any component can access cart state */}
         <CartProvider>
           {children}
+          <CartDrawer />
+          <WhatsAppCTA />
           <ChatAssistantWidget />
-          <UnifiedFloatingActionButton />
         </CartProvider>
         <Analytics />
         <SpeedInsights />

@@ -17,7 +17,7 @@ export default function Header({
   onOpenCart,
   onSelectCategory,
 }: HeaderProps) {
-  const { totalItems } = useCart();
+  const { totalItems, openCart } = useCart();
 
   // ── Cart badge pop animation ──────────────────────────────────────────────
   const [badgeAnimKey, setBadgeAnimKey] = useState(0);
@@ -151,7 +151,7 @@ export default function Header({
 
             {/* Cart Icon with live amber badge */}
             <button
-              onClick={onOpenCart}
+              onClick={onOpenCart || openCart}
               className="relative flex items-center justify-center gap-2 bg-[#1C3E25] hover:bg-[#244F30] border border-[#E58A13]/30 active:scale-95 py-2 px-4 rounded-full transition-all duration-150 touch-manipulation min-h-[44px] cursor-pointer text-[#FAF7F2]"
               aria-label={`Open cart, ${totalItems} item${totalItems !== 1 ? 's' : ''}`}
             >
@@ -186,7 +186,7 @@ export default function Header({
             </a>
 
             <button
-              onClick={onOpenCart}
+              onClick={onOpenCart || openCart}
               className="relative w-11 h-11 flex items-center justify-center text-[#FAF7F2] hover:bg-white/10 active:scale-90 touch-manipulation rounded-full transition-all duration-150 cursor-pointer"
               aria-label={`Open cart, ${totalItems} item${totalItems !== 1 ? 's' : ''}`}
             >

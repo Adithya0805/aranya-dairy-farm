@@ -37,6 +37,25 @@ export default function DetailModal({
   const [showStickyBar, setShowStickyBar] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
 
+  // Keep last active content during close transition
+  const [cachedContent, setCachedContent] = useState<ModalContent | null>(content);
+  const [cachedProduct, setCachedProduct] = useState<Product | null>(product || null);
+
+  useEffect(() => {
+    if (content) {
+      setCachedContent(content);
+    }
+  }, [content]);
+
+  useEffect(() => {
+    if (product) {
+      setCachedProduct(product);
+    }
+  }, [product]);
+
+  const activeContent = content || cachedContent;
+  const activeProduct = product || cachedProduct;
+
   // Reset local state when product changes or modal opens
   useEffect(() => {
     if (isOpen) {
@@ -50,7 +69,7 @@ export default function DetailModal({
     return () => {
       document.body.style.overflow = '';
     };
-  }, [isOpen, product]);
+  }, [isOpen, activeProduct]);
 
   // Handle escape key
   useEffect(() => {
@@ -71,9 +90,9 @@ export default function DetailModal({
     setShowStickyBar(drawerRef.current.scrollTop > 160);
   };
 
-  if (!isOpen || !content) return null;
+  if (!activeContent) return null;
 
-  const hasPrice = product?.price !== null && product?.price !== undefined;
+  const hasPrice = activeProduct?.price !== null && activeProduct?.price !== undefined;
 
   const handleAddToCart = (targetProduct: Product, addQty: number) => {
     if (targetProduct.price === null) return;
@@ -85,29 +104,40 @@ export default function DetailModal({
   };
 
   const defaultWhatsappMsg = encodeURIComponent(
-    `Hello Aranya Dairy Farm, I'd like to learn more about ${content.title}.`
+    `Hello Aranya Dairy Farm, I'd like to learn more about ${activeContent.title}.`
   );
-  const finalWhatsappMsg = content.whatsappMessage
-    ? encodeURIComponent(content.whatsappMessage)
+  const finalWhatsappMsg = activeContent.whatsappMessage
+    ? encodeURIComponent(activeContent.whatsappMessage)
     : defaultWhatsappMsg;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden flex justify-end bg-black/40 backdrop-blur-xs transition-opacity duration-300">
-      {/* Backdrop Click */}
-      <div className="absolute inset-0 cursor-pointer" onClick={onClose} />
-
-      {/* Drawer Container */}
+    <>
+      {/* ── Backdrop Overlay ── */}
       <div
+        className={`fixed inset-0 z-[90] bg-black/50 backdrop-blur-xs transition-opacity duration-300 ${
+          isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      {/* ── Right-Side Slide Drawer ── */}
+      <aside
         ref={drawerRef}
         onScroll={handleScroll}
-        className="relative w-full max-w-lg bg-[#FAF7F2] h-full shadow-2xl overflow-y-auto flex flex-col justify-between border-l border-[#122E1B]/10 animate-in slide-in-from-right duration-300 pb-[calc(56px+env(safe-area-inset-bottom,0px))] md:pb-0"
+        role="dialog"
+        aria-modal="true"
+        aria-label={activeContent.title}
+        className={`fixed top-0 right-0 bottom-0 z-[100] w-full max-w-lg bg-[#FAF7F2] shadow-2xl flex flex-col justify-between border-l border-[#122E1B]/15 transform transition-transform duration-300 ease-in-out ${
+          isOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'
+        } overflow-y-auto overscroll-contain pb-[calc(56px+env(safe-area-inset-bottom,0px))] md:pb-0`}
       >
         <div>
           {/* Drawer Header */}
           <div className="sticky top-0 bg-[#FAF7F2]/95 backdrop-blur-md px-6 py-4 border-b border-[#122E1B]/10 flex items-center justify-between z-10">
-            {content.category && (
+            {activeContent.category && (
               <span className="text-xs font-sans uppercase font-bold tracking-widest text-[#B84A28]">
-                {content.category}
+                {activeContent.category}
               </span>
             )}
             <button
@@ -120,12 +150,12 @@ export default function DetailModal({
           </div>
 
           {/* Optional Header Image */}
-          {content.image && (
+          {activeContent.image && (
             <div className="w-full aspect-[16/9] relative overflow-hidden bg-[#F4EFEA] border-b border-[#122E1B]/10 flex items-center justify-center p-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={content.image}
-                alt={content.title}
+                src={activeContent.image}
+                alt={activeContent.title}
                 className="w-full h-full object-contain"
                 onError={(e) => {
                   const target = e.currentTarget;
@@ -140,24 +170,24 @@ export default function DetailModal({
           {/* Drawer Body Content */}
           <div className="p-6 sm:p-8 space-y-6">
             <div>
-              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#15321E]">
-                {content.title}
-              </h2>
-              {content.subtitle && (
-                <p className="text-sm text-[#B84A28] font-medium mt-1">
-                  {content.subtitle}
+              {activeContent.subtitle && (
+                <p className="text-xs font-sans font-bold uppercase tracking-wider text-[#B84A28] mb-1">
+                  {activeContent.subtitle}
                 </p>
               )}
+              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#15321E]">
+                {activeContent.title}
+              </h2>
             </div>
 
             {/* Product Price & Inline Quick Action (if product view) */}
-            {product && (
-              <div className="p-4 bg-white rounded-xl border border-[#122E1B]/10 space-y-3">
+            {activeProduct && (
+              <div className="p-4 sm:p-5 bg-white rounded-2xl border border-[#122E1B]/10 space-y-3.5 shadow-xs">
                 <div className="flex items-baseline justify-between gap-2">
-                  <span className="text-xs font-sans text-[#8A7B6E]">Price & Packaging:</span>
+                  <span className="text-xs font-sans font-medium text-[#8A7B6E]">Price & Packaging:</span>
                   {hasPrice ? (
                     <span className="text-xl font-sans font-bold text-[#15321E]">
-                      {formatPrice(product.price!)}
+                      {formatPrice(activeProduct.price!)}
                     </span>
                   ) : (
                     <span className="text-xs font-sans font-semibold text-[#E58A13] uppercase tracking-wider">
@@ -192,12 +222,12 @@ export default function DetailModal({
                       </button>
                     </div>
 
-                    {/* Add to cart */}
+                    {/* Add to cart button */}
                     <button
                       type="button"
-                      onClick={() => handleAddToCart(product, qty)}
+                      onClick={() => handleAddToCart(activeProduct, qty)}
                       disabled={isAdded}
-                      className={`flex-1 min-h-[42px] rounded-full text-white font-sans text-xs uppercase font-bold tracking-wider px-4 py-2.5 flex items-center justify-center gap-2 shadow-md transition-all active:scale-95 cursor-pointer ${
+                      className={`flex-1 min-h-[44px] rounded-full text-white font-sans text-xs uppercase font-bold tracking-wider px-5 py-3 flex items-center justify-center gap-2 shadow-md transition-all active:scale-95 cursor-pointer ${
                         isAdded
                           ? 'bg-[#15321E] text-[#FAF7F2]'
                           : 'bg-[#E58A13] hover:bg-[#CA7508] shadow-[#E58A13]/25'
@@ -211,7 +241,9 @@ export default function DetailModal({
                       ) : (
                         <>
                           <ShoppingBag className="w-4 h-4" />
-                          <span>Add to Cart</span>
+                          <span>
+                            Add to Cart • {formatPrice((activeProduct.price ?? 0) * qty)}
+                          </span>
                         </>
                       )}
                     </button>
@@ -222,19 +254,19 @@ export default function DetailModal({
 
             {/* Paragraphs */}
             <div className="space-y-4 text-sm text-[#5F6E62] leading-relaxed font-sans">
-              {content.bodyParagraphs.map((paragraph, index) => (
+              {activeContent.bodyParagraphs.map((paragraph, index) => (
                 <p key={index}>{paragraph}</p>
               ))}
             </div>
 
             {/* Bullet Highlights */}
-            {content.bulletPoints && content.bulletPoints.length > 0 && (
-              <div className="space-y-3 pt-2 border-t border-[#122E1B]/10">
+            {activeContent.bulletPoints && activeContent.bulletPoints.length > 0 && (
+              <div className="space-y-3 pt-3 border-t border-[#122E1B]/10">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-[#15321E]">
                   Key Standards & Details
                 </h4>
                 <ul className="space-y-2.5">
-                  {content.bulletPoints.map((point, idx) => (
+                  {activeContent.bulletPoints.map((point, idx) => (
                     <li key={idx} className="flex items-start gap-2.5 text-xs text-[#15321E]">
                       <CheckCircle className="w-4 h-4 text-[#E58A13] shrink-0 mt-0.5" />
                       <span>{point}</span>
@@ -252,28 +284,28 @@ export default function DetailModal({
             href={`https://wa.me/${WHATSAPP_NUMBER}?text=${finalWhatsappMsg}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full min-h-[48px] bg-[#E58A13] hover:bg-[#CA7508] active:scale-[0.98] text-white font-sans text-xs uppercase font-bold tracking-wider py-3.5 px-6 rounded-full flex items-center justify-center gap-2 transition-all shadow-md shadow-[#E58A13]/20"
+            className="w-full min-h-[48px] bg-[#E58A13] hover:bg-[#CA7508] active:scale-[0.98] text-white font-sans text-xs uppercase font-bold tracking-wider py-3.5 px-6 rounded-full flex items-center justify-center gap-2 transition-all shadow-md shadow-[#E58A13]/20 cursor-pointer"
           >
             <MessageSquare className="w-4 h-4 text-white" />
-            <span>{content.ctaLabel || 'Inquire on WhatsApp'}</span>
+            <span>{activeContent.ctaLabel || 'Inquire on WhatsApp'}</span>
           </a>
           <button
             onClick={onClose}
             className="w-full min-h-[44px] flex items-center justify-center text-center text-xs text-[#B84A28] hover:underline active:scale-95 font-medium py-1 transition-all cursor-pointer"
           >
-            Back to Nature View
+            Back to Products
           </button>
         </div>
-      </div>
+      </aside>
 
       {/* Sticky Mobile Add to Cart Bar (Visible when user scrolls down in product detail) */}
-      {product && (
+      {activeProduct && (
         <StickyMobileAddToCartBar
-          product={product}
-          isVisible={showStickyBar}
+          product={activeProduct}
+          isVisible={showStickyBar && isOpen}
           onAddToCart={(p, q) => handleAddToCart(p, q)}
         />
       )}
-    </div>
+    </>
   );
 }

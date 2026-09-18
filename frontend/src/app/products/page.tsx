@@ -9,7 +9,6 @@ import SlimTrustLine from '@/components/SlimTrustLine';
 import Footer from '@/components/Footer';
 import DetailModal, { ModalContent } from '@/components/DetailModal';
 import QuickViewModal from '@/components/QuickViewModal';
-import CartDrawer from '@/components/CartDrawer';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import { Product, getProductPriceLabel } from '@/lib/products';
 import { ArrowLeft, ArrowUp, Sparkles, Droplets, Heart, MessageCircle } from 'lucide-react';
@@ -31,12 +30,11 @@ function ProductsContent() {
     }
   }, [searchParams]);
 
-  // Modals & Cart State
+  // Modals State
   const [modalOpen, setModalOpen] = useState(false);
   const [activeModalContent, setActiveModalContent] = useState<ModalContent | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
-  const [cartOpen, setCartOpen] = useState(false);
 
   const openModal = (content: ModalContent) => {
     setActiveModalContent(content);
@@ -119,7 +117,6 @@ function ProductsContent() {
     <main className="min-h-screen bg-[#FDFBF7] font-sans antialiased text-[#3E4B41] flex flex-col selection:bg-[#E58A13] selection:text-white pb-16 md:pb-0">
       {/* Header Bar */}
       <Header
-        onOpenCart={() => setCartOpen(true)}
         onOpenStory={handleOpenStory}
         onOpenContact={handleOpenContact}
         onSelectCategory={(cat) => setSelectedCategory(cat)}
@@ -319,7 +316,6 @@ function ProductsContent() {
 
       {/* Mobile Persistent Bottom Navigation Bar */}
       <MobileBottomNav
-        onOpenCart={() => setCartOpen(true)}
         onOpenContact={handleOpenContact}
         onSelectCategory={(cat) => setSelectedCategory(cat)}
       />
@@ -341,9 +337,6 @@ function ProductsContent() {
         product={quickViewProduct}
         onClose={() => setQuickViewProduct(null)}
       />
-
-      {/* Shopping cart slide-in drawer */}
-      <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
     </main>
   );
 }

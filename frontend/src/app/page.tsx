@@ -10,7 +10,6 @@ import ConsolidatedTrustAndStorySection from '@/components/ConsolidatedTrustAndS
 import Footer from '@/components/Footer';
 import DetailModal, { ModalContent } from '@/components/DetailModal';
 import QuickViewModal from '@/components/QuickViewModal';
-import CartDrawer from '@/components/CartDrawer';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import { Product, getProductPriceLabel, PRODUCTS } from '@/lib/products';
 import { getProducts } from '@/lib/catalog';
@@ -25,9 +24,6 @@ export default function Home() {
 
   // ── Quick View Modal State ──────────────────────────────────────────────────
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
-
-  // ── Shopping Cart Drawer ────────────────────────────────────────────────────
-  const [cartOpen, setCartOpen] = useState(false);
 
   // ── Live Products for Featured Showcase ─────────────────────────────────────
   const [liveProducts, setLiveProducts] = useState<Product[]>(PRODUCTS);
@@ -123,7 +119,6 @@ export default function Home() {
 
       {/* Header Bar with Logo, Nav Links & Cart */}
       <Header
-        onOpenCart={() => setCartOpen(true)}
         onOpenStory={handleOpenStory}
         onOpenContact={handleOpenContact}
       />
@@ -152,7 +147,6 @@ export default function Home() {
 
       {/* Mobile Persistent Bottom Navigation Bar */}
       <MobileBottomNav
-        onOpenCart={() => setCartOpen(true)}
         onOpenContact={handleOpenContact}
       />
 
@@ -173,9 +167,6 @@ export default function Home() {
         product={quickViewProduct}
         onClose={() => setQuickViewProduct(null)}
       />
-
-      {/* Shopping cart slide-in drawer */}
-      <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
 
     </main>
   );

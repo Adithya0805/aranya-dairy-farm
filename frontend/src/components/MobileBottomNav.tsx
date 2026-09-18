@@ -7,7 +7,7 @@ import { Home, ShoppingBag, Truck, ShoppingCart } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 
 interface MobileBottomNavProps {
-  onOpenCart: () => void;
+  onOpenCart?: () => void;
   onOpenContact?: () => void;
   onSelectCategory?: (category: string) => void;
 }
@@ -16,7 +16,7 @@ export default function MobileBottomNav({
   onOpenCart,
 }: MobileBottomNavProps) {
   const pathname = usePathname();
-  const { totalItems } = useCart();
+  const { totalItems, openCart } = useCart();
 
   const isHome = pathname === '/';
   const isShop = pathname?.startsWith('/products');
@@ -25,7 +25,7 @@ export default function MobileBottomNav({
   return (
     <aside
       aria-label="Mobile Bottom Navigation"
-      className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#FAF7F2]/95 backdrop-blur-md border-t border-[#122E1B]/15 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FAF7F2]/95 backdrop-blur-md border-t border-[#122E1B]/15 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]"
       style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
     >
       <nav className="grid grid-cols-4 items-center px-2 py-1.5" aria-label="Mobile Navigation Links">
@@ -68,7 +68,7 @@ export default function MobileBottomNav({
 
         {/* 4. Cart */}
         <button
-          onClick={onOpenCart}
+          onClick={onOpenCart || openCart}
           className="relative flex flex-col items-center justify-center py-1 text-[#15321E] hover:text-[#D48B16] active:scale-95 transition-all touch-manipulation min-h-[48px] cursor-pointer"
           aria-label={`Open shopping cart, ${totalItems} items`}
         >

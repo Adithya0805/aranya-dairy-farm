@@ -1,25 +1,53 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Plus, Minus, Trash2, ShoppingBag, MessageSquare, CheckCircle } from 'lucide-react';
+import { X, Plus, Minus, Trash2, ShoppingBag, MessageSquare, CheckCircle, ExternalLink } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { buildWhatsAppUrl } from '@/lib/whatsapp';
 import { submitOrderAction } from '@/app/actions/orders';
 import { createOrder } from '@/lib/catalog';
 
 interface CartDrawerProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
-export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
-  const { items, totalItems, totalPriceLabel, removeItem, updateQuantity, clearCart, buildWhatsAppMessage } =
-    useCart();
+export default function CartDrawer({ isOpen: externalIsOpen, onClose: externalOnClose }: CartDrawerProps) {
+  const {
+    items,
+    totalItems,
+    totalPriceLabel,
+    isCartOpen: contextIsOpen,
+    closeCart: contextCloseCart,
+    removeItem,
+    updateQuantity,
+    clearCart,
+    buildWhatsAppMessage,
+  } = useCart();
+
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : contextIsOpen;
+  const onClose = externalOnClose !== undefined ? externalOnClose : contextCloseCart;
+
   const [orderSent, setOrderSent] = useState(false);
+  const [lastOrderCode, setLastOrderCode] = useState<string>('');
+  const [lastWhatsAppUrl, setLastWhatsAppUrl] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Generates a quick client fallback code if server is slow
+  const generateLocalCode = () => {
+    return Math.random().toString(36).substring(2, 10).toUpperCase();
+  };
 
   const handleWhatsAppCheckout = async () => {
-    if (items.length === 0) return;
+    if (items.length === 0 || isSubmitting) return;
+    setIsSubmitting(true);
+
     const message = buildWhatsAppMessage();
+    const fallbackCode = generateLocalCode();
+    const siteUrl =
+      typeof window !== 'undefined'
+        ? window.location.origin
+        : (process.env.NEXT_PUBLIC_SITE_URL || '');
 
     const orderPayload = {
       items: items.map((i) => ({
@@ -32,23 +60,14 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
       whatsapp_message: message,
     };
 
-    // Log the order to Supabase (Server Action with client fallback).
-    // If successful, append the 8-character Order Code + tracking link to the WhatsApp message
-    // so the customer receives it in their conversation with the farm.
-    let finalMessage = message;
+    let confirmedCode = fallbackCode;
+
     try {
+      // Fast submit to Supabase server action
       const res = await submitOrderAction(orderPayload);
       if (res.success && (res.orderCode || res.orderId)) {
-        const siteUrl =
-          typeof window !== 'undefined'
-            ? window.location.origin
-            : (process.env.NEXT_PUBLIC_SITE_URL || '');
-        const code = res.orderCode || (res.orderId ? res.orderId.replace(/-/g, '').slice(0, 8).toUpperCase() : '');
-        const trackingLink = `${siteUrl}/track-order?code=${code}`;
-        finalMessage =
-          message +
-          `\n\n─────────────────────\n📦 Order Code: #${code}\n🔗 Track your order: ${trackingLink}\n─────────────────────`;
-      } else if (!res.success) {
+        confirmedCode = res.orderCode || (res.orderId ? res.orderId.replace(/-/g, '').slice(0, 8).toUpperCase() : fallbackCode);
+      } else {
         await createOrder(orderPayload);
       }
     } catch {
@@ -59,14 +78,28 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
       }
     }
 
-    const url = buildWhatsAppUrl(finalMessage);
-    window.open(url, '_blank', 'noopener,noreferrer');
+    const trackingLink = `${siteUrl}/track-order?code=${confirmedCode}`;
+    const finalMessage =
+      message +
+      `\n\n─────────────────────\n📦 Order Code: #${confirmedCode}\n🔗 Track your order: ${trackingLink}\n─────────────────────`;
+
+    const finalUrl = buildWhatsAppUrl(finalMessage);
+    setLastOrderCode(confirmedCode);
+    setLastWhatsAppUrl(finalUrl);
+
+    // Deep link redirect to WhatsApp — NEVER blocked by browser popup blockers!
+    if (typeof window !== 'undefined') {
+      window.location.href = finalUrl;
+    }
+
     clearCart();
+    setIsSubmitting(false);
     setOrderSent(true);
   };
 
   const handleClose = () => {
     setOrderSent(false);
+    setIsSubmitting(false);
     onClose();
   };
 
@@ -90,9 +123,9 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
       {/* ── Backdrop ── */}
       <div
         className={`
-          fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px]
+          fixed inset-0 z-[90] bg-black/50 backdrop-blur-xs
           transition-opacity duration-300
-          ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}
+          ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
         `}
         onClick={handleClose}
         aria-hidden="true"
@@ -107,11 +140,11 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
         aria-label="Shopping cart"
         aria-modal="true"
         className={`
-          fixed z-50 bg-[#FAF7F2] flex flex-col shadow-2xl
+          fixed z-[100] bg-[#FAF7F2] flex flex-col shadow-2xl
           /* Mobile bottom sheet */
           bottom-0 left-0 right-0
           h-[92dvh]
-          rounded-t-2xl
+          rounded-t-3xl
           /* Desktop right sidebar */
           sm:bottom-auto sm:top-0 sm:left-auto sm:right-0
           sm:h-full sm:w-[440px] sm:max-w-[95vw]
@@ -120,14 +153,14 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
           transition-transform duration-300 ease-in-out
           ${isOpen
             ? 'translate-y-0 sm:translate-x-0'
-            : 'translate-y-full sm:translate-y-0 sm:translate-x-full'
+            : 'translate-y-full sm:translate-y-0 sm:translate-x-full pointer-events-none'
           }
         `}
       >
 
         {/* Mobile drag handle indicator */}
         <div className="sm:hidden flex justify-center pt-3 pb-1 shrink-0">
-          <div className="w-10 h-1 rounded-full bg-[#122E1B]/20" />
+          <div className="w-12 h-1 rounded-full bg-[#122E1B]/20" />
         </div>
 
         {/* ── Header ── */}
@@ -143,7 +176,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               )}
             </h2>
           </div>
-          {/* Close — min 44×44 */}
+          {/* Close button */}
           <button
             onClick={handleClose}
             className="w-11 h-11 flex items-center justify-center rounded-full text-[#15321E] hover:bg-[#122E1B]/8 active:scale-95 transition-all touch-manipulation cursor-pointer"
@@ -158,19 +191,38 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
           {/* Order Sent Confirmation */}
           {orderSent ? (
-            <div className="flex flex-col items-center justify-center h-full px-8 text-center space-y-5">
+            <div className="flex flex-col items-center justify-center h-full px-6 sm:px-8 text-center space-y-5 py-8">
               <div className="w-16 h-16 rounded-full bg-[#E8F5EE] flex items-center justify-center">
                 <CheckCircle className="w-9 h-9 text-[#1B4D2E]" />
               </div>
               <div className="space-y-2">
-                <h3 className="font-serif text-2xl text-[#1C241E]">Order Sent!</h3>
-                <p className="text-sm text-[#57655B] leading-relaxed">
-                  We&apos;ll confirm your order on WhatsApp shortly and share delivery details. 🙏
+                <h3 className="font-serif text-2xl text-[#1C241E] font-bold">Order Forwarded to WhatsApp!</h3>
+                {lastOrderCode && (
+                  <p className="text-xs font-mono font-bold text-[#1B4D2E] bg-[#1B4D2E]/10 px-3 py-1 rounded-full inline-block">
+                    Order Code: #{lastOrderCode}
+                  </p>
+                )}
+                <p className="text-sm text-[#57655B] leading-relaxed max-w-sm mx-auto">
+                  We&apos;ll confirm your order and delivery schedule on WhatsApp shortly. 🙏
                 </p>
               </div>
+
+              {lastWhatsAppUrl && (
+                <a
+                  href={lastWhatsAppUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#1FB055] text-white font-sans text-xs uppercase font-bold tracking-wider py-3.5 px-6 rounded-full shadow-md transition-all active:scale-95"
+                >
+                  <MessageSquare className="w-4 h-4 fill-current" />
+                  <span>Re-open WhatsApp Chat</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              )}
+
               <button
                 onClick={handleClose}
-                className="mt-2 bg-[#1C241E] hover:bg-[#1B4D2E] text-white text-xs uppercase font-semibold tracking-widest px-8 py-4 min-h-[48px] transition-colors touch-manipulation"
+                className="mt-2 border border-[#1C241E] text-[#1C241E] hover:bg-[#1C241E] hover:text-white text-xs uppercase font-semibold tracking-widest px-8 py-3.5 rounded-full transition-colors touch-manipulation cursor-pointer"
               >
                 Continue Shopping
               </button>
@@ -188,7 +240,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               </div>
               <button
                 onClick={handleClose}
-                className="mt-2 border border-[#1C241E] text-[#1C241E] hover:bg-[#1C241E] hover:text-white text-xs uppercase font-semibold tracking-widest px-8 py-4 min-h-[48px] transition-colors touch-manipulation"
+                className="mt-2 border border-[#1C241E] text-[#1C241E] hover:bg-[#1C241E] hover:text-white text-xs uppercase font-semibold tracking-widest px-8 py-3.5 rounded-full transition-colors touch-manipulation cursor-pointer"
               >
                 Continue Shopping
               </button>
@@ -205,7 +257,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                   <li key={product.id} className="py-4 flex gap-3 sm:gap-4">
 
                     {/* Product image — fixed square */}
-                    <div className="w-[72px] h-[72px] sm:w-20 sm:h-20 shrink-0 overflow-hidden bg-[#EAE6DF] rounded-md flex items-center justify-center p-1">
+                    <div className="w-[72px] h-[72px] sm:w-20 sm:h-20 shrink-0 overflow-hidden bg-[#EAE6DF] rounded-xl flex items-center justify-center p-1 border border-[#122E1B]/10">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={product.image}
@@ -230,7 +282,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                           )}
                           <p className="text-[11px] text-[#8A7B6E] font-sans truncate">{product.unit}</p>
                         </div>
-                        {/* Remove — min 44×44 */}
+                        {/* Remove button */}
                         <button
                           onClick={() => removeItem(product.id)}
                           className="w-10 h-10 flex items-center justify-center text-[#8A7B6E] hover:text-red-500 active:scale-90 transition-all duration-150 shrink-0 touch-manipulation rounded-full cursor-pointer"
@@ -241,11 +293,11 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       </div>
 
                       <div className="flex items-center justify-between">
-                        {/* Quantity Stepper — min 44px height */}
+                        {/* Quantity Stepper */}
                         <div className="flex items-center border border-[#1B4D2E]/20 rounded-full overflow-hidden bg-[#FAF7F2]">
                           <button
                             onClick={() => updateQuantity(product.id, quantity - 1)}
-                            className="w-11 h-11 flex items-center justify-center text-[#1C241E] hover:bg-[#1B4D2E]/10 active:scale-90 transition-all duration-150 touch-manipulation cursor-pointer"
+                            className="w-10 h-10 flex items-center justify-center text-[#1C241E] hover:bg-[#1B4D2E]/10 active:scale-90 transition-all duration-150 touch-manipulation cursor-pointer"
                             aria-label="Decrease quantity"
                           >
                             <Minus className="w-3.5 h-3.5" />
@@ -255,7 +307,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                           </span>
                           <button
                             onClick={() => updateQuantity(product.id, quantity + 1)}
-                            className="w-11 h-11 flex items-center justify-center text-[#1C241E] hover:bg-[#1B4D2E]/10 active:scale-90 transition-all duration-150 touch-manipulation cursor-pointer"
+                            className="w-10 h-10 flex items-center justify-center text-[#1C241E] hover:bg-[#1B4D2E]/10 active:scale-90 transition-all duration-150 touch-manipulation cursor-pointer"
                             aria-label="Increase quantity"
                           >
                             <Plus className="w-3.5 h-3.5" />
@@ -274,7 +326,8 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
         {/* ── Footer: Total + WhatsApp CTA ── */}
         {!orderSent && items.length > 0 && (
-          <div className="shrink-0 border-t border-[#122E1B]/10 bg-[#FAF7F2] px-5 sm:px-6 pt-4 pb-safe-4 space-y-4"
+          <div
+            className="shrink-0 border-t border-[#122E1B]/10 bg-[#FAF7F2] px-5 sm:px-6 pt-4 pb-safe-4 space-y-3.5"
             style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
           >
             {/* Running Total */}
@@ -288,13 +341,14 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               Delivery charges calculated at confirmation.
             </p>
 
-            {/* WhatsApp Checkout — full width, min 52px tall for comfort */}
+            {/* WhatsApp Checkout Button */}
             <button
               onClick={handleWhatsAppCheckout}
-              className="w-full flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#1FB055] active:bg-[#18943E] text-white font-sans text-sm font-bold py-4 min-h-[52px] rounded-full shadow-lg shadow-[#25D366]/20 transition-all touch-manipulation active:scale-[0.98] cursor-pointer"
+              disabled={isSubmitting}
+              className="w-full flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#1FB055] active:bg-[#18943E] disabled:opacity-60 text-white font-sans text-sm font-bold py-4 min-h-[52px] rounded-full shadow-lg shadow-[#25D366]/20 transition-all touch-manipulation active:scale-[0.98] cursor-pointer"
             >
               <MessageSquare className="w-4 h-4 fill-white shrink-0" />
-              <span>Order via WhatsApp</span>
+              <span>{isSubmitting ? 'Opening WhatsApp...' : 'Order via WhatsApp'}</span>
             </button>
 
             <p className="text-[11px] text-center text-[#5F6E62] font-sans">
