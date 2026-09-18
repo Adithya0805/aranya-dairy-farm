@@ -6,15 +6,26 @@ import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import TrustBadgesSection from '@/components/TrustBadgesSection';
 import Footer from '@/components/Footer';
-import WhatsAppCTA from '@/components/WhatsAppCTA';
 import CartDrawer from '@/components/CartDrawer';
 import MobileBottomNav from '@/components/MobileBottomNav';
-import { ArrowLeft, ArrowRight, Heart, Sparkles, Droplets, ShieldCheck, Sun, MessageCircle } from 'lucide-react';
+import PhotoLightboxModal from '@/components/PhotoLightboxModal';
+import { ArrowLeft, ArrowRight, Heart, Sparkles, Droplets, ShieldCheck, Sun, MessageCircle, ZoomIn } from 'lucide-react';
 import { WA_STORY_INQUIRY } from '@/lib/whatsapp';
 
 export default function StoryPage() {
   const router = useRouter();
   const [cartOpen, setCartOpen] = useState(false);
+  const [lightbox, setLightbox] = useState<{
+    isOpen: boolean;
+    imageSrc: string;
+    imageAlt: string;
+    tag?: string;
+    caption?: string;
+  }>({
+    isOpen: false,
+    imageSrc: '',
+    imageAlt: '',
+  });
 
   const pillars = [
     {
@@ -75,7 +86,7 @@ export default function StoryPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#FDFBF7] font-sans antialiased text-[#3E4B41] flex flex-col selection:bg-[#E58A13] selection:text-white pb-16 md:pb-0">
+    <main className="min-h-screen bg-[#FDFBF7] font-sans antialiased text-[#3E4B41] flex flex-col selection:bg-[#D48B16] selection:text-white pb-16 md:pb-0">
       {/* 1. Header Bar */}
       <Header
         onOpenCart={() => setCartOpen(true)}
@@ -90,13 +101,13 @@ export default function StoryPage() {
             <nav aria-label="Breadcrumbs" className="flex items-center flex-wrap gap-2.5 sm:gap-3.5">
               <Link
                 href="/"
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white/90 hover:bg-white text-[#15321E] hover:text-[#E58A13] font-sans text-sm sm:text-base font-semibold border border-[#122E1B]/10 shadow-xs transition-all duration-200 group active:scale-95 cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white/90 hover:bg-white text-[#15321E] hover:text-[#D48B16] font-sans text-sm sm:text-base font-semibold border border-[#122E1B]/10 shadow-xs transition-all duration-200 group active:scale-95 cursor-pointer"
               >
-                <ArrowLeft className="w-4 h-4 text-[#E58A13] group-hover:-translate-x-1 transition-transform" />
+                <ArrowLeft className="w-4 h-4 text-[#D48B16] group-hover:-translate-x-1 transition-transform" />
                 <span>Home</span>
               </Link>
 
-              <span className="text-[#E58A13] font-bold text-base sm:text-xl">/</span>
+              <span className="text-[#D48B16] font-bold text-base sm:text-xl">/</span>
 
               <div className="inline-flex items-center gap-2">
                 <span className="font-serif text-xl sm:text-2xl lg:text-3xl font-bold text-[#15321E] tracking-tight">
@@ -121,11 +132,11 @@ export default function StoryPage() {
       </section>
 
       {/* 2. Subpage Hero Banner */}
-      <section className="bg-[#122E1B] text-[#FAF7F2] py-12 sm:py-18 border-b border-[#E58A13]/25 relative overflow-hidden">
+      <section className="bg-[#122E1B] text-[#FAF7F2] py-12 sm:py-18 border-b border-[#D48B16]/25 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-[#122E1B]/80 to-black/55 z-0" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-4">
           <div className="space-y-3 max-w-3xl">
-            <span className="inline-flex items-center gap-1.5 text-xs font-sans uppercase font-bold tracking-widest text-[#E58A13]">
+            <span className="inline-flex items-center gap-1.5 text-xs font-sans uppercase font-bold tracking-widest text-[#D48B16]">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Our 9-Year Heritage Story • Estd. 2017</span>
             </span>
@@ -149,7 +160,7 @@ export default function StoryPage() {
           {/* Block 1: The Problem & Our Beginning */}
           <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-center">
             <div className="lg:col-span-6 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E58A13]/10 text-[#E58A13] text-xs font-bold uppercase tracking-wider">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D48B16]/10 text-[#D48B16] text-xs font-bold uppercase tracking-wider">
                 <span>The Aranya Genesis</span>
               </div>
               <h2 className="text-2xl sm:text-4xl font-serif font-bold text-[#15321E] leading-snug">
@@ -169,7 +180,32 @@ export default function StoryPage() {
             </div>
 
             <div className="lg:col-span-6">
-              <div className="w-full aspect-[4/3] rounded-3xl overflow-hidden border border-[#122E1B]/15 shadow-xl relative group">
+              <div
+                role="button"
+                tabIndex={0}
+                aria-label="Click to enlarge pasture photograph"
+                onClick={() =>
+                  setLightbox({
+                    isOpen: true,
+                    imageSrc: '/images/nature_hero_pasture.jpg',
+                    imageAlt: 'Aranya Dairy Farm Green Pastures in Shoolagiri',
+                    tag: 'Natural Pasture Grazing',
+                    caption: 'Pesticide-free open green pastures and holistic cattle care',
+                  })
+                }
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    setLightbox({
+                      isOpen: true,
+                      imageSrc: '/images/nature_hero_pasture.jpg',
+                      imageAlt: 'Aranya Dairy Farm Green Pastures in Shoolagiri',
+                      tag: 'Natural Pasture Grazing',
+                      caption: 'Pesticide-free open green pastures and holistic cattle care',
+                    });
+                  }
+                }}
+                className="w-full aspect-[4/3] rounded-3xl overflow-hidden border border-[#122E1B]/15 shadow-xl relative group cursor-zoom-in"
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/images/nature_hero_pasture.jpg"
@@ -177,12 +213,15 @@ export default function StoryPage() {
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white/80 group-hover:text-white group-hover:bg-black/70 backdrop-blur-xs transition-all">
+                  <ZoomIn className="w-4 h-4" />
+                </div>
                 <div className="absolute bottom-6 left-6 right-6 text-white">
-                  <span className="text-xs uppercase font-sans tracking-widest text-[#E58A13] font-bold">
-                    Shoolagiri Foothills
+                  <span className="text-xs uppercase font-sans tracking-widest text-[#D48B16] font-bold">
+                    Natural Pasture Grazing
                   </span>
                   <p className="font-serif text-lg font-bold text-[#FAF7F2] mt-0.5">
-                    Pesticide-free pastures under the Tamil Nadu sun
+                    Pesticide-free open green pastures and holistic cattle care
                   </p>
                 </div>
               </div>
@@ -192,7 +231,7 @@ export default function StoryPage() {
           {/* Block 2: The 4 Sacred Pillars Grid */}
           <div className="space-y-8">
             <div className="text-center max-w-2xl mx-auto space-y-3">
-              <span className="text-xs font-sans uppercase font-bold tracking-widest text-[#E58A13]">
+              <span className="text-xs font-sans uppercase font-bold tracking-widest text-[#D48B16]">
                 Our Unbreakable Standards
               </span>
               <h2 className="text-2xl sm:text-4xl font-serif font-bold text-[#15321E]">
@@ -209,9 +248,9 @@ export default function StoryPage() {
                 return (
                   <div
                     key={pillar.title}
-                    className="p-6 sm:p-8 rounded-3xl bg-white border border-[#122E1B]/10 shadow-xs space-y-4 hover:border-[#E58A13]/40 transition-colors"
+                    className="p-6 sm:p-8 rounded-3xl bg-white border border-[#122E1B]/10 shadow-xs space-y-4 hover:border-[#D48B16]/40 transition-colors"
                   >
-                    <div className="w-12 h-12 rounded-2xl bg-[#E58A13]/10 border border-[#E58A13]/25 flex items-center justify-center text-[#E58A13]">
+                    <div className="w-12 h-12 rounded-2xl bg-[#D48B16]/10 border border-[#D48B16]/25 flex items-center justify-center text-[#D48B16]">
                       <Icon className="w-6 h-6" />
                     </div>
                     <div className="space-y-1">
@@ -219,7 +258,7 @@ export default function StoryPage() {
                         <h3 className="font-serif text-lg sm:text-xl font-bold text-[#15321E]">
                           {pillar.title}
                         </h3>
-                        <span className="text-xs font-sans font-bold text-[#E58A13]">
+                        <span className="text-xs font-sans font-bold text-[#D48B16]">
                           {pillar.titleTamil}
                         </span>
                       </div>
@@ -236,7 +275,32 @@ export default function StoryPage() {
           {/* Block 3: The Vedic Bilona Craft Details */}
           <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-center">
             <div className="lg:col-span-6 order-2 lg:order-1">
-              <div className="w-full aspect-[4/3] rounded-3xl overflow-hidden border border-[#122E1B]/15 shadow-xl relative group">
+              <div
+                role="button"
+                tabIndex={0}
+                aria-label="Click to enlarge milk bottle photograph"
+                onClick={() =>
+                  setLightbox({
+                    isOpen: true,
+                    imageSrc: '/images/a2_milk_bottle.jpg',
+                    imageAlt: 'Pure A2 Farm Fresh Glass Milk Bottle',
+                    tag: 'Zero Plastic Contact',
+                    caption: 'Bottled fresh at 4°C in sterilized glass bottles',
+                  })
+                }
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    setLightbox({
+                      isOpen: true,
+                      imageSrc: '/images/a2_milk_bottle.jpg',
+                      imageAlt: 'Pure A2 Farm Fresh Glass Milk Bottle',
+                      tag: 'Zero Plastic Contact',
+                      caption: 'Bottled fresh at 4°C in sterilized glass bottles',
+                    });
+                  }
+                }}
+                className="w-full aspect-[4/3] rounded-3xl overflow-hidden border border-[#122E1B]/15 shadow-xl relative group cursor-zoom-in"
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/images/a2_milk_bottle.jpg"
@@ -244,8 +308,11 @@ export default function StoryPage() {
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white/80 group-hover:text-white group-hover:bg-black/70 backdrop-blur-xs transition-all">
+                  <ZoomIn className="w-4 h-4" />
+                </div>
                 <div className="absolute bottom-6 left-6 right-6 text-white">
-                  <span className="text-xs uppercase font-sans tracking-widest text-[#E58A13] font-bold">
+                  <span className="text-xs uppercase font-sans tracking-widest text-[#D48B16] font-bold">
                     Zero Plastic Contact
                   </span>
                   <p className="font-serif text-lg font-bold text-[#FAF7F2] mt-0.5">
@@ -271,19 +338,19 @@ export default function StoryPage() {
                 </p>
                 <ul className="space-y-2.5 text-xs sm:text-sm text-[#15321E] font-medium">
                   <li className="flex items-start gap-2.5">
-                    <ShieldCheck className="w-4 h-4 text-[#E58A13] shrink-0 mt-0.5" />
+                    <ShieldCheck className="w-4 h-4 text-[#D48B16] shrink-0 mt-0.5" />
                     <span>Whole raw A2 milk is cultured naturally with mother curd cultures.</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <ShieldCheck className="w-4 h-4 text-[#E58A13] shrink-0 mt-0.5" />
+                    <ShieldCheck className="w-4 h-4 text-[#D48B16] shrink-0 mt-0.5" />
                     <span>The curd is churned in both directions with a wooden churning staff (Bilona).</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <ShieldCheck className="w-4 h-4 text-[#E58A13] shrink-0 mt-0.5" />
+                    <ShieldCheck className="w-4 h-4 text-[#D48B16] shrink-0 mt-0.5" />
                     <span>The separated fresh butter (Makkhan) is slow-simmered over a gentle wood fire in clay pots.</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <ShieldCheck className="w-4 h-4 text-[#E58A13] shrink-0 mt-0.5" />
+                    <ShieldCheck className="w-4 h-4 text-[#D48B16] shrink-0 mt-0.5" />
                     <span>The result is pure, golden, granular, aromatic ghee packed with bioavailable fat-soluble vitamins A, D, E, and K.</span>
                   </li>
                 </ul>
@@ -294,7 +361,7 @@ export default function StoryPage() {
           {/* Block 4: Timeline / Milestones */}
           <div className="space-y-8 bg-white p-8 sm:p-12 rounded-3xl border border-[#122E1B]/10">
             <div className="text-center max-w-xl mx-auto space-y-2">
-              <span className="text-xs font-sans uppercase font-bold tracking-widest text-[#E58A13]">
+              <span className="text-xs font-sans uppercase font-bold tracking-widest text-[#D48B16]">
                 Our Journey
               </span>
               <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#15321E]">
@@ -303,24 +370,30 @@ export default function StoryPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-4">
-              {milestones.map((m) => (
-                <div key={m.year} className="p-5 rounded-2xl bg-[#FAF7F2] border border-[#122E1B]/5 space-y-2.5">
-                  <span className="inline-block font-serif text-2xl font-bold text-[#E58A13]">
-                    {m.year}
-                  </span>
-                  <h4 className="font-serif text-base font-bold text-[#15321E]">
-                    {m.title}
-                  </h4>
-                  <p className="text-xs text-[#5F6E62] leading-relaxed">
-                    {m.description}
-                  </p>
-                </div>
-              ))}
+              {milestones.map((m, idx) => {
+                const delays = ['delay-0', 'delay-100', 'delay-200', 'delay-300'];
+                return (
+                  <div
+                    key={m.year}
+                    className={`p-5 rounded-2xl bg-[#FAF7F2] border border-[#122E1B]/5 space-y-2.5 transition-all duration-300 hover:border-[#D48B16]/30 hover:shadow-md hover:-translate-y-1 ${delays[idx] || ''}`}
+                  >
+                    <span className="inline-block font-serif text-2xl font-bold text-[#D48B16]">
+                      {m.year}
+                    </span>
+                    <h4 className="font-serif text-base font-bold text-[#15321E]">
+                      {m.title}
+                    </h4>
+                    <p className="text-xs text-[#5F6E62] leading-relaxed">
+                      {m.description}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
           {/* Block 5: Call to Action Row */}
-          <div className="bg-[#122E1B] text-white p-8 sm:p-12 rounded-3xl border border-[#E58A13]/30 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+          <div className="bg-[#122E1B] text-white p-8 sm:p-12 rounded-3xl border border-[#D48B16]/30 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
             <div className="space-y-2 max-w-xl">
               <h3 className="text-2xl sm:text-3xl font-serif font-bold text-[#FAF7F2]">
                 Experience Fresh A2 Farm Purity
@@ -333,18 +406,18 @@ export default function StoryPage() {
             <div className="flex flex-col sm:flex-row items-center gap-3.5 shrink-0 w-full sm:w-auto">
               <a
                 href="/products"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#E58A13] hover:bg-[#CA7508] active:scale-95 text-white font-sans text-xs uppercase font-bold tracking-wider py-3.5 px-6 rounded-full transition-all shadow-md min-h-[44px]"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#D48B16] hover:bg-[#B8740D] active:scale-95 text-white font-sans text-xs uppercase font-bold tracking-wider py-3.5 px-6 rounded-full transition-all shadow-md min-h-[44px]"
               >
-                <span>Browse Farm Products</span>
+                <span>Explore All Products</span>
                 <ArrowRight className="w-4 h-4" />
               </a>
               <a
                 href={WA_STORY_INQUIRY}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#1C3E25] hover:bg-[#244F30] border border-[#E58A13]/40 active:scale-95 text-[#FAF7F2] font-sans text-xs uppercase font-bold tracking-wider py-3.5 px-6 rounded-full transition-all min-h-[44px]"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#1C3E25] hover:bg-[#244F30] border border-[#D48B16]/40 active:scale-95 text-[#FAF7F2] font-sans text-xs uppercase font-bold tracking-wider py-3.5 px-6 rounded-full transition-all min-h-[44px]"
               >
-                <MessageCircle className="w-4 h-4 text-[#E58A13]" />
+                <MessageCircle className="w-4 h-4 text-[#D48B16]" />
                 <span>Inquire on WhatsApp</span>
               </a>
             </div>
@@ -356,10 +429,7 @@ export default function StoryPage() {
       {/* 5. Footer */}
       <Footer />
 
-      {/* 6. Floating WhatsApp CTA */}
-      <WhatsAppCTA />
-
-      {/* 7. Mobile Bottom Navigation */}
+      {/* 6. Mobile Bottom Navigation */}
       <MobileBottomNav
         onOpenCart={() => setCartOpen(true)}
         onOpenContact={() => {
@@ -369,6 +439,16 @@ export default function StoryPage() {
 
       {/* 8. Shopping Cart Drawer */}
       <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
+
+      {/* 9. Photo Lightbox Modal */}
+      <PhotoLightboxModal
+        isOpen={lightbox.isOpen}
+        onClose={() => setLightbox((prev) => ({ ...prev, isOpen: false }))}
+        imageSrc={lightbox.imageSrc}
+        imageAlt={lightbox.imageAlt}
+        tag={lightbox.tag}
+        caption={lightbox.caption}
+      />
     </main>
   );
 }

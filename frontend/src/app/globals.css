@@ -9,8 +9,8 @@
   --color-terracotta: #B84A28;
   --color-cream: #FAF7F2;
   --color-cream-light: #FDFBF7;
-  --color-accent: #E58A13;
-  --color-accent-hover: #CA7508;
+  --color-accent: #D48B16;
+  --color-accent-hover: #B8740D;
   --color-text-main: #15321E;
   --color-text-body: #3E4B41;
   --color-text-muted: #5F6E62;
@@ -91,14 +91,14 @@ p, span, button, input, select, textarea, a {
   justify-content: center;
   gap: 0.5rem;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 14px rgba(229, 138, 19, 0.3);
+  box-shadow: 0 4px 14px rgba(212, 139, 22, 0.3);
   touch-action: manipulation;
 }
 
 .btn-pill-amber:hover {
   background-color: var(--color-accent-hover);
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(229, 138, 19, 0.4);
+  box-shadow: 0 6px 18px rgba(212, 139, 22, 0.4);
 }
 
 .btn-pill-amber:active {
@@ -141,11 +141,22 @@ p, span, button, input, select, textarea, a {
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* Route page transition — lightweight 240ms */
+@keyframes pageTransition {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* ─── Animation Utility Classes ─────────────────────────────────────────────── */
 
 /* Hero content */
 .animate-fade-in {
   animation: fadeUp 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Route page transition */
+.animate-page-transition {
+  animation: pageTransition 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* Staggered product cards */
@@ -194,6 +205,12 @@ p, span, button, input, select, textarea, a {
   transform: translateY(0);
 }
 
+/* Stagger delay utility classes for timeline / card choreography */
+.delay-0 { transition-delay: 0ms; animation-delay: 0ms; }
+.delay-100 { transition-delay: 100ms; animation-delay: 100ms; }
+.delay-200 { transition-delay: 200ms; animation-delay: 200ms; }
+.delay-300 { transition-delay: 300ms; animation-delay: 300ms; }
+
 /* ─── Hero Sequenced Entrance Keyframes (headline -> subtext -> buttons) ─── */
 @keyframes heroHeadlineIn {
   from { opacity: 0; transform: translateY(18px); }
@@ -225,10 +242,10 @@ p, span, button, input, select, textarea, a {
 /* ─── Floating Button Idle Pulse / Glow Keyframes ────────────────────────── */
 @keyframes floatingIdlePulse {
   0%, 100% {
-    box-shadow: 0 10px 25px -5px rgba(21, 50, 30, 0.4), 0 0 0 0 rgba(229, 138, 19, 0);
+    box-shadow: 0 10px 25px -5px rgba(21, 50, 30, 0.4), 0 0 0 0 rgba(212, 139, 22, 0);
   }
   50% {
-    box-shadow: 0 14px 28px -4px rgba(21, 50, 30, 0.55), 0 0 0 6px rgba(229, 138, 19, 0.28);
+    box-shadow: 0 14px 28px -4px rgba(21, 50, 30, 0.55), 0 0 0 6px rgba(212, 139, 22, 0.28);
   }
 }
 
@@ -261,6 +278,7 @@ a[role="button"]:active,
 /* ─── prefers-reduced-motion — disable all animations instantly ───────────── */
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in,
+  .animate-page-transition,
   .animate-card-reveal,
   .animate-badge-pop,
   .animate-icon-bounce,
@@ -290,5 +308,6 @@ a[role="button"]:active,
 
   * {
     transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
   }
 }

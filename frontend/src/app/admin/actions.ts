@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { getAdminClient, verifyAdminUser } from '@/lib/supabaseServer';
 import { PRODUCTS } from '@/lib/products';
+import { syncProductEmbedding, reindexFullKnowledgeBase } from '@/lib/ragKnowledgeBase';
 
 export interface AdminProductPayload {
   id: string;
@@ -250,6 +251,34 @@ export async function updateProductAction(payload: AdminProductPayload, token?: 
         console.warn('[Admin] Low-stock alert check failed:', alertErr);
       }
     }
+    // Live RAG Sync: Automatically regenerate vector embedding for this product
+    try {
+      const { data: updatedProductData } = await admin
+        .from('products')
+        .select('id, name, name_tamil, category_id, price, unit, available, description, categories(name)')
+        .eq('id', payload.id)
+        .single();
+
+      if (updatedProductData) {
+        let catName = 'General Store';
+        if (updatedProductData.categories) {
+          const c = updatedProductData.categories as unknown as { name?: string };
+          catName = c.name || catName;
+        }
+        await syncProductEmbedding({
+          id: updatedProductData.id,
+          name: updatedProductData.name,
+          nameTamil: updatedProductData.name_tamil,
+          category: catName,
+          unit: updatedProductData.unit,
+          price: updatedProductData.price,
+          available: updatedProductData.available,
+          description: updatedProductData.description,
+        });
+      }
+    } catch (ragSyncErr) {
+      console.warn('[Admin RAG Sync] Product vector sync warning:', ragSyncErr);
+    }
 
     return { success: true };
   } catch (err: unknown) {
@@ -463,6 +492,34 @@ export async function updateProductWithImageAction(formData: FormData) {
       } catch (alertErr) {
         console.warn('[Admin] Low-stock alert check failed:', alertErr);
       }
+    }
+    // Live RAG Sync: Automatically regenerate vector embedding for this product
+    try {
+      const { data: updatedProductData } = await admin
+        .from('products')
+        .select('id, name, name_tamil, category_id, price, unit, available, description, categories(name)')
+        .eq('id', id)
+        .single();
+
+      if (updatedProductData) {
+        let catName = 'General Store';
+        if (updatedProductData.categories) {
+          const c = updatedProductData.categories as unknown as { name?: string };
+          catName = c.name || catName;
+        }
+        await syncProductEmbedding({
+          id: updatedProductData.id,
+          name: updatedProductData.name,
+          nameTamil: updatedProductData.name_tamil,
+          category: catName,
+          unit: updatedProductData.unit,
+          price: updatedProductData.price,
+          available: updatedProductData.available,
+          description: updatedProductData.description,
+        });
+      }
+    } catch (ragSyncErr) {
+      console.warn('[Admin RAG Sync] Product vector sync warning:', ragSyncErr);
     }
 
     return { success: true, imageUrl: newImageUrl };
@@ -1029,4 +1086,38 @@ export async function deleteVisitAction(id: string, token?: string) {
     return { success: false, error: message };
   }
 }
+
+/**
+ * Server Action: Triggers a complete re-index of the RAG Knowledge Base.
+ * Re-embeds all static content (Story, Hygiene, Contact, Visits) + all 32 products.
+ */
+export async function reindexKnowledgeBaseAction(token?: string) {
+  const auth = await verifyAdminUser(token);
+  if (!auth.authorized) {
+    return {
+      success: false,
+      error: auth.error || 'Unauthorized',
+      staticChunksCount: 0,
+      productChunksCount: 0,
+      totalChunksCount: 0,
+      breakdown: {},
+    };
+  }
+
+  try {
+    const result = await reindexFullKnowledgeBase();
+    return result;
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return {
+      success: false,
+      staticChunksCount: 0,
+      productChunksCount: 0,
+      totalChunksCount: 0,
+      breakdown: {},
+      error: message,
+    };
+  }
+}
+
 

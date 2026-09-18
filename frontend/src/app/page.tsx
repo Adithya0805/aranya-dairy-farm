@@ -3,22 +3,19 @@
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
-import { WHATSAPP_DISPLAY } from '@/lib/whatsapp';
-import { PRIMARY_FARM_EMAIL } from '@/lib/contact';
-import TrustBadgesSection from '@/components/TrustBadgesSection';
+import QuickActionTileRow from '@/components/QuickActionTileRow';
 import FeaturedCategoriesSection from '@/components/FeaturedCategoriesSection';
 import FeaturedProductsPreview from '@/components/FeaturedProductsPreview';
-import AboutSection from '@/components/AboutSection';
-import TestimonialsSection from '@/components/TestimonialsSection';
-import ContactSection from '@/components/ContactSection';
+import ConsolidatedTrustAndStorySection from '@/components/ConsolidatedTrustAndStorySection';
 import Footer from '@/components/Footer';
-import WhatsAppCTA from '@/components/WhatsAppCTA';
 import DetailModal, { ModalContent } from '@/components/DetailModal';
 import QuickViewModal from '@/components/QuickViewModal';
 import CartDrawer from '@/components/CartDrawer';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import { Product, getProductPriceLabel, PRODUCTS } from '@/lib/products';
 import { getProducts } from '@/lib/catalog';
+import { WHATSAPP_DISPLAY } from '@/lib/whatsapp';
+import { PRIMARY_FARM_EMAIL } from '@/lib/contact';
 
 export default function Home() {
   // ── Detail Drawer (Our Story, Cold-Chain, Product details) ─────────────────
@@ -124,46 +121,34 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#FDFBF7] font-sans antialiased text-[#3E4B41] flex flex-col selection:bg-[#E58A13] selection:text-white pb-16 md:pb-0">
 
-      {/* 1. Dark Header Bar with Brand Wordmark, Nav, & Cart */}
+      {/* Header Bar with Logo, Nav Links & Cart */}
       <Header
         onOpenCart={() => setCartOpen(true)}
         onOpenStory={handleOpenStory}
         onOpenContact={handleOpenContact}
       />
 
-      {/* 2. Hero Section with Full-Bleed Nature Photography & Amber Pill CTA */}
+      {/* Section 1: Hero Section (Simplified with single "Shop Now" CTA) */}
       <Hero />
 
-      {/* 3. Trust Badge Row (9 Years Trusted, 100% Organic, Fresh Daily) */}
-      <TrustBadgesSection />
+      {/* Section 2: Quick-Action Tile Row (App-Style 4 Shortcut Hub) */}
+      <QuickActionTileRow />
 
-      {/* 4. Featured Categories Showcase (Dairy, Rice & Millets, Pulses & Lentils) */}
+      {/* Section 3: Featured Categories Showcase */}
       <FeaturedCategoriesSection products={liveProducts} />
 
-      {/* 5. Featured Products Preview with Pill Add to Cart */}
+      {/* Section 4: Farm Favorites Showcase */}
       <FeaturedProductsPreview
         products={liveProducts}
         onSelectProduct={handleSelectProduct}
         onQuickView={(p) => setQuickViewProduct(p)}
       />
 
-      {/* 6. Split About/Story Section with 3-Feature Row */}
-      <AboutSection
-        onOpenColdChain={openModal}
-        onOpenStory={handleOpenStory}
-      />
+      {/* Section 5: Consolidated Trust & Story Section */}
+      <ConsolidatedTrustAndStorySection />
 
-      {/* 7. Customer Testimonials */}
-      <TestimonialsSection />
-
-      {/* 10. Contact & Visit Inquiry Form */}
-      <ContactSection />
-
-      {/* 11. Redesigned 3-Column Dark Footer */}
+      {/* Dark 3-Column Footer */}
       <Footer onOpenStory={handleOpenStory} onOpenContact={handleOpenContact} />
-
-      {/* Floating WhatsApp CTA */}
-      <WhatsAppCTA />
 
       {/* Mobile Persistent Bottom Navigation Bar */}
       <MobileBottomNav

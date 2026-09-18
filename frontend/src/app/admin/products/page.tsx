@@ -16,6 +16,7 @@ import {
   Plus,
   Sparkles,
   Check,
+  Brain,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import {
@@ -27,6 +28,7 @@ import {
   syncTamilNamesAction,
   getAdminCategoriesAction,
   deleteProductAction,
+  reindexKnowledgeBaseAction,
 } from '@/app/admin/actions';
 import { resolveProductImageUrl } from '@/lib/catalog';
 import { PRODUCTS } from '@/lib/products';
@@ -80,6 +82,9 @@ export default function AdminProductsPage() {
 
   // Sync Tamil state
   const [syncingTamil, setSyncingTamil] = useState(false);
+
+  // Re-index RAG Knowledge Base state
+  const [reindexingKb, setReindexingKb] = useState(false);
 
   // Add Product Modal State
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -551,6 +556,34 @@ export default function AdminProductsPage() {
     }
   };
 
+  // Re-index RAG Knowledge Base
+  const handleReindexKb = async () => {
+    setReindexingKb(true);
+    setFeedback(null);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await reindexKnowledgeBaseAction(session?.access_token);
+      if (res.success) {
+        setFeedback({
+          type: 'success',
+          message: `RAG Knowledge Base indexed successfully! Indexed ${res.totalChunksCount} total vector chunks (${res.staticChunksCount} static farm facts + ${res.productChunksCount} products).`,
+        });
+      } else {
+        setFeedback({
+          type: 'error',
+          message: res.error || 'Failed to re-index Knowledge Base.',
+        });
+      }
+    } catch (err: unknown) {
+      setFeedback({
+        type: 'error',
+        message: err instanceof Error ? err.message : 'Error re-indexing Knowledge Base',
+      });
+    } finally {
+      setReindexingKb(false);
+    }
+  };
+
   // Open Add Product Modal
   const handleOpenAddModal = async () => {
     if (availableCategories.length === 0) {
@@ -746,8 +779,18 @@ export default function AdminProductsPage() {
             title="Repair and sync verified Tamil names from product dictionary"
             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md border border-[#1B4D2E]/25 bg-white text-xs font-semibold uppercase tracking-wider text-[#1B4D2E] hover:bg-[#F2ECE7] transition-colors cursor-pointer disabled:opacity-50"
           >
-            <Sparkles className={`w-3.5 h-3.5 ${syncingTamil ? 'animate-spin' : 'text-[#E58A13]'}`} />
+            <Sparkles className={`w-3.5 h-3.5 ${syncingTamil ? 'animate-spin' : 'text-[#D48B16]'}`} />
             <span>{syncingTamil ? 'Syncing...' : 'Sync Tamil Names'}</span>
+          </button>
+
+          <button
+            onClick={handleReindexKb}
+            disabled={reindexingKb}
+            title="Generate fresh vector embeddings for static farm knowledge and all 32 products"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md border border-[#D48B16]/40 bg-[#FAF7F2] text-xs font-semibold uppercase tracking-wider text-[#15321E] hover:bg-[#D48B16]/10 transition-colors cursor-pointer disabled:opacity-50"
+          >
+            <Brain className={`w-3.5 h-3.5 ${reindexingKb ? 'animate-spin' : 'text-[#D48B16]'}`} />
+            <span>{reindexingKb ? 'Re-indexing AI...' : 'Re-index Knowledge Base'}</span>
           </button>
 
           <button

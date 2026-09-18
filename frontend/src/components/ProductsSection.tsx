@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { Plus, Minus, ShoppingBag, Bell, Eye, Sparkles } from 'lucide-react';
+import { Plus, Minus, ShoppingBag, Bell, Eye, Sparkles, Search, X, ArrowUpDown } from 'lucide-react';
 import { PRODUCTS, Product, CATEGORIES, formatPrice } from '@/lib/products';
 import { getCategories, getProducts, testAnonProductWrite } from '@/lib/catalog';
 import { supabase } from '@/lib/supabase';
@@ -17,6 +17,59 @@ interface ProductsSectionProps {
   selectedCategory?: string;
   onCategoryChange?: (category: string) => void;
   onProductsLoaded?: (products: Product[]) => void;
+}
+
+const TRANSLITERATION_MAP: Record<string, string[]> = {
+  milk: ['paal', 'pal', 'பால்', 'pasumpaal', 'cow milk'],
+  paal: ['milk', 'pal', 'பால்', 'pasumpaal', 'cow milk'],
+  pal: ['milk', 'paal', 'பால்', 'pasumpaal'],
+  பால்: ['milk', 'paal', 'pal', 'pasumpaal'],
+  ghee: ['nei', 'ney', 'நெய்', 'bilona'],
+  nei: ['ghee', 'ney', 'நெய்', 'bilona'],
+  ney: ['ghee', 'nei', 'நெய்', 'bilona'],
+  நெய்: ['ghee', 'nei', 'ney', 'bilona'],
+  paneer: ['panir', 'பன்னீர்', 'cottage cheese'],
+  பன்னீர்: ['paneer', 'panir'],
+  curd: ['thayir', 'tayir', 'தயிர்', 'yogurt', 'dahi'],
+  thayir: ['curd', 'tayir', 'தயிர்', 'yogurt'],
+  தயிர்: ['curd', 'thayir'],
+  butter: ['vennai', 'வெண்ணெய்', 'makkhan'],
+  vennai: ['butter', 'வெண்ணெய்'],
+  வெண்ணெய்: ['butter', 'vennai'],
+  rice: ['arisi', 'அரிசி', 'paddy'],
+  arisi: ['rice', 'அரிசி'],
+  அரிசி: ['rice', 'arisi'],
+  dal: ['paruppu', 'dhal', 'பருப்பு', 'lentil', 'pulse'],
+  dhal: ['dal', 'paruppu', 'பருப்பு', 'lentil'],
+  paruppu: ['dal', 'dhal', 'பருப்பு', 'lentil', 'pulse'],
+  பருப்பு: ['dal', 'paruppu', 'dhal'],
+  millet: ['siruthaniyam', 'தினை', 'சாமை', 'வரகு', 'குதிரைவாலி', 'கம்பு', 'கேழ்வரகு', 'ragi', 'samai', 'thinai', 'varagu', 'kuthiraivali'],
+  oil: ['ennai', 'எண்ணெய்', 'cold pressed'],
+  honey: ['then', 'தேன்', 'wild honey'],
+};
+
+function matchesSearch(product: Product, query: string): boolean {
+  if (!query.trim()) return true;
+  const q = query.toLowerCase().trim();
+
+  const nameMatch = product.name.toLowerCase().includes(q);
+  const tamilMatch = product.nameTamil.toLowerCase().includes(q);
+  const descMatch = (product.description || '').toLowerCase().includes(q);
+  const catMatch = product.category.toLowerCase().includes(q);
+
+  if (nameMatch || tamilMatch || descMatch || catMatch) return true;
+
+  const productKeywords = `${product.name} ${product.nameTamil} ${product.category} ${product.description || ''}`.toLowerCase();
+
+  for (const [key, synonyms] of Object.entries(TRANSLITERATION_MAP)) {
+    if (q.includes(key) || synonyms.some((s) => q.includes(s))) {
+      if (productKeywords.includes(key) || synonyms.some((s) => productKeywords.includes(s))) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 export default function ProductsSection({
@@ -37,6 +90,10 @@ export default function ProductsSection({
 
   // Category filter state ('All' or one of the dynamic category names)
   const [selectedCategory, setSelectedCategory] = useState<string>(externalCategory || 'All');
+
+  // Search & Sort state
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [sortBy, setSortBy] = useState<'featured' | 'price-low' | 'price-high' | 'name-asc'>('featured');
 
   useEffect(() => {
     if (externalCategory !== undefined) {
@@ -134,11 +191,41 @@ export default function ProductsSection({
     return counts;
   }, [availableProducts, categories]);
 
-  // Filtered products to display in the grid
+  // Filtered & Sorted products to display in the grid
   const displayedProducts = useMemo(() => {
-    if (selectedCategory === 'All') return availableProducts;
-    return availableProducts.filter((p) => p.category === selectedCategory);
-  }, [availableProducts, selectedCategory]);
+    // 1. Filter by category
+    let list =
+      selectedCategory === 'All'
+        ? availableProducts
+        : availableProducts.filter((p) => p.category === selectedCategory);
+
+    // 2. Filter by multilingual search
+    if (searchQuery.trim()) {
+      list = list.filter((p) => matchesSearch(p, searchQuery));
+    }
+
+    // 3. Sort
+    const sorted = [...list];
+    if (sortBy === 'price-low') {
+      sorted.sort((a, b) => {
+        if (a.price === null && b.price === null) return 0;
+        if (a.price === null) return 1;
+        if (b.price === null) return -1;
+        return a.price - b.price;
+      });
+    } else if (sortBy === 'price-high') {
+      sorted.sort((a, b) => {
+        if (a.price === null && b.price === null) return 0;
+        if (a.price === null) return 1;
+        if (b.price === null) return -1;
+        return b.price - a.price;
+      });
+    } else if (sortBy === 'name-asc') {
+      sorted.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    return sorted;
+  }, [availableProducts, selectedCategory, searchQuery, sortBy]);
 
   const handleAddToCart = useCallback(
     (product: Product) => {
@@ -186,7 +273,7 @@ export default function ProductsSection({
       <section
         id="shop"
         ref={sectionRef}
-        className="reveal-section py-16 sm:py-24 bg-[#FAF7F2] border-b border-[#122E1B]/10 w-full"
+        className="reveal-section py-12 sm:py-20 bg-[#FAF7F2] border-b border-[#122E1B]/10 w-full"
       >
         {/* Anchor for backwards-compatibility */}
         <div id="products" className="scroll-mt-24" />
@@ -230,7 +317,7 @@ export default function ProductsSection({
           </div>
 
           {/* Top Info Bar with WhatsApp catalog inquiry */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 sm:mb-10">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
             <div>
               <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#15321E]">
                 All Farm Offerings
@@ -238,6 +325,11 @@ export default function ProductsSection({
               <div className="flex flex-wrap items-center gap-2.5 mt-1">
                 <p className="text-xs sm:text-sm text-[#5F6E62]">
                   Showing {displayedProducts.length} verified farm items
+                  {searchQuery && (
+                    <span className="text-[#15321E] font-medium ml-1">
+                      for &ldquo;{searchQuery}&rdquo;
+                    </span>
+                  )}
                 </p>
                 {/* Genuine order activity count — ONLY rendered if real weekly count >= 5 */}
                 {weeklyOrderCount !== null && weeklyOrderCount >= 5 && (
@@ -258,8 +350,57 @@ export default function ProductsSection({
             </a>
           </div>
 
+          {/* ── Search Bar & Sort Dropdown Row ── */}
+          <div className="mb-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            
+            {/* Search input with English + Tamil placeholder & clear button */}
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 text-[#8A7B6E] absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search products (e.g. milk, ghee, பால், dal, paal, arisi)..."
+                className="w-full bg-white border border-[#122E1B]/15 hover:border-[#D48B16]/50 focus:border-[#D48B16] rounded-full pl-11 pr-10 py-3 text-xs sm:text-sm text-[#15321E] placeholder-[#8A988D] font-sans shadow-xs focus:outline-hidden focus:ring-1 focus:ring-[#D48B16] transition-all"
+                aria-label="Search products in English or Tamil"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-[#8A7B6E] hover:text-[#15321E] rounded-full hover:bg-black/5 transition-colors cursor-pointer"
+                  aria-label="Clear search"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            {/* Sort by dropdown */}
+            <div className="relative shrink-0 flex items-center">
+              <div className="relative w-full sm:w-auto">
+                <ArrowUpDown className="w-4 h-4 text-[#8A7B6E] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                  aria-label="Sort products by"
+                  className="w-full sm:w-auto appearance-none bg-white border border-[#122E1B]/15 hover:border-[#D48B16]/50 focus:border-[#D48B16] rounded-full pl-10 pr-9 py-3 text-xs sm:text-sm font-sans font-medium text-[#15321E] shadow-xs cursor-pointer focus:outline-hidden focus:ring-1 focus:ring-[#D48B16] transition-all"
+                >
+                  <option value="featured">Sort: Featured</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="name-asc">Name: A to Z</option>
+                </select>
+                <div className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-[#8A7B6E]">
+                  ▼
+                </div>
+              </div>
+            </div>
+
+          </div>
+
           {/* Category Filter Chips / Tabs (Horizontal scrollable, dynamic from Supabase) */}
-          <div id="category-filters" className="mb-10 sm:mb-14 scroll-mt-24">
+          <div id="category-filters" className="mb-8 sm:mb-12 scroll-mt-24">
             <div className="flex items-center gap-2 sm:gap-2.5 overflow-x-auto pb-3 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 no-scrollbar touch-pan-x">
               {['All', ...categories].map((category) => {
                 const isSelected = selectedCategory === category;
@@ -273,7 +414,7 @@ export default function ProductsSection({
                       ${
                         isSelected
                           ? 'bg-[#E58A13] text-white font-bold shadow-md shadow-[#E58A13]/25 scale-[1.02]'
-                          : 'bg-[#FAF7F2] hover:bg-[#F2ECE7] hover:text-[#15321E] text-[#15321E] font-medium border border-[#122E1B]/10'
+                          : 'bg-white hover:bg-[#F2ECE7] hover:text-[#15321E] text-[#15321E] font-medium border border-[#122E1B]/10'
                       }
                     `}
                     aria-pressed={isSelected}
@@ -296,7 +437,7 @@ export default function ProductsSection({
 
           {/* Product Cards Grid */}
           <div
-            key={selectedCategory}
+            key={`${selectedCategory}-${sortBy}`}
             className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 animate-grid-fade"
           >
             {displayedProducts.map((product, index) => {
@@ -474,19 +615,36 @@ export default function ProductsSection({
             })}
           </div>
 
-          {/* Empty state if a selected category has no available products */}
+          {/* Empty state if a selected category or search query has no matching products */}
           {displayedProducts.length === 0 && (
             <div className="py-16 text-center space-y-3 bg-white border border-[#122E1B]/10 rounded-2xl p-8">
-              <p className="font-serif text-2xl text-[#15321E] font-bold">No items currently available in this category</p>
-              <p className="text-sm text-[#5F6E62] font-sans max-w-md mx-auto">
-                We are actively restocking and confirming items with the farm. In the meantime, select another category or check back soon.
+              <p className="font-serif text-2xl text-[#15321E] font-bold">
+                {searchQuery ? `No items found matching "${searchQuery}"` : 'No items currently available in this category'}
               </p>
-              <button
-                onClick={() => handleSelectCategory('All')}
-                className="mt-4 inline-block bg-[#E58A13] hover:bg-[#CA7508] text-white text-xs uppercase font-bold tracking-widest px-6 py-3 rounded-full transition-colors touch-manipulation"
-              >
-                View All Products
-              </button>
+              <p className="text-sm text-[#5F6E62] font-sans max-w-md mx-auto">
+                {searchQuery
+                  ? 'Try searching with an alternative term (e.g. "milk", "paal", "ghee", "dal") or clear your filters.'
+                  : 'We are actively restocking and confirming items with the farm. Select another category or check back soon.'}
+              </p>
+              <div className="pt-2 flex flex-wrap justify-center gap-3">
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="inline-block bg-[#15321E] hover:bg-[#1C3E25] text-white text-xs uppercase font-bold tracking-widest px-6 py-3 rounded-full transition-colors touch-manipulation cursor-pointer"
+                  >
+                    Clear Search
+                  </button>
+                )}
+                <button
+                  onClick={() => {
+                    setSearchQuery('');
+                    handleSelectCategory('All');
+                  }}
+                  className="inline-block bg-[#E58A13] hover:bg-[#CA7508] text-white text-xs uppercase font-bold tracking-widest px-6 py-3 rounded-full transition-colors touch-manipulation cursor-pointer"
+                >
+                  View All Products
+                </button>
+              </div>
             </div>
           )}
 

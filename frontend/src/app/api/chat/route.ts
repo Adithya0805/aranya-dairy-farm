@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit } from '@/lib/rateLimit';
-import { getLiveProductCatalogSummary, buildSystemPrompt } from '@/lib/farmKnowledge';
+import { similaritySearch } from '@/lib/ragKnowledgeBase';
 import { WHATSAPP_DISPLAY } from '@/lib/whatsapp';
 
 interface ChatMessage {
@@ -27,93 +27,57 @@ function checkOrderIntent(text: string): boolean {
     'add to cart',
     'checkout',
     'whatsapp',
+    'வாங்க',
+    'ஆர்டர்',
   ];
   return orderKeywords.some((keyword) => lower.includes(keyword));
 }
 
 /**
- * Intelligent local fallback responder when GEMINI_API_KEY is not configured
- * or the external API is unreachable. Adheres strictly to the same guardrails.
+ * Constructs a strict, RAG-grounded prompt using retrieved knowledge base chunks.
  */
-function generateLocalKnowledgeReply(userMessage: string): string {
+function buildRagSystemPrompt(retrievedContext: string): string {
+  return `You are the knowledgeable, warm, and honest customer AI Assistant for Aranya Organic Dairy Farm (located in Shoolagiri, near Hosur, Tamil Nadu).
+
+Your task is to answer the customer's question truthfully, accurately, and politely based SOLELY on the retrieved farm knowledge provided below.
+
+================================================================================
+RETRIEVED KNOWLEDGE BASE CONTEXT:
+${retrievedContext}
+================================================================================
+
+STRICT RULES & GUARDRAILS:
+1. STRICT GROUNDING: Use ONLY facts, details, and principles directly stated in the retrieved context above. NEVER hallucinate, extrapolate, or invent farm details, delivery areas, or practices not explicitly provided.
+2. UNKNOWN QUERIES: If the retrieved context does not contain enough information to answer the user's question (e.g. out-of-scope topics, unsupported products, or unverified claims), clearly and politely state that the information is not in farm records and advise them to message the farm caretakers on WhatsApp at ${WHATSAPP_DISPLAY}.
+3. PRICING RULES:
+   - If the retrieved context lists a confirmed numeric price (e.g. "₹80", "₹120"), you may mention it.
+   - If a product's price states "Price updating soon" or is not mentioned, EXPLICITLY state that the price is currently being updated by the farm, and invite them to check the Shop page or message WhatsApp (${WHATSAPP_DISPLAY}) for live rates.
+   - NEVER invent or guess a numeric price under any circumstances.
+4. ORDERING & PURCHASE INTENT: You cannot process payments or finalize orders in this chat. When the customer wants to buy, order, or subscribe, politely guide them to tap the "Continue on WhatsApp" button or message the farm directly at ${WHATSAPP_DISPLAY}.
+5. TONE & LANGUAGE: Keep replies concise, helpful, friendly, and well-structured with bullet points when listing items. Reply in Tamil if the user asks in Tamil, or in English otherwise.
+`;
+}
+
+/**
+ * Generates an intelligent grounded local fallback reply using retrieved facts
+ * when Gemini API key is missing or the external API call fails.
+ */
+function generateRagFallbackReply(userMessage: string, contextFacts: string[]): string {
   const q = userMessage.toLowerCase();
 
-  // 1. Order Intent & Purchasing takes precedence when customer wants to buy
-  if (
-    q.includes('how do i buy') ||
-    q.includes('how to buy') ||
-    q.includes('how to order') ||
-    q.includes('place an order') ||
-    q.includes('want to buy') ||
-    q.includes('want to order') ||
-    q.includes('subscribe') ||
-    q.includes('subscription')
-  ) {
-    return `To place an order or start a daily morning subscription, please connect directly with our farm team on WhatsApp! All orders and doorstep delivery routes are managed via WhatsApp.\n\nPlease tap the **Continue on WhatsApp** button in this chat or message us directly at **${WHATSAPP_DISPLAY}**.`;
-  }
-
-  // 2. Pricing Guardrail (Strictly no invented numbers)
-  if (q.includes('price') || q.includes('cost') || q.includes('rate') || q.includes('how much') || q.includes('விலை')) {
-    return `Our final product pricing is currently being finalized by the farm to ensure fair, transparent farm-to-table rates. No numeric prices are confirmed yet.\n\nPlease check our Shop page or message us directly on WhatsApp (${WHATSAPP_DISPLAY}) for current pricing updates!`;
-  }
-
-  // 3. Organic & A2 Practices (Cow care, feed, calf-first, Vedic Bilona process)
-  if (
-    q.includes('cow') ||
-    q.includes('breed') ||
-    q.includes('feed') ||
-    q.includes('pasture') ||
-    q.includes('eat') ||
-    q.includes('raised') ||
-    q.includes('treated') ||
-    q.includes('calf') ||
-    q.includes('bilona') ||
-    q.includes('organic') ||
-    q.includes('antibiotic') ||
-    q.includes('hormone') ||
-    q.includes('oxytocin') ||
-    q.includes('cold chain') ||
-    q.includes('glass bottle') ||
-    q.includes('hygiene') ||
-    q.includes('story')
-  ) {
-    return `At Aranya Organic Dairy Farm (established in 2017 in Shoolagiri):\n• **Native Herd**: 100% free-roaming indigenous Gir & Sahiwal cows grazing naturally across pesticide-free open pastures.\n• **Natural Diet**: Grass-fed on fresh napier grass, moringa foliage, and native wild medicinal herbs.\n• **Calf-First Milking**: Calves feed first to their complete satisfaction; our caretakers only harvest surplus milk.\n• **Zero Chemicals**: Strictly zero synthetic hormones, zero oxytocin stimulants, and zero routine antibiotics.\n• **Vedic Bilona Ghee**: Authentic 5-step process from Charaka Samhita—whole A2 curd is churned bidirectionally with a wooden bilona staff, and separated makkhan is gently clarified in earthen clay pots over a low wood fire.\n• **4°C Cold-Chain**: Milk is chilled to 4°C within minutes of milking and delivered in 100% sterilized eco glass bottles (zero plastic contact).`;
-  }
-
-  // 4. Delivery Area Coverage
-  if (
-    q.includes('area') ||
-    q.includes('location') ||
-    q.includes('where') ||
-    q.includes('cover') ||
-    q.includes('hosur') ||
-    q.includes('shoolagiri') ||
-    q.includes('bangalore') ||
-    q.includes('bengaluru') ||
-    q.includes('chennai') ||
-    q.includes('south india') ||
-    q.includes('ship') ||
-    q.includes('இடம்')
-  ) {
-    return `Our delivery coverage:\n• **Primary Fresh Milk Delivery**: Shoolagiri and Hosur, delivered every morning at 4°C in reusable glass bottles.\n• **South India Shipping**: We offer shipping across South India for dry provisions, traditional Vedic Bilona Ghee, native millets, and pulses. Specific shipping rules and carrier rates are currently being finalized.\n• **Farm Location**: Shoolagiri, Hosur Krishnagiri Highway, Tamil Nadu 635117.`;
-  }
-
-  // 5. Timings & Schedule
-  if (q.includes('time') || q.includes('timing') || q.includes('hour') || q.includes('when') || q.includes('morning') || q.includes('cutoff') || q.includes('schedule') || q.includes('நேரம்')) {
-    return `Our farm delivery timings and hours are:\n• **Daily Morning Delivery**: 5:30 AM – 7:30 AM delivered chilled at 4°C in sterilized eco glass bottles across Shoolagiri & Hosur.\n• **Order Cut-off**: Orders placed before 8:00 PM are delivered fresh the next morning.\n• **Farm Visits**: Weekends by appointment.\n• **WhatsApp Support**: 6:00 AM – 8:30 PM daily at ${WHATSAPP_DISPLAY}.`;
-  }
-
-  // 6. Available Products
-  if (q.includes('product') || q.includes('available') || q.includes('sell') || q.includes('items') || q.includes('catalog') || q.includes('what do you') || q.includes('பொருட்கள்')) {
-    return `Here are the products currently available from Aranya Farm:\n• **Pure A2 Dairy**: Fresh Farm Milk, A2 Desi Cow Milk (1L Glass Bottle), Farm Whole Milk, Fresh Cultured Butter, Pure Cow Ghee, Cultured Dairy Paneer, Traditional Bilona Cow Ghee.\n• **Native Millets**: Finger Millet (Ragi), Foxtail, Kodo, Little, Barnyard, and Pearl Millet.\n• **Organic Pulses**: Toor Dal, Moong Dal, Urad Dal, Chana Dal.\n• **Natural Sweeteners & Oils**: Organic Jaggery Powder, Raw Honey, Country Sugar, Cold-Pressed Groundnut & Sesame Oils.\n*(Note: Traditional rice varieties are pending confirmation).*`;
-  }
-
-  // General Intent to Order
+  // 1. Order Intent
   if (checkOrderIntent(q)) {
-    return `To place an order or subscribe for daily delivery, please order directly through WhatsApp! All orders are fulfilled directly by our farm caretakers.\n\nYou can click the **Continue on WhatsApp** button in this chat or message us at **${WHATSAPP_DISPLAY}**.`;
+    return `To place an order or start a daily morning subscription, please connect directly with our farm team on WhatsApp! All orders and daily morning delivery routes are coordinated via WhatsApp.\n\nPlease tap the **Continue on WhatsApp** button below or message us directly at **${WHATSAPP_DISPLAY}**.`;
   }
 
-  return `Welcome to Aranya Organic Dairy Farm, Shoolagiri! We provide 100% pure raw A2 milk, Vedic Bilona ghee, native millets, and organic provisions delivered fresh to your doorstep in Hosur and Shoolagiri.\n\nFeel free to ask about our morning delivery timings, delivery areas, organic cow care practices, or tap **Continue on WhatsApp** to order directly!`;
+  // 2. If we retrieved relevant facts, summarize them directly
+  if (contextFacts.length > 0) {
+    return contextFacts.slice(0, 3).join('\n\n') +
+      `\n\n*For any additional details or to order, feel free to reach out on WhatsApp at ${WHATSAPP_DISPLAY}.*`;
+  }
+
+  // 3. Fallback for out-of-scope or empty context
+  return `I don't have verified farm records regarding that question. For specific inquiries or custom orders, please connect directly with our farm team on WhatsApp at **${WHATSAPP_DISPLAY}**!`;
 }
 
 export async function POST(req: NextRequest) {
@@ -155,9 +119,25 @@ export async function POST(req: NextRequest) {
   const sanitizedContent = lastUserMessage.content.trim().slice(0, 1000);
   const userHasOrderIntent = checkOrderIntent(sanitizedContent);
 
-  // 3. Load dynamic product catalog & system prompt
-  const catalogSummary = await getLiveProductCatalogSummary();
-  const systemPrompt = buildSystemPrompt(catalogSummary);
+  // 3. RAG Step: Vector Similarity Search against Knowledge Base
+  let retrievedChunks: { content: string; source: string; similarity?: number }[] = [];
+  try {
+    retrievedChunks = await similaritySearch(sanitizedContent, 5, 0.20);
+  } catch (ragErr) {
+    console.warn('[RAG] Similarity search exception:', ragErr);
+  }
+
+  const contextText =
+    retrievedChunks.length > 0
+      ? retrievedChunks
+          .map(
+            (c, i) =>
+              `[Source ${i + 1}: ${c.source.toUpperCase()}${typeof c.similarity === 'number' ? ` | Relevance: ${(c.similarity * 100).toFixed(1)}%` : ''}]\n${c.content}`
+          )
+          .join('\n\n')
+      : 'No specific knowledge base matches found for this query.';
+
+  const systemPrompt = buildRagSystemPrompt(contextText);
 
   // 4. Check for Gemini API key
   const apiKey =
@@ -166,28 +146,29 @@ export async function POST(req: NextRequest) {
     process.env.GOOGLE_GENERATIVE_AI_API_KEY;
 
   if (!apiKey) {
-    // Graceful fallback to verified farm knowledge engine
-    const replyText = generateLocalKnowledgeReply(sanitizedContent);
+    // Graceful fallback to verified RAG local responder
+    const replyText = generateRagFallbackReply(
+      sanitizedContent,
+      retrievedChunks.map((c) => c.content)
+    );
     return NextResponse.json({
       reply: replyText,
       hasOrderIntent: userHasOrderIntent || checkOrderIntent(replyText),
-      source: 'local-knowledge',
+      source: 'rag-local-fallback',
+      retrievedCount: retrievedChunks.length,
     });
   }
 
   // 5. Format conversation history for Gemini API
-  // Limit conversation history to the last 6 messages to keep context efficient
   const historySlice = messages.slice(-6).map((m) => ({
     role: m.role === 'assistant' ? 'model' : 'user',
     parts: [{ text: m.content.slice(0, 1000) }],
   }));
 
-  // Ensure first message in history has role 'user'
   while (historySlice.length > 0 && historySlice[0].role !== 'user') {
     historySlice.shift();
   }
 
-  // If after trimming no messages remain, put the current user message
   if (historySlice.length === 0) {
     historySlice.push({
       role: 'user',
@@ -220,7 +201,7 @@ export async function POST(req: NextRequest) {
     if (!response.ok) {
       console.warn('[Gemini API] Request failed with status', response.status);
 
-      // Try fallback to gemini-1.5-flash if model name was custom or primary failed
+      // Fallback model trial: gemini-1.5-flash
       if (modelName !== 'gemini-1.5-flash') {
         const fallbackEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
         const fbResponse = await fetch(fallbackEndpoint, {
@@ -240,18 +221,22 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({
               reply: fbReply,
               hasOrderIntent: userHasOrderIntent || checkOrderIntent(fbReply),
-              source: 'gemini-1.5-flash',
+              source: 'gemini-1.5-flash-rag',
+              retrievedCount: retrievedChunks.length,
             });
           }
         }
       }
 
-      // If Gemini returned an error, fallback gracefully to verified local knowledge
-      const fallbackReply = generateLocalKnowledgeReply(sanitizedContent);
+      const fallbackReply = generateRagFallbackReply(
+        sanitizedContent,
+        retrievedChunks.map((c) => c.content)
+      );
       return NextResponse.json({
         reply: fallbackReply,
         hasOrderIntent: userHasOrderIntent || checkOrderIntent(fallbackReply),
-        source: 'local-knowledge-fallback',
+        source: 'rag-local-fallback',
+        retrievedCount: retrievedChunks.length,
       });
     }
 
@@ -259,28 +244,36 @@ export async function POST(req: NextRequest) {
     const generatedReply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!generatedReply) {
-      const fallbackReply = generateLocalKnowledgeReply(sanitizedContent);
+      const fallbackReply = generateRagFallbackReply(
+        sanitizedContent,
+        retrievedChunks.map((c) => c.content)
+      );
       return NextResponse.json({
         reply: fallbackReply,
         hasOrderIntent: userHasOrderIntent || checkOrderIntent(fallbackReply),
-        source: 'local-knowledge-fallback',
+        source: 'rag-local-fallback',
+        retrievedCount: retrievedChunks.length,
       });
     }
 
     return NextResponse.json({
       reply: generatedReply,
       hasOrderIntent: userHasOrderIntent || checkOrderIntent(generatedReply),
-      source: modelName,
+      source: `${modelName}-rag`,
+      retrievedCount: retrievedChunks.length,
     });
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message.replace(/key=[^&]+/g, 'key=REDACTED') : 'Unknown error';
-    console.error('[Gemini API] Error calling model:', errorMsg);
-    // Gracefully provide verified knowledge
-    const fallbackReply = generateLocalKnowledgeReply(sanitizedContent);
+    console.error('[RAG Chat] Error calling Gemini model:', errorMsg);
+    const fallbackReply = generateRagFallbackReply(
+      sanitizedContent,
+      retrievedChunks.map((c) => c.content)
+    );
     return NextResponse.json({
       reply: fallbackReply,
       hasOrderIntent: userHasOrderIntent || checkOrderIntent(fallbackReply),
-      source: 'local-knowledge-fallback',
+      source: 'rag-local-fallback',
+      retrievedCount: retrievedChunks.length,
     });
   }
 }

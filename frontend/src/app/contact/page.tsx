@@ -3,9 +3,8 @@
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Header from '@/components/Header';
-import TrustBadgesSection from '@/components/TrustBadgesSection';
+import SlimTrustLine from '@/components/SlimTrustLine';
 import Footer from '@/components/Footer';
-import WhatsAppCTA from '@/components/WhatsAppCTA';
 import CartDrawer from '@/components/CartDrawer';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import {
@@ -277,8 +276,8 @@ Message: ${inquiryData.notes || 'Please provide details on daily deliveries and 
         </div>
       </section>
 
-      {/* 3. Trust Badges Row */}
-      <TrustBadgesSection />
+      {/* 3. Slim Trust Line */}
+      <SlimTrustLine />
 
       {/* 4. Direct Reachability Cards Grid */}
       <section className="py-14 sm:py-20 bg-[#FAF7F2] border-b border-[#122E1B]/10">
@@ -806,10 +805,7 @@ Message: ${inquiryData.notes || 'Please provide details on daily deliveries and 
       {/* 6. Footer */}
       <Footer />
 
-      {/* 7. Floating WhatsApp CTA */}
-      <WhatsAppCTA />
-
-      {/* 8. Mobile Bottom Navigation */}
+      {/* 7. Mobile Bottom Navigation */}
       <MobileBottomNav
         onOpenCart={() => setCartOpen(true)}
         onOpenContact={() => {}}

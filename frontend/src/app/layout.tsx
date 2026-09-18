@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import ChatAssistantWidget from "@/components/ChatAssistantWidget";
+import UnifiedFloatingActionButton from "@/components/UnifiedFloatingActionButton";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { FARM_DOMAIN } from "@/lib/contact";
@@ -79,6 +80,7 @@ export default function RootLayout({
         <CartProvider>
           {children}
           <ChatAssistantWidget />
+          <UnifiedFloatingActionButton />
         </CartProvider>
         <Analytics />
         <SpeedInsights />

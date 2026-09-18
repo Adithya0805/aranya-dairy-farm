@@ -5,9 +5,8 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import ProductsSection from '@/components/ProductsSection';
-import TrustBadgesSection from '@/components/TrustBadgesSection';
+import SlimTrustLine from '@/components/SlimTrustLine';
 import Footer from '@/components/Footer';
-import WhatsAppCTA from '@/components/WhatsAppCTA';
 import DetailModal, { ModalContent } from '@/components/DetailModal';
 import QuickViewModal from '@/components/QuickViewModal';
 import CartDrawer from '@/components/CartDrawer';
@@ -185,6 +184,9 @@ function ProductsContent() {
         </div>
       </section>
 
+      {/* Slim Trust Line */}
+      <SlimTrustLine />
+
       {/* Complete Product Catalog Grid */}
       <ProductsSection
         selectedCategory={selectedCategory}
@@ -312,14 +314,8 @@ function ProductsContent() {
         </div>
       </section>
 
-      {/* Trust Badges Row */}
-      <TrustBadgesSection />
-
       {/* Footer */}
       <Footer onOpenStory={handleOpenStory} onOpenContact={handleOpenContact} />
-
-      {/* Floating WhatsApp CTA */}
-      <WhatsAppCTA />
 
       {/* Mobile Persistent Bottom Navigation Bar */}
       <MobileBottomNav
