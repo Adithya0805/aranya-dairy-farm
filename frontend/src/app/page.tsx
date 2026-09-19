@@ -41,30 +41,9 @@ export default function Home() {
     setModalOpen(true);
   };
 
-  /** Map a Product to a ModalContent for the detail drawer */
+  /** Open centered Product Showcase Modal */
   const handleSelectProduct = (product: Product) => {
-    setSelectedProduct(product);
-    const priceDisplay = getProductPriceLabel(product);
-    openModal({
-      title: `${product.name} (${product.nameTamil})`,
-      subtitle: `${product.category} • ${product.unit} • ${priceDisplay}`,
-      category: product.category,
-      image: product.image,
-      bodyParagraphs: [
-        product.description ||
-          `100% pure, farm-fresh ${product.name} (${product.nameTamil}) sourced directly from Aranya Organic Dairy Farm, Shoolagiri.`,
-        'Processed with zero chemical additives, preservatives, or artificial colors at our Shoolagiri farm.',
-        'Orders placed before 8:00 PM are delivered fresh to your doorstep by 7:00 AM the next morning.',
-      ],
-      bulletPoints: [
-        `Local Grocery: ${product.nameTamil}`,
-        `Packaging Unit: ${product.unit}`,
-        `Current Status: ${priceDisplay}`,
-        'Direct from Aranya Organic Dairy Farm, Shoolagiri',
-      ],
-      ctaLabel: `Inquire about ${product.name} on WhatsApp`,
-      whatsappMessage: `Hello Aranya Dairy Farm, I would like to inquire about ${product.name} (${product.nameTamil}) [${product.unit}].`,
-    });
+    setQuickViewProduct(product);
   };
 
   const handleOpenStory = () => {
