@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Plus, Minus, Trash2, ShoppingBag, MessageSquare, CheckCircle, ExternalLink } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { buildWhatsAppUrl } from '@/lib/whatsapp';
@@ -32,6 +33,11 @@ export default function CartDrawer({ isOpen: externalIsOpen, onClose: externalOn
   const [lastOrderCode, setLastOrderCode] = useState<string>('');
   const [lastWhatsAppUrl, setLastWhatsAppUrl] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Generates a quick client fallback code if server is slow
   const generateLocalCode = () => {
@@ -118,15 +124,13 @@ export default function CartDrawer({ isOpen: externalIsOpen, onClose: externalOn
     };
   }, [isOpen]);
 
-  return (
-    <>
+  if (!mounted) return null;
+
+  return createPortal(
+    <div className={`fixed inset-0 z-[9999] pointer-events-auto transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
       {/* ── Backdrop ── */}
       <div
-        className={`
-          fixed inset-0 z-[90] bg-black/50 backdrop-blur-xs
-          transition-opacity duration-300
-          ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
-        `}
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm cursor-pointer"
         onClick={handleClose}
         aria-hidden="true"
       />
@@ -140,7 +144,7 @@ export default function CartDrawer({ isOpen: externalIsOpen, onClose: externalOn
         aria-label="Shopping cart"
         aria-modal="true"
         className={`
-          fixed z-[100] bg-[#FAF7F2] flex flex-col shadow-2xl
+          fixed z-10 bg-[#FAF7F2] flex flex-col shadow-2xl
           /* Mobile bottom sheet */
           bottom-0 left-0 right-0
           h-[92dvh]
@@ -358,6 +362,7 @@ export default function CartDrawer({ isOpen: externalIsOpen, onClose: externalOn
         )}
 
       </div>
-    </>
+    </div>,
+    document.body
   );
 }

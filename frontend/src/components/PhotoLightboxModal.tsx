@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
 interface PhotoLightboxModalProps {
@@ -20,6 +21,12 @@ export default function PhotoLightboxModal({
   tag,
   caption,
 }: PhotoLightboxModalProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -40,14 +47,14 @@ export default function PhotoLightboxModal({
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (!mounted || !isOpen) return null;
 
-  return (
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
       aria-label={imageAlt || 'Expanded farm photograph'}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-10 bg-black/85 backdrop-blur-md animate-fade-in"
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 md:p-10 bg-black/85 backdrop-blur-md animate-fade-in"
       onClick={onClose}
     >
       {/* Modal Container */}
@@ -90,6 +97,7 @@ export default function PhotoLightboxModal({
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

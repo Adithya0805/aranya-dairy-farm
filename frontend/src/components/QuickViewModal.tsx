@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Plus, Minus, ShoppingBag, Check, MessageSquare } from 'lucide-react';
 import { Product, formatPrice } from '@/lib/products';
 import { useCart } from '@/context/CartContext';
@@ -20,30 +21,28 @@ export default function QuickViewModal({
   const { addItem } = useCart();
   const [qty, setQty] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
-
-  // Cached product to allow graceful exit animation
-  const [cachedProduct, setCachedProduct] = useState<Product | null>(product);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (product) {
-      setCachedProduct(product);
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (product && isOpen) {
       setQty(1);
       setIsAdded(false);
     }
-  }, [product]);
+  }, [product, isOpen]);
 
-  const activeProduct = product || cachedProduct;
-
-  // Lock body scroll while modal is open to prevent background double-scrolling
+  // Lock body scroll while modal is open
   useEffect(() => {
     if (isOpen) {
+      const originalOverflow = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
     }
-    return () => {
-      document.body.style.overflow = '';
-    };
   }, [isOpen]);
 
   // Handle escape key to close
@@ -59,64 +58,56 @@ export default function QuickViewModal({
     };
   }, [isOpen, onClose]);
 
-  if (!activeProduct) return null;
+  if (!mounted || !isOpen || !product) return null;
 
-  const hasPrice = activeProduct.price !== null;
+  const hasPrice = product.price !== null && product.price !== undefined;
 
   const handleAddToCart = () => {
     if (!hasPrice) return;
     for (let i = 0; i < qty; i++) {
-      addItem(activeProduct);
+      addItem(product);
     }
     setIsAdded(true);
     setTimeout(() => {
       setIsAdded(false);
       onClose();
-    }, 650);
+    }, 600);
   };
 
   const handleNotifyMe = () => {
     const text = encodeURIComponent(
-      `Hello Aranya Dairy Farm, please notify me when pricing for ${activeProduct.name} (${activeProduct.nameTamil}) [${activeProduct.unit}] is available.`
+      `Hello Aranya Dairy Farm, please notify me when pricing for ${product.name} (${product.nameTamil}) [${product.unit}] is available.`
     );
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`, '_blank', 'noopener,noreferrer');
   };
 
-  return (
+  return createPortal(
     <div
-      className={`fixed inset-0 z-[90] flex items-end sm:items-center justify-center transition-opacity duration-300 ${
-        isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-      }`}
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-3.5 sm:p-6 overflow-hidden"
       role="dialog"
       aria-modal="true"
       aria-labelledby="quick-view-title"
     >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-xs cursor-pointer"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-200"
         onClick={onClose}
         aria-label="Close modal backdrop"
       />
 
-      {/* Modal Dialog (Bottom sheet on mobile, centered card on desktop) */}
+      {/* Modal Dialog Card */}
       <div
-        className={`relative z-[100] w-full sm:max-w-2xl max-h-[90vh] sm:max-h-[85vh] bg-[#FAF7F2] rounded-t-3xl sm:rounded-3xl shadow-2xl border border-[#122E1B]/15 overflow-y-auto flex flex-col transform transition-transform duration-300 ease-out ${
-          isOpen ? 'translate-y-0 scale-100' : 'translate-y-6 sm:translate-y-0 sm:scale-95'
-        }`}
+        className="relative z-10 w-full max-w-2xl max-h-[90vh] bg-[#FAF7F2] rounded-3xl shadow-2xl border border-[#122E1B]/15 overflow-y-auto overscroll-contain flex flex-col animate-in fade-in zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
       >
-        {/* Mobile top pull indicator */}
-        <div className="pt-3 pb-1 flex justify-center sm:hidden">
-          <div className="w-12 h-1.5 rounded-full bg-[#122E1B]/20" />
-        </div>
-
         {/* Header with Category Tag and Close Button */}
-        <div className="px-6 sm:px-8 pt-4 pb-3 flex items-center justify-between border-b border-[#122E1B]/10">
+        <div className="sticky top-0 bg-[#FAF7F2]/95 backdrop-blur-md px-6 sm:px-8 pt-4 pb-3 flex items-center justify-between border-b border-[#122E1B]/10 z-20 shrink-0">
           <span className="text-xs font-sans uppercase font-bold tracking-widest text-[#B84A28]">
-            {activeProduct.category}
+            {product.category}
           </span>
           <button
             onClick={onClose}
-            className="min-w-[40px] min-h-[40px] flex items-center justify-center text-[#15321E] hover:text-[#E58A13] hover:bg-[#122E1B]/5 rounded-full transition-all cursor-pointer active:scale-95 ml-auto"
+            className="w-10 h-10 flex items-center justify-center text-[#15321E] hover:text-[#E58A13] hover:bg-[#122E1B]/5 rounded-full transition-all cursor-pointer active:scale-95 ml-auto"
             aria-label="Close Quick View"
           >
             <X className="w-5 h-5" />
@@ -124,14 +115,14 @@ export default function QuickViewModal({
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 sm:p-8 space-y-6">
+        <div className="p-6 sm:p-8 space-y-6 flex-1">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
             {/* Product Image */}
             <div className="aspect-square bg-[#F4EFEA] rounded-2xl overflow-hidden p-3 border border-[#122E1B]/10 flex items-center justify-center shadow-2xs">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={activeProduct.image}
-                alt={activeProduct.name}
+                src={product.image}
+                alt={product.name}
                 className="w-full h-full object-contain hover:scale-105 transition-transform duration-300"
                 onError={(e) => {
                   const target = e.currentTarget;
@@ -149,15 +140,15 @@ export default function QuickViewModal({
                   id="quick-view-title"
                   className="text-2xl sm:text-3xl font-serif font-bold text-[#15321E] leading-tight"
                 >
-                  {activeProduct.name}
+                  {product.name}
                 </h3>
                 <p className="text-sm font-sans text-[#122E1B]/75 font-medium mt-1">
-                  {activeProduct.nameTamil}
+                  {product.nameTamil}
                 </p>
               </div>
 
               <p className="text-xs text-[#8A7B6E] font-sans">
-                Pack Size: <span className="text-[#15321E] font-semibold">{activeProduct.unit}</span>
+                Pack Size: <span className="text-[#15321E] font-semibold">{product.unit}</span>
               </p>
 
               {/* Price or Updating State */}
@@ -165,10 +156,10 @@ export default function QuickViewModal({
                 {hasPrice ? (
                   <div className="flex items-baseline gap-2">
                     <span className="text-2xl sm:text-3xl font-sans font-bold text-[#15321E]">
-                      {formatPrice(activeProduct.price!)}
+                      {formatPrice(product.price!)}
                     </span>
                     <span className="text-xs text-[#5F6E62] font-sans font-medium">
-                      ({activeProduct.unit})
+                      ({product.unit})
                     </span>
                   </div>
                 ) : (
@@ -181,8 +172,8 @@ export default function QuickViewModal({
 
               {/* Description */}
               <p className="text-xs sm:text-sm text-[#5F6E62] font-sans leading-relaxed pt-1">
-                {activeProduct.description ||
-                  `Farm-fresh ${activeProduct.name} (${activeProduct.nameTamil}), direct from Aranya Organic Dairy Farm in Shoolagiri. Free from chemical preservatives, synthetic additives, and artificial processing.`}
+                {product.description ||
+                  `Farm-fresh ${product.name} (${product.nameTamil}), direct from Aranya Organic Dairy Farm in Shoolagiri. Free from chemical preservatives, synthetic additives, and artificial processing.`}
               </p>
             </div>
           </div>
@@ -247,7 +238,7 @@ export default function QuickViewModal({
                     <>
                       <ShoppingBag className="w-4 h-4" />
                       <span>
-                        ADD TO CART • {formatPrice((activeProduct.price ?? 0) * qty)}
+                        ADD TO CART • {formatPrice((product.price ?? 0) * qty)}
                       </span>
                     </>
                   )}
@@ -266,6 +257,7 @@ export default function QuickViewModal({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
