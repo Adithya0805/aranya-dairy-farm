@@ -25,3 +25,18 @@
 ## Typography Guidelines
 - **Primary Font**: Inter / Outfit / System Sans-serif (Clean, readable, modern)
 - **Heading Font**: Serif / Display Accent (Warm, organic, trustworthy feel)
+
+## Official Logo Assets & Locations
+- **Emblem Mark (Primary Web & App Avatar)**: `frontend/public/images/aranya-logo.png` & `assets/aranya-logo.png`
+  - 512x512 transparent PNG featuring the organic green leaf circular swirl with native Gir cow and calf on grass.
+- **Full Brand Lockup (Emblem + Typography)**: `frontend/public/images/aranya-logo-full.png` & `assets/aranya-logo-full.png`
+  - 1024x1024 transparent PNG with emblem, stylized "Aranya" title in Earth Dark (`#4A3525`), golden accent divider (`#E5A93C`), and "Organic Dairy Farm" in Forest Green (`#1B4D2E`).
+- **Circular Badge**: `frontend/public/images/aranya-logo-badge.png` (512x512 PNG with circular white disk and gold border).
+- **Original Source Master**: `frontend/public/images/aranya-logo.jpg` & `assets/aranya-logo-original.jpg` (1024x1024 master).
+- **Favicons & PWA Icons**:
+  - `frontend/public/icon-192.png` (192x192 PWA Android icon)
+  - `frontend/public/icon-512.png` (512x512 PWA splash icon)
+  - `frontend/src/app/apple-icon.png` (180x180 iOS touch icon)
+  - `frontend/src/app/icon.png` (Next.js dynamic app icon)
+  - `frontend/public/favicon.ico` & `frontend/src/app/favicon.ico` (Multi-resolution Windows & browser tab icons)
+

@@ -60,8 +60,13 @@ export default function AdminLoginPage() {
   return (
     <div className="min-h-screen bg-[#F4EFEA] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#1B4D2E] text-white shadow-md mb-4">
-          <ShieldCheck className="w-6 h-6" />
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white border-2 border-[#1B4D2E]/20 p-1 shadow-md mb-4 overflow-hidden">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/aranya-logo.png"
+            alt="Aranya Organic Dairy Farm"
+            className="w-full h-full object-contain rounded-full"
+          />
         </div>
         <h2 className="text-3xl font-serif font-bold tracking-tight text-[#1C241E]">
           Aranya Farm Admin

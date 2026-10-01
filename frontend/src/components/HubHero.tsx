@@ -32,9 +32,14 @@ export default function HubHero({ onSelectSection }: HubHeroProps) {
       <header className="relative z-30 bg-[#1B4D2E] text-white border-b border-white/10 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto flex items-center justify-between h-16 sm:h-20">
           {/* Logo & Brand Name */}
-          <a href="#" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 rounded-full bg-[#E5A93C] flex items-center justify-center text-[#4A3525] shrink-0">
-              <Leaf className="w-5 h-5 fill-current" />
+          <a href="#" className="flex items-center gap-2.5 sm:gap-3 group">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full overflow-hidden bg-white border border-[#E5A93C]/50 flex items-center justify-center p-0.5 shadow-sm shrink-0 group-hover:scale-105 transition-transform">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/aranya-logo.png"
+                alt="Aranya Organic Dairy Farm"
+                className="w-full h-full object-contain rounded-full"
+              />
             </div>
             <div>
               <span className="font-serif text-lg sm:text-xl font-bold tracking-tight text-white block leading-none">
