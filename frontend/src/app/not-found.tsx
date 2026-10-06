@@ -55,14 +55,14 @@ export default function NotFound() {
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#122E1B] hover:bg-[#1C3E25] active:scale-95 text-white font-sans text-xs uppercase font-bold tracking-wider px-6 py-3.5 min-h-[48px] rounded-full transition-all touch-manipulation shadow-md"
           >
             <ArrowLeft className="w-4 h-4 text-[#E58A13]" />
-            <span>Return to Home</span>
+            <span>Back to Home</span>
           </Link>
           <Link
             href="/products"
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#E58A13] hover:bg-[#CA7508] active:scale-95 text-white font-sans text-xs uppercase font-bold tracking-wider px-6 py-3.5 min-h-[48px] rounded-full transition-all touch-manipulation shadow-md shadow-[#E58A13]/20"
           >
             <ShoppingBag className="w-4 h-4" />
-            <span>Explore Products</span>
+            <span>Shop Products</span>
           </Link>
         </div>
 

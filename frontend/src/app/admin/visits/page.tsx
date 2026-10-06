@@ -331,7 +331,14 @@ export default function AdminVisitsPage() {
       </div>
 
       {/* ── Visits Table / Cards ── */}
-      {filteredVisits.length === 0 ? (
+      {loading ? (
+        <div className="py-20 text-center space-y-3">
+          <div className="w-8 h-8 border-2 border-[#1B4D2E] border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-xs uppercase font-bold tracking-wider text-[#57655B]">
+            Loading farm visit requests...
+          </p>
+        </div>
+      ) : filteredVisits.length === 0 ? (
         <div className="bg-white rounded-2xl border border-[#1B4D2E]/10 p-12 text-center space-y-3">
           <div className="w-12 h-12 rounded-full bg-[#FAF7F2] border border-[#1B4D2E]/15 flex items-center justify-center mx-auto text-[#8A7B6E]">
             <Calendar className="w-6 h-6" />

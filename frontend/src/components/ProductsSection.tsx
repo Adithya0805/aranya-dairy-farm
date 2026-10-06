@@ -435,6 +435,20 @@ export default function ProductsSection({
             </div>
           </div>
 
+          {/* Skeleton loading grid fallback */}
+          {products.length === 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 lg:gap-10">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="bg-white border border-[#122E1B]/10 rounded-2xl p-4 sm:p-5 animate-pulse space-y-4">
+                  <div className="w-full aspect-square bg-[#122E1B]/5 rounded-xl" />
+                  <div className="h-4 bg-[#122E1B]/10 rounded-full w-3/4" />
+                  <div className="h-3 bg-[#122E1B]/5 rounded-full w-1/2" />
+                  <div className="h-10 bg-[#122E1B]/10 rounded-full w-full" />
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* Product Cards Grid */}
           <div
             key={`${selectedCategory}-${sortBy}`}

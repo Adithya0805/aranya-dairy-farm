@@ -35,7 +35,7 @@ const QUICK_QUESTIONS = [
 
 export default function ChatAssistantWidget() {
   const pathname = usePathname();
-  const { items, buildWhatsAppMessage } = useCart();
+  const { items, buildWhatsAppMessage, totalItems } = useCart();
 
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -203,12 +203,18 @@ export default function ChatAssistantWidget() {
     return null;
   }
 
+  const hasStickyCart = totalItems > 0;
+
   return (
     <>
       {/* ── 1. Floating Chat Bubble Launcher ───────────────────────────────── */}
-      {/* Mobile: bottom-[8.5rem] right-4 (stacked directly above WhatsApp at bottom-20, clear of nav at bottom-0) */}
-      {/* Desktop (sm+): sm:bottom-22 sm:right-6 (stacked directly above WhatsApp at sm:bottom-6 sm:right-6) */}
-      <div className="fixed bottom-[8.5rem] right-4 sm:bottom-22 sm:right-6 z-40">
+      {/* Mobile: bottom-[8.5rem] (or bottom-[11.75rem] if sticky cart is visible) right-4 */}
+      {/* Desktop (sm+): sm:bottom-22 sm:right-6 */}
+      <div
+        className={`fixed right-4 sm:bottom-22 sm:right-6 z-40 transition-all duration-300 ease-out ${
+          hasStickyCart ? 'bottom-[11.75rem]' : 'bottom-[8.5rem]'
+        }`}
+      >
         <button
           type="button"
           onClick={() => setIsOpen((prev) => !prev)}
@@ -365,10 +371,15 @@ export default function ChatAssistantWidget() {
                   <Bot className="w-4 h-4" />
                 </div>
                 <div className="bg-white border border-[#122E1B]/10 rounded-2xl rounded-tl-none p-3 shadow-xs">
-                  <div className="flex items-center gap-1.5 py-1 px-1">
-                    <span className="w-2 h-2 rounded-full bg-[#15321E] animate-bounce [animation-delay:-0.3s]" />
-                    <span className="w-2 h-2 rounded-full bg-[#E58A13] animate-bounce [animation-delay:-0.15s]" />
-                    <span className="w-2 h-2 rounded-full bg-[#15321E] animate-bounce" />
+                  <div className="flex items-center gap-2 py-0.5 px-1">
+                    <div className="flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-[#15321E] animate-bounce [animation-delay:-0.3s]" />
+                      <span className="w-2 h-2 rounded-full bg-[#E58A13] animate-bounce [animation-delay:-0.15s]" />
+                      <span className="w-2 h-2 rounded-full bg-[#15321E] animate-bounce" />
+                    </div>
+                    <span className="text-[11px] font-sans text-[#5F6E62] font-medium animate-pulse">
+                      typing...
+                    </span>
                   </div>
                 </div>
               </div>

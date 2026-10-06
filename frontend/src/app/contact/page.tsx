@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import SlimTrustLine from '@/components/SlimTrustLine';
 import Footer from '@/components/Footer';
@@ -22,6 +23,7 @@ import {
   Users,
   Compass,
   FileText,
+  AlertCircle,
 } from 'lucide-react';
 import {
   WHATSAPP_TEL,
@@ -39,12 +41,19 @@ import {
 import { submitVisitRequestAction } from '@/app/actions/visits';
 
 export default function ContactPage() {
+  const router = useRouter();
   const [activeFormTab, setActiveFormTab] = useState<'visit' | 'inquiry'>('visit');
 
   // Visit Booking Form State
   const [visitSubmitted, setVisitSubmitted] = useState(false);
   const [visitSubmitting, setVisitSubmitting] = useState(false);
   const [visitError, setVisitError] = useState<string | null>(null);
+  const [visitFieldErrors, setVisitFieldErrors] = useState<{
+    name?: string;
+    phone?: string;
+    preferred_date?: string;
+    num_visitors?: string;
+  }>({});
   const [visitData, setVisitData] = useState({
     name: '',
     phone: '',
@@ -56,6 +65,11 @@ export default function ContactPage() {
 
   // General Inquiry Form State
   const [inquirySubmitted, setInquirySubmitted] = useState(false);
+  const [inquiryFieldErrors, setInquiryFieldErrors] = useState<{
+    name?: string;
+    phone?: string;
+    area?: string;
+  }>({});
   const [inquiryData, setInquiryData] = useState({
     name: '',
     phone: '',
@@ -63,6 +77,15 @@ export default function ContactPage() {
     area: '',
     notes: '',
   });
+
+  // Helper for Indian phone number validation
+  const isValidPhone = (phone: string): boolean => {
+    const digits = phone.replace(/\D/g, '');
+    if (digits.length === 10 && /^[6-9]/.test(digits)) return true;
+    if (digits.length === 12 && digits.startsWith('91') && /^[6-9]/.test(digits.slice(2))) return true;
+    if (digits.length === 11 && digits.startsWith('0') && /^[6-9]/.test(digits.slice(1))) return true;
+    return false;
+  };
 
   // Calculate min date for visit (tomorrow)
   const minVisitDate = useMemo(() => {
@@ -78,17 +101,52 @@ export default function ContactPage() {
   const handleVisitSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setVisitError(null);
+
+    const errors: {
+      name?: string;
+      phone?: string;
+      preferred_date?: string;
+      num_visitors?: string;
+    } = {};
+
+    if (!visitData.name.trim()) {
+      errors.name = 'Please enter your full name.';
+    } else if (visitData.name.trim().length < 2) {
+      errors.name = 'Name must be at least 2 characters.';
+    }
+
+    if (!visitData.phone.trim()) {
+      errors.phone = 'Please enter your mobile or WhatsApp number.';
+    } else if (!isValidPhone(visitData.phone)) {
+      errors.phone = 'Please enter a valid 10-digit mobile number (e.g. 9876543210).';
+    }
+
+    if (!visitData.preferred_date) {
+      errors.preferred_date = 'Please select your preferred visit date.';
+    } else if (visitData.preferred_date < minVisitDate) {
+      errors.preferred_date = 'Farm visits must be booked at least one day in advance. Please choose tomorrow or a later date.';
+    }
+
+    if (!visitData.num_visitors || Number(visitData.num_visitors) < 1) {
+      errors.num_visitors = 'Number of visitors must be at least 1.';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setVisitFieldErrors(errors);
+      return;
+    }
+    setVisitFieldErrors({});
     setVisitSubmitting(true);
 
     try {
       // 1. Submit to Supabase via Server Action
       const res = await submitVisitRequestAction({
-        name: visitData.name,
-        phone: visitData.phone,
+        name: visitData.name.trim(),
+        phone: visitData.phone.trim(),
         preferred_date: visitData.preferred_date,
         time_slot: visitData.time_slot,
         num_visitors: Number(visitData.num_visitors) || 1,
-        notes: visitData.notes,
+        notes: visitData.notes.trim(),
       });
 
       if (!res.success) {
@@ -98,12 +156,12 @@ export default function ContactPage() {
       // 2. Format WhatsApp notification message to the farm
       const msg = `🌿 *Farm Visit Booking Request*
 ─────────────────────
-• *Name:* ${visitData.name}
-• *Phone:* ${visitData.phone}
+• *Name:* ${visitData.name.trim()}
+• *Phone:* ${visitData.phone.trim()}
 • *Preferred Date:* ${visitData.preferred_date}
 • *Time Slot:* ${visitData.time_slot}
 • *Visitors:* ${visitData.num_visitors} ${Number(visitData.num_visitors) === 1 ? 'Person' : 'People'}
-${visitData.notes ? `• *Notes:* ${visitData.notes}\n` : ''}─────────────────────
+${visitData.notes ? `• *Notes:* ${visitData.notes.trim()}\n` : ''}─────────────────────
 Hello Aranya Farm, please confirm our visit slot.`;
 
       // 3. Open WhatsApp in new tab
@@ -111,15 +169,19 @@ Hello Aranya Farm, please confirm our visit slot.`;
 
       // 4. Update UI to success state
       setVisitSubmitted(true);
+
+      // 5. Redirect to /thank-you page
+      router.push(`/thank-you?type=visit&name=${encodeURIComponent(visitData.name.trim())}`);
     } catch {
       setVisitError('Network error. Opening WhatsApp directly.');
       const msg = `🌿 *Farm Visit Booking Request*
-• *Name:* ${visitData.name}
-• *Phone:* ${visitData.phone}
+• *Name:* ${visitData.name.trim()}
+• *Phone:* ${visitData.phone.trim()}
 • *Date:* ${visitData.preferred_date} (${visitData.time_slot})
 • *Visitors:* ${visitData.num_visitors}`;
       window.open(buildWhatsAppUrl(msg), '_blank', 'noopener,noreferrer');
       setVisitSubmitted(true);
+      router.push(`/thank-you?type=visit&name=${encodeURIComponent(visitData.name.trim())}`);
     } finally {
       setVisitSubmitting(false);
     }
@@ -128,7 +190,37 @@ Hello Aranya Farm, please confirm our visit slot.`;
   // Handle General Delivery Inquiry Submission
   const handleInquirySubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const errors: {
+      name?: string;
+      phone?: string;
+      area?: string;
+    } = {};
+
+    if (!inquiryData.name.trim()) {
+      errors.name = 'Please enter your full name.';
+    } else if (inquiryData.name.trim().length < 2) {
+      errors.name = 'Name must be at least 2 characters.';
+    }
+
+    if (!inquiryData.phone.trim()) {
+      errors.phone = 'Please enter your mobile or WhatsApp number.';
+    } else if (!isValidPhone(inquiryData.phone)) {
+      errors.phone = 'Please enter a valid 10-digit mobile number (e.g. 9876543210).';
+    }
+
+    if (!inquiryData.area.trim()) {
+      errors.area = 'Please specify your delivery area or neighborhood (e.g. Hosur, Shoolagiri).';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setInquiryFieldErrors(errors);
+      return;
+    }
+    setInquiryFieldErrors({});
+
     setInquirySubmitted(true);
+    router.push(`/thank-you?type=inquiry&name=${encodeURIComponent(inquiryData.name.trim())}`);
   };
 
   const handleInquiryWhatsAppDirect = () => {
@@ -519,10 +611,11 @@ Message: ${inquiryData.notes || 'Please provide details on daily deliveries and 
                       </div>
                     </div>
                   ) : (
-                    <form onSubmit={handleVisitSubmit} className="space-y-4">
+                    <form onSubmit={handleVisitSubmit} noValidate className="space-y-4">
                       {visitError && (
-                        <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800">
-                          {visitError}
+                        <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-center gap-2">
+                          <AlertCircle className="w-4 h-4 shrink-0 text-amber-600" />
+                          <span>{visitError}</span>
                         </div>
                       )}
 
@@ -533,12 +626,24 @@ Message: ${inquiryData.notes || 'Please provide details on daily deliveries and 
                           </label>
                           <input
                             type="text"
-                            required
                             value={visitData.name}
-                            onChange={(e) => setVisitData({ ...visitData, name: e.target.value })}
+                            onChange={(e) => {
+                              setVisitData({ ...visitData, name: e.target.value });
+                              if (visitFieldErrors.name) setVisitFieldErrors((prev) => ({ ...prev, name: undefined }));
+                            }}
                             placeholder="e.g. Priya Sundaram"
-                            className="w-full px-4 py-3 rounded-xl border border-[#D1DDD3] bg-white text-base sm:text-sm focus:outline-none focus:border-[#1B4D2E] min-h-[44px]"
+                            className={`w-full px-4 py-3 rounded-xl border bg-white text-base sm:text-sm focus:outline-none min-h-[44px] transition-colors ${
+                              visitFieldErrors.name
+                                ? 'border-rose-400 focus:border-rose-500 bg-rose-50/20'
+                                : 'border-[#D1DDD3] focus:border-[#1B4D2E]'
+                            }`}
                           />
+                          {visitFieldErrors.name && (
+                            <p className="text-xs text-rose-600 flex items-center gap-1 mt-1 font-medium animate-in fade-in duration-200">
+                              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                              <span>{visitFieldErrors.name}</span>
+                            </p>
+                          )}
                         </div>
 
                         <div>
@@ -547,12 +652,24 @@ Message: ${inquiryData.notes || 'Please provide details on daily deliveries and 
                           </label>
                           <input
                             type="tel"
-                            required
                             value={visitData.phone}
-                            onChange={(e) => setVisitData({ ...visitData, phone: e.target.value })}
+                            onChange={(e) => {
+                              setVisitData({ ...visitData, phone: e.target.value });
+                              if (visitFieldErrors.phone) setVisitFieldErrors((prev) => ({ ...prev, phone: undefined }));
+                            }}
                             placeholder="e.g. 9944338612"
-                            className="w-full px-4 py-3 rounded-xl border border-[#D1DDD3] bg-white text-base sm:text-sm focus:outline-none focus:border-[#1B4D2E] min-h-[44px]"
+                            className={`w-full px-4 py-3 rounded-xl border bg-white text-base sm:text-sm focus:outline-none min-h-[44px] transition-colors ${
+                              visitFieldErrors.phone
+                                ? 'border-rose-400 focus:border-rose-500 bg-rose-50/20'
+                                : 'border-[#D1DDD3] focus:border-[#1B4D2E]'
+                            }`}
                           />
+                          {visitFieldErrors.phone && (
+                            <p className="text-xs text-rose-600 flex items-center gap-1 mt-1 font-medium animate-in fade-in duration-200">
+                              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                              <span>{visitFieldErrors.phone}</span>
+                            </p>
+                          )}
                         </div>
                       </div>
 
@@ -563,13 +680,26 @@ Message: ${inquiryData.notes || 'Please provide details on daily deliveries and 
                           </label>
                           <input
                             type="date"
-                            required
                             min={minVisitDate}
                             value={visitData.preferred_date}
-                            onChange={(e) => setVisitData({ ...visitData, preferred_date: e.target.value })}
-                            className="w-full px-4 py-3 rounded-xl border border-[#D1DDD3] bg-white text-base sm:text-sm focus:outline-none focus:border-[#1B4D2E] min-h-[44px]"
+                            onChange={(e) => {
+                              setVisitData({ ...visitData, preferred_date: e.target.value });
+                              if (visitFieldErrors.preferred_date) setVisitFieldErrors((prev) => ({ ...prev, preferred_date: undefined }));
+                            }}
+                            className={`w-full px-4 py-3 rounded-xl border bg-white text-base sm:text-sm focus:outline-none min-h-[44px] transition-colors ${
+                              visitFieldErrors.preferred_date
+                                ? 'border-rose-400 focus:border-rose-500 bg-rose-50/20'
+                                : 'border-[#D1DDD3] focus:border-[#1B4D2E]'
+                            }`}
                           />
-                          <p className="text-[11px] text-[#8A7B6E] mt-0.5">Please choose a future date.</p>
+                          {visitFieldErrors.preferred_date ? (
+                            <p className="text-xs text-rose-600 flex items-center gap-1 mt-1 font-medium animate-in fade-in duration-200">
+                              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                              <span>{visitFieldErrors.preferred_date}</span>
+                            </p>
+                          ) : (
+                            <p className="text-[11px] text-[#8A7B6E] mt-0.5">Please choose a future date (tomorrow onwards).</p>
+                          )}
                         </div>
 
                         <div>
@@ -596,14 +726,27 @@ Message: ${inquiryData.notes || 'Please provide details on daily deliveries and 
                             type="number"
                             min="1"
                             max="30"
-                            required
                             value={visitData.num_visitors}
-                            onChange={(e) => setVisitData({ ...visitData, num_visitors: Math.max(1, Number(e.target.value)) })}
-                            className="w-full pl-10 pr-4 py-3 rounded-xl border border-[#D1DDD3] bg-white text-base sm:text-sm focus:outline-none focus:border-[#1B4D2E] min-h-[44px]"
+                            onChange={(e) => {
+                              setVisitData({ ...visitData, num_visitors: Math.max(1, Number(e.target.value)) });
+                              if (visitFieldErrors.num_visitors) setVisitFieldErrors((prev) => ({ ...prev, num_visitors: undefined }));
+                            }}
+                            className={`w-full pl-10 pr-4 py-3 rounded-xl border bg-white text-base sm:text-sm focus:outline-none min-h-[44px] transition-colors ${
+                              visitFieldErrors.num_visitors
+                                ? 'border-rose-400 focus:border-rose-500 bg-rose-50/20'
+                                : 'border-[#D1DDD3] focus:border-[#1B4D2E]'
+                            }`}
                           />
                           <Users className="w-4 h-4 text-[#8A7B6E] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                         </div>
-                        <p className="text-[11px] text-[#8A7B6E] mt-0.5">Including adults and children.</p>
+                        {visitFieldErrors.num_visitors ? (
+                          <p className="text-xs text-rose-600 flex items-center gap-1 mt-1 font-medium animate-in fade-in duration-200">
+                            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                            <span>{visitFieldErrors.num_visitors}</span>
+                          </p>
+                        ) : (
+                          <p className="text-[11px] text-[#8A7B6E] mt-0.5">Including adults and children.</p>
+                        )}
                       </div>
 
                       <div>
@@ -687,7 +830,7 @@ Message: ${inquiryData.notes || 'Please provide details on daily deliveries and 
                       </div>
                     </div>
                   ) : (
-                    <form onSubmit={handleInquirySubmit} className="space-y-4">
+                    <form onSubmit={handleInquirySubmit} noValidate className="space-y-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-xs font-bold uppercase tracking-wider text-[#15321E] mb-1">
@@ -695,12 +838,24 @@ Message: ${inquiryData.notes || 'Please provide details on daily deliveries and 
                           </label>
                           <input
                             type="text"
-                            required
                             value={inquiryData.name}
-                            onChange={(e) => setInquiryData({ ...inquiryData, name: e.target.value })}
+                            onChange={(e) => {
+                              setInquiryData({ ...inquiryData, name: e.target.value });
+                              if (inquiryFieldErrors.name) setInquiryFieldErrors((prev) => ({ ...prev, name: undefined }));
+                            }}
                             placeholder="e.g. Anand Kumar"
-                            className="w-full px-4 py-3 rounded-xl border border-[#D1DDD3] bg-white text-base sm:text-sm focus:outline-none focus:border-[#E58A13] min-h-[44px]"
+                            className={`w-full px-4 py-3 rounded-xl border bg-white text-base sm:text-sm focus:outline-none min-h-[44px] transition-colors ${
+                              inquiryFieldErrors.name
+                                ? 'border-rose-400 focus:border-rose-500 bg-rose-50/20'
+                                : 'border-[#D1DDD3] focus:border-[#E58A13]'
+                            }`}
                           />
+                          {inquiryFieldErrors.name && (
+                            <p className="text-xs text-rose-600 flex items-center gap-1 mt-1 font-medium animate-in fade-in duration-200">
+                              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                              <span>{inquiryFieldErrors.name}</span>
+                            </p>
+                          )}
                         </div>
 
                         <div>
@@ -709,12 +864,24 @@ Message: ${inquiryData.notes || 'Please provide details on daily deliveries and 
                           </label>
                           <input
                             type="tel"
-                            required
                             value={inquiryData.phone}
-                            onChange={(e) => setInquiryData({ ...inquiryData, phone: e.target.value })}
+                            onChange={(e) => {
+                              setInquiryData({ ...inquiryData, phone: e.target.value });
+                              if (inquiryFieldErrors.phone) setInquiryFieldErrors((prev) => ({ ...prev, phone: undefined }));
+                            }}
                             placeholder="e.g. 9876543210"
-                            className="w-full px-4 py-3 rounded-xl border border-[#D1DDD3] bg-white text-base sm:text-sm focus:outline-none focus:border-[#E58A13] min-h-[44px]"
+                            className={`w-full px-4 py-3 rounded-xl border bg-white text-base sm:text-sm focus:outline-none min-h-[44px] transition-colors ${
+                              inquiryFieldErrors.phone
+                                ? 'border-rose-400 focus:border-rose-500 bg-rose-50/20'
+                                : 'border-[#D1DDD3] focus:border-[#E58A13]'
+                            }`}
                           />
+                          {inquiryFieldErrors.phone && (
+                            <p className="text-xs text-rose-600 flex items-center gap-1 mt-1 font-medium animate-in fade-in duration-200">
+                              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                              <span>{inquiryFieldErrors.phone}</span>
+                            </p>
+                          )}
                         </div>
                       </div>
 
@@ -741,12 +908,24 @@ Message: ${inquiryData.notes || 'Please provide details on daily deliveries and 
                           </label>
                           <input
                             type="text"
-                            required
                             value={inquiryData.area}
-                            onChange={(e) => setInquiryData({ ...inquiryData, area: e.target.value })}
+                            onChange={(e) => {
+                              setInquiryData({ ...inquiryData, area: e.target.value });
+                              if (inquiryFieldErrors.area) setInquiryFieldErrors((prev) => ({ ...prev, area: undefined }));
+                            }}
                             placeholder="e.g. Hosur SIPCOT / Shoolagiri"
-                            className="w-full px-4 py-3 rounded-xl border border-[#D1DDD3] bg-white text-base sm:text-sm focus:outline-none focus:border-[#E58A13] min-h-[44px]"
+                            className={`w-full px-4 py-3 rounded-xl border bg-white text-base sm:text-sm focus:outline-none min-h-[44px] transition-colors ${
+                              inquiryFieldErrors.area
+                                ? 'border-rose-400 focus:border-rose-500 bg-rose-50/20'
+                                : 'border-[#D1DDD3] focus:border-[#E58A13]'
+                            }`}
                           />
+                          {inquiryFieldErrors.area && (
+                            <p className="text-xs text-rose-600 flex items-center gap-1 mt-1 font-medium animate-in fade-in duration-200">
+                              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                              <span>{inquiryFieldErrors.area}</span>
+                            </p>
+                          )}
                         </div>
                       </div>
 

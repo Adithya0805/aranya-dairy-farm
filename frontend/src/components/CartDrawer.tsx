@@ -351,8 +351,12 @@ export default function CartDrawer({ isOpen: externalIsOpen, onClose: externalOn
               disabled={isSubmitting}
               className="w-full flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#1FB055] active:bg-[#18943E] disabled:opacity-60 text-white font-sans text-sm font-bold py-4 min-h-[52px] rounded-full shadow-lg shadow-[#25D366]/20 transition-all touch-manipulation active:scale-[0.98] cursor-pointer"
             >
-              <MessageSquare className="w-4 h-4 fill-white shrink-0" />
-              <span>{isSubmitting ? 'Opening WhatsApp...' : 'Order via WhatsApp'}</span>
+              {isSubmitting ? (
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin shrink-0" />
+              ) : (
+                <MessageSquare className="w-4 h-4 fill-white shrink-0" />
+              )}
+              <span>{isSubmitting ? 'Preparing Your Order...' : 'Order via WhatsApp'}</span>
             </button>
 
             <p className="text-[11px] text-center text-[#5F6E62] font-sans">

@@ -80,6 +80,7 @@ export default function TrackOrderContent() {
   const [fetchState, setFetchState] = useState<FetchState>('idle');
   const [order, setOrder] = useState<TrackedOrder | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
+  const [validationError, setValidationError] = useState('');
 
   const fetchOrder = useCallback(async (codeOrId: string) => {
     const trimmed = codeOrId.trim().replace(/^#+/, '').trim();
@@ -88,6 +89,7 @@ export default function TrackOrderContent() {
     setFetchState('loading');
     setOrder(null);
     setErrorMessage('');
+    setValidationError('');
 
     try {
       const res = await fetch(`/api/track-order?code=${encodeURIComponent(trimmed)}`);
@@ -121,7 +123,15 @@ export default function TrackOrderContent() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = inputId.trim().replace(/^#+/, '').trim();
-    if (!trimmed) return;
+    if (!trimmed) {
+      setValidationError('Please enter your 8-character Order Code (e.g. 0A3E78AD).');
+      return;
+    }
+    if (trimmed.length < 4) {
+      setValidationError('Order code is too short. Please enter a valid 8-character Order Code (e.g. 0A3E78AD).');
+      return;
+    }
+    setValidationError('');
     router.push(`/track-order?code=${encodeURIComponent(trimmed)}`);
     fetchOrder(trimmed);
   };
@@ -171,37 +181,52 @@ export default function TrackOrderContent() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="flex gap-3">
-            <div className="flex-1 relative">
-              <div className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none">
-                <Package className="w-4 h-4 text-[#8A7B6E]" />
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <div className="flex gap-3">
+              <div className="flex-1 relative">
+                <div className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none">
+                  <Package className="w-4 h-4 text-[#8A7B6E]" />
+                </div>
+                <input
+                  type="text"
+                  value={inputId}
+                  onChange={(e) => {
+                    setInputId(e.target.value);
+                    if (validationError) setValidationError('');
+                  }}
+                  placeholder="e.g. 0A3E78AD"
+                  autoCapitalize="characters"
+                  className={`w-full pl-10 pr-4 py-3 border rounded-xl text-sm text-[#1C241E] placeholder-[#8A7B6E] focus:outline-none focus:ring-2 bg-[#FAF7F2] transition-colors font-mono uppercase ${
+                    validationError
+                      ? 'border-rose-400 focus:ring-rose-200 focus:border-rose-500 bg-rose-50/20'
+                      : 'border-[#1B4D2E]/20 focus:ring-[#1B4D2E]/30 focus:border-[#1B4D2E]/40'
+                  }`}
+                  spellCheck={false}
+                  autoComplete="off"
+                  aria-label="Order Code"
+                />
               </div>
-              <input
-                type="text"
-                value={inputId}
-                onChange={(e) => setInputId(e.target.value)}
-                placeholder="e.g. 0A3E78AD"
-                autoCapitalize="characters"
-                className="w-full pl-10 pr-4 py-3 border border-[#1B4D2E]/20 rounded-xl text-sm text-[#1C241E] placeholder-[#8A7B6E] focus:outline-none focus:ring-2 focus:ring-[#1B4D2E]/30 focus:border-[#1B4D2E]/40 bg-[#FAF7F2] transition-colors font-mono uppercase"
-                spellCheck={false}
-                autoComplete="off"
-                aria-label="Order Code"
-              />
+              <button
+                type="submit"
+                disabled={fetchState === 'loading'}
+                className="flex items-center gap-2 bg-[#1B4D2E] hover:bg-[#15321E] disabled:bg-[#1B4D2E]/40 text-white px-5 py-3 rounded-xl text-sm font-semibold transition-colors touch-manipulation cursor-pointer min-w-[80px] justify-center"
+              >
+                {fetchState === 'loading' ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <Search className="w-4 h-4" />
+                    <span>Track</span>
+                  </>
+                )}
+              </button>
             </div>
-            <button
-              type="submit"
-              disabled={fetchState === 'loading' || !inputId.trim()}
-              className="flex items-center gap-2 bg-[#1B4D2E] hover:bg-[#15321E] disabled:bg-[#1B4D2E]/40 text-white px-5 py-3 rounded-xl text-sm font-semibold transition-colors touch-manipulation cursor-pointer min-w-[80px] justify-center"
-            >
-              {fetchState === 'loading' ? (
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <>
-                  <Search className="w-4 h-4" />
-                  <span>Track</span>
-                </>
-              )}
-            </button>
+            {validationError && (
+              <p className="text-xs text-rose-600 flex items-center gap-1.5 font-medium animate-in fade-in duration-200">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+                <span>{validationError}</span>
+              </p>
+            )}
           </form>
         </div>
 

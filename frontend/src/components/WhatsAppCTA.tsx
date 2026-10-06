@@ -8,12 +8,14 @@ import { useCart } from '@/context/CartContext';
 
 export default function WhatsAppCTA() {
   const pathname = usePathname();
-  const { items, buildWhatsAppMessage } = useCart();
+  const { items, buildWhatsAppMessage, totalItems } = useCart();
 
   // Hide on admin portal
   if (pathname?.startsWith('/admin')) {
     return null;
   }
+
+  const hasStickyCart = totalItems > 0;
 
   const handleWhatsAppClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (items.length > 0) {
@@ -25,7 +27,11 @@ export default function WhatsAppCTA() {
   };
 
   return (
-    <div className="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-40">
+    <div
+      className={`fixed right-4 sm:bottom-6 sm:right-6 z-40 transition-all duration-300 ease-out ${
+        hasStickyCart ? 'bottom-[7.75rem]' : 'bottom-20'
+      }`}
+    >
       <a
         href={WA_GENERAL_ORDER}
         onClick={handleWhatsAppClick}

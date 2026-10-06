@@ -288,3 +288,137 @@ test('Domain & Email Integrity: Official domain and email consistency', () => {
   scanForStaleDomain('src');
 });
 
+test('Mobile Experience: Hero above-the-fold CTA & persistent mobile cart bar', () => {
+  const heroContent = fs.readFileSync('src/components/Hero.tsx', 'utf8');
+  assert.ok(
+    heroContent.includes('Shop Now'),
+    'Hero component must contain the primary "Shop Now" CTA'
+  );
+  assert.ok(
+    heroContent.includes('min-h-[56vh]'),
+    'Hero component must use mobile-optimized min-height for above-the-fold clarity'
+  );
+  assert.ok(
+    heroContent.includes('py-8'),
+    'Hero component must use compact vertical padding on mobile to guarantee CTA visibility'
+  );
+
+  const tileRowContent = fs.readFileSync('src/components/QuickActionTileRow.tsx', 'utf8');
+  assert.ok(
+    tileRowContent.includes('-mt-6'),
+    'QuickActionTileRow must use tuned negative margin on mobile'
+  );
+
+  const cartBarContent = fs.readFileSync('src/components/PersistentMobileCartBar.tsx', 'utf8');
+  assert.ok(
+    cartBarContent.includes('totalItems > 0'),
+    'PersistentMobileCartBar must check for cart items'
+  );
+  assert.ok(
+    cartBarContent.includes('calc(56px + env(safe-area-inset-bottom'),
+    'PersistentMobileCartBar must dock directly above MobileBottomNav'
+  );
+
+  const layoutContent = fs.readFileSync('src/app/layout.tsx', 'utf8');
+  assert.ok(
+    layoutContent.includes('PersistentMobileCartBar'),
+    'RootLayout must mount PersistentMobileCartBar'
+  );
+
+  const whatsappContent = fs.readFileSync('src/components/WhatsAppCTA.tsx', 'utf8');
+  assert.ok(
+    whatsappContent.includes('hasStickyCart'),
+    'WhatsAppCTA must dynamically adjust position when sticky cart is visible'
+  );
+
+  const chatContent = fs.readFileSync('src/components/ChatAssistantWidget.tsx', 'utf8');
+  assert.ok(
+    chatContent.includes('hasStickyCart'),
+    'ChatAssistantWidget must dynamically adjust position when sticky cart is visible'
+  );
+});
+
+// ----------------------------------------------------------------------------
+// 10. UX States: Cookie Banner, Thank You Page, 404 Page & Form Validation
+// ----------------------------------------------------------------------------
+test('UX States: Cookie banner, Thank You Page, 404 Page & Form Validation', () => {
+  // 1. Cookie Banner
+  const cookieBannerContent = fs.readFileSync('src/components/CookieBanner.tsx', 'utf8');
+  assert.ok(
+    cookieBannerContent.includes('We use basic analytics to improve this site.'),
+    'CookieBanner must contain plain language analytics notice'
+  );
+  assert.ok(
+    cookieBannerContent.includes('aranya_cookie_consent'),
+    'CookieBanner must save consent in localStorage under aranya_cookie_consent'
+  );
+
+  const layoutContent = fs.readFileSync('src/app/layout.tsx', 'utf8');
+  assert.ok(
+    layoutContent.includes('CookieBanner'),
+    'RootLayout must mount CookieBanner'
+  );
+
+  // 2. Thank You Page
+  assert.ok(fs.existsSync('src/app/thank-you/page.tsx'), 'Thank you page must exist');
+  const thankYouContent = fs.readFileSync('src/app/thank-you/page.tsx', 'utf8');
+  assert.ok(
+    thankYouContent.includes("confirm on WhatsApp shortly"),
+    'Thank you page must reassure user with WhatsApp confirmation message'
+  );
+  assert.ok(
+    thankYouContent.includes('/products'),
+    'Thank you page must link to Shop'
+  );
+  assert.ok(
+    thankYouContent.includes('/track-order'),
+    'Thank you page must link to Track Order'
+  );
+
+  // 3. 404 Page
+  const notFoundContent = fs.readFileSync('src/app/not-found.tsx', 'utf8');
+  assert.ok(
+    notFoundContent.includes('Back to Home'),
+    '404 page must provide "Back to Home" button'
+  );
+  assert.ok(
+    notFoundContent.includes('Shop Products'),
+    '404 page must provide "Shop Products" link'
+  );
+
+  // 4. Chat Typing Indicator
+  const chatContent = fs.readFileSync('src/components/ChatAssistantWidget.tsx', 'utf8');
+  assert.ok(
+    chatContent.includes('typing...'),
+    'ChatAssistantWidget must display explicit "typing..." indicator during RAG response'
+  );
+
+  // 5. Contact Page Form Validation & Redirect
+  const contactContent = fs.readFileSync('src/app/contact/page.tsx', 'utf8');
+  assert.ok(
+    contactContent.includes('isValidPhone'),
+    'Contact page must validate Indian phone numbers'
+  );
+  assert.ok(
+    contactContent.includes('minVisitDate'),
+    'Contact page must reject past dates for farm visits'
+  );
+  assert.ok(
+    contactContent.includes('/thank-you?type=visit'),
+    'Visit form submission must redirect to /thank-you page'
+  );
+  assert.ok(
+    contactContent.includes('/thank-you?type=inquiry'),
+    'Inquiry form submission must redirect to /thank-you page'
+  );
+
+  // 6. Order Tracking Validation
+  const trackOrderContent = fs.readFileSync('src/app/track-order/TrackOrderContent.tsx', 'utf8');
+  assert.ok(
+    trackOrderContent.includes('validationError'),
+    'TrackOrderContent must provide explicit inline validation error for empty or invalid codes'
+  );
+});
+
+
+
