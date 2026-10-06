@@ -105,7 +105,7 @@ export default function FeaturedProductsPreview({
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={product.image}
-                    alt={product.name}
+                    alt={`${product.name} — Aranya Organic Dairy Farm, Shoolagiri`}
                     className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
                     onError={(e) => {
                       const target = e.currentTarget;

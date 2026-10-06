@@ -16,7 +16,7 @@ export default function Hero({ onShopClick: _onShopClick }: HeroProps) {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/images/nature_hero_pasture.jpg"
-        alt="Aranya Organic Dairy Pasture in Shoolagiri"
+        alt="Pasture-raised native Gir cows grazing on green pastures, Aranya Organic Dairy Farm, Shoolagiri"
         className="absolute inset-0 w-full h-full object-cover object-center"
         fetchPriority="high"
       />

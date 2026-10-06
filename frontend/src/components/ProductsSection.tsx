@@ -285,7 +285,7 @@ export default function ProductsSection({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/nature_hero_pasture.jpg"
-              alt="Our Shop - Aranya Organic Dairy"
+              alt="Aranya Organic Dairy Farm pasture in Shoolagiri"
               className="absolute inset-0 w-full h-full object-cover object-center opacity-20 pointer-events-none"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-[#122E1B]/95 via-[#122E1B]/85 to-[#122E1B]/95 pointer-events-none" />
@@ -462,7 +462,7 @@ export default function ProductsSection({
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={product.image}
-                      alt={product.name}
+                      alt={`${product.name} — Aranya Organic Dairy Farm, Shoolagiri`}
                       className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                         const target = e.currentTarget;

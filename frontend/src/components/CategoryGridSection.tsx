@@ -100,7 +100,7 @@ export default function CategoryGridSection({ onOpenStory }: CategoryGridSection
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={cat.image}
-                    alt={cat.title}
+                    alt={`${cat.title} category — Aranya Organic Dairy Farm, Shoolagiri`}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>

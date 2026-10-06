@@ -173,7 +173,7 @@ export default function ConsolidatedTrustAndStorySection() {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/images/a2_milk_bottle.jpg"
-                  alt="Aranya Pure Organic A2 Milk Bottle in Shoolagiri"
+                  alt="Raw A2 organic milk bottle, Aranya Organic Dairy Farm, Shoolagiri"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-70" />

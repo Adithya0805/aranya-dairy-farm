@@ -37,7 +37,7 @@ export default function HubHero({ onSelectSection }: HubHeroProps) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/aranya-logo.png"
-                alt="Aranya Organic Dairy Farm"
+                alt="Aranya Organic Dairy Farm Logo"
                 className="w-full h-full object-contain rounded-full"
               />
             </div>

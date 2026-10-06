@@ -147,7 +147,7 @@ export default function TrackOrderContent() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/aranya-logo.png"
-                alt="Aranya Farm"
+                alt="Aranya Organic Dairy Farm Logo"
                 className="w-full h-full object-contain rounded-full"
                 onError={(e) => { e.currentTarget.style.display = 'none'; }}
               />

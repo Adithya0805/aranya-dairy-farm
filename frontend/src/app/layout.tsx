@@ -10,28 +10,32 @@ import { FARM_DOMAIN } from "@/lib/contact";
 
 export const metadata: Metadata = {
   metadataBase: new URL(FARM_DOMAIN),
-  title: "Aranya Organic Dairy Farm | Fresh A2 Milk & Bilona Ghee in Shoolagiri, Hosur",
+  title: {
+    default: "Aranya Organic Dairy Farm | A2 Milk, Ghee & Grocery — Hosur",
+    template: "%s | Aranya Organic Dairy Farm",
+  },
   description:
-    "9-year established organic dairy farm in Shoolagiri, Hosur, Tamil Nadu. 100% pure raw A2 cow milk, traditional Bilona ghee, paneer, and curd delivered in eco glass bottles.",
+    "Pure raw A2 milk, Vedic Bilona ghee, and fresh organic provisions from free-grazing cows at Aranya Dairy Farm in Shoolagiri. Delivered daily across Hosur homes.",
   keywords: [
     "A2 Milk Hosur",
     "Organic Dairy Farm Shoolagiri",
     "Bilona Ghee Tamil Nadu",
     "Aranya Dairy Farm",
     "Pure A2 Cow Milk Hosur",
+    "Vedic Bilona Ghee Shoolagiri",
   ],
   openGraph: {
-    title: "Aranya Organic Dairy Farm — Pure A2 Milk & Bilona Ghee",
+    title: "Aranya Organic Dairy Farm | A2 Milk, Ghee & Grocery — Hosur",
     description:
-      "Ethical pasture-raised cows, 4°C instant chilling, zero preservatives. Delivered fresh in glass bottles.",
+      "Pure raw A2 milk, Vedic Bilona ghee, and fresh organic provisions from free-grazing cows at Aranya Dairy Farm in Shoolagiri. Delivered daily across Hosur homes.",
     url: FARM_DOMAIN,
     siteName: "Aranya Organic Dairy Farm",
     images: [
       {
-        url: "/images/nature_hero_pasture.jpg",
+        url: "/images/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Aranya Dairy Farm Pasture-Raised Native Cows",
+        alt: "Aranya Organic Dairy Farm — Pure A2 Milk & Vedic Bilona Ghee in Shoolagiri, Hosur",
       },
     ],
     locale: "en_IN",
@@ -39,20 +43,24 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Aranya Organic Dairy Farm — Pure A2 Milk & Bilona Ghee",
+    title: "Aranya Organic Dairy Farm | A2 Milk, Ghee & Grocery — Hosur",
     description:
-      "Ethical pasture-raised cows, 4°C instant chilling, zero preservatives. Delivered fresh in glass bottles.",
-    images: ["/images/nature_hero_pasture.jpg"],
+      "Pure raw A2 milk, Vedic Bilona ghee, and fresh organic provisions from free-grazing cows at Aranya Dairy Farm in Shoolagiri. Delivered daily across Hosur homes.",
+    images: ["/images/og-image.jpg"],
   },
   icons: {
     icon: [
-      { url: '/images/aranya-logo.png', type: 'image/png' },
-      { url: '/favicon.ico', type: 'image/x-icon' },
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icon.png', sizes: '48x48', type: 'image/png' },
+      { url: '/images/aranya-logo.png', sizes: '512x512', type: 'image/png' },
     ],
     apple: [
-      { url: '/images/aranya-logo.png', type: 'image/png' },
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
     ],
-    shortcut: '/images/aranya-logo.png',
+    shortcut: '/favicon.ico',
   },
   manifest: "/manifest.json",
   appleWebApp: {

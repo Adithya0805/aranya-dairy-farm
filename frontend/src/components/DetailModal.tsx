@@ -137,7 +137,7 @@ export default function DetailModal({
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={content.image}
-                alt={content.title}
+                alt={`${content.title} — Aranya Organic Dairy Farm`}
                 className="w-full h-full object-contain"
                 onError={(e) => {
                   const target = e.currentTarget;

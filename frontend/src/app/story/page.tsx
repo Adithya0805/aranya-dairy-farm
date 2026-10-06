@@ -194,7 +194,7 @@ export default function StoryPage() {
                     setLightbox({
                       isOpen: true,
                       imageSrc: '/images/nature_hero_pasture.jpg',
-                      imageAlt: 'Aranya Dairy Farm Green Pastures in Shoolagiri',
+                      imageAlt: 'Pasture-raised native Gir cows grazing in Shoolagiri, Aranya Organic Dairy Farm',
                       tag: 'Natural Pasture Grazing',
                       caption: 'Pesticide-free open green pastures and holistic cattle care',
                     });
@@ -205,7 +205,7 @@ export default function StoryPage() {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/images/nature_hero_pasture.jpg"
-                  alt="Aranya Dairy Farm Green Pastures in Shoolagiri"
+                  alt="Pasture-raised native Gir cows grazing in Shoolagiri, Aranya Organic Dairy Farm"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
@@ -279,7 +279,7 @@ export default function StoryPage() {
                   setLightbox({
                     isOpen: true,
                     imageSrc: '/images/a2_milk_bottle.jpg',
-                    imageAlt: 'Pure A2 Farm Fresh Glass Milk Bottle',
+                    imageAlt: 'Raw A2 organic whole milk bottle, Aranya Organic Dairy Farm, Shoolagiri',
                     tag: 'Zero Plastic Contact',
                     caption: 'Bottled fresh at 4°C in sterilized glass bottles',
                   })
@@ -289,7 +289,7 @@ export default function StoryPage() {
                     setLightbox({
                       isOpen: true,
                       imageSrc: '/images/a2_milk_bottle.jpg',
-                      imageAlt: 'Pure A2 Farm Fresh Glass Milk Bottle',
+                      imageAlt: 'Raw A2 organic whole milk bottle, Aranya Organic Dairy Farm, Shoolagiri',
                       tag: 'Zero Plastic Contact',
                       caption: 'Bottled fresh at 4°C in sterilized glass bottles',
                     });
@@ -300,7 +300,7 @@ export default function StoryPage() {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/images/a2_milk_bottle.jpg"
-                  alt="Pure A2 Farm Fresh Glass Milk Bottle"
+                  alt="Raw A2 organic whole milk bottle, Aranya Organic Dairy Farm, Shoolagiri"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />

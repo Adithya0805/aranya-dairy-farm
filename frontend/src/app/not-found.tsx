@@ -13,7 +13,7 @@ export default function NotFound() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/aranya-logo.png"
-                alt="Aranya Farm Logo"
+                alt="Aranya Organic Dairy Farm Logo"
                 className="w-full h-full object-contain rounded-full"
               />
             </div>

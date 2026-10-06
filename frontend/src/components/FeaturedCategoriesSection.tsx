@@ -84,7 +84,7 @@ export default function FeaturedCategoriesSection({
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={item.image}
-                  alt={item.title}
+                  alt={`${item.title} — Aranya Organic Dairy Farm, Shoolagiri`}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
