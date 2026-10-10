@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import Link from 'next/link';
 import { Plus, Minus, ShoppingBag, Bell, Eye, Sparkles, Search, X, ArrowUpDown } from 'lucide-react';
 import { PRODUCTS, Product, CATEGORIES, formatPrice } from '@/lib/products';
 import { getCategories, getProducts, testAnonProductWrite } from '@/lib/catalog';
@@ -541,17 +542,19 @@ export default function ProductsSection({
                   {/* Product Details */}
                   <div className="space-y-1.5 mb-4 flex-1">
                     <div className="flex items-baseline justify-between gap-2">
-                      <h3
-                        className="font-serif text-lg sm:text-xl text-[#15321E] font-bold group-hover:text-[#E58A13] transition-colors cursor-pointer leading-snug"
-                        onClick={() => onSelectProduct?.(product)}
-                      >
-                        {product.name}
+                      <h3 className="font-serif text-lg sm:text-xl text-[#15321E] font-bold leading-snug">
+                        <Link
+                          href={`/products/${product.id}`}
+                          className="hover:text-[#E58A13] transition-colors"
+                        >
+                          {product.name}
+                        </Link>
                       </h3>
                     </div>
 
                     {/* Tamil Name */}
                     <p className="text-xs font-sans text-[#122E1B]/75 font-medium tracking-wide">
-                      {product.nameTamil}
+                      <span lang="ta">{product.nameTamil}</span>
                     </p>
 
                     {/* Packaging Unit */}

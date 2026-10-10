@@ -376,9 +376,9 @@ export default function StoryPage() {
                     <span className="inline-block font-serif text-2xl font-bold text-[#D48B16]">
                       {m.year}
                     </span>
-                    <h4 className="font-serif text-base font-bold text-[#15321E]">
+                    <h3 className="font-serif text-base font-bold text-[#15321E]">
                       {m.title}
-                    </h4>
+                    </h3>
                     <p className="text-xs text-[#5F6E62] leading-relaxed">
                       {m.description}
                     </p>
@@ -391,22 +391,22 @@ export default function StoryPage() {
           {/* Block 5: Call to Action Row */}
           <div className="bg-[#122E1B] text-white p-8 sm:p-12 rounded-3xl border border-[#D48B16]/30 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
             <div className="space-y-2 max-w-xl">
-              <h3 className="text-2xl sm:text-3xl font-serif font-bold text-[#FAF7F2]">
+              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#FAF7F2]">
                 Experience Fresh A2 Farm Purity
-              </h3>
+              </h2>
               <p className="text-xs sm:text-sm text-[#D1DDD3] leading-relaxed">
                 Explore our full showcase of unadulterated milk, Bilona ghee, native millets, and unpolished pulses delivered to your home.
               </p>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center gap-3.5 shrink-0 w-full sm:w-auto">
-              <a
+              <Link
                 href="/products"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#D48B16] hover:bg-[#B8740D] active:scale-95 text-white font-sans text-xs uppercase font-bold tracking-wider py-3.5 px-6 rounded-full transition-all shadow-md min-h-[44px]"
               >
                 <span>Explore All Products</span>
                 <ArrowRight className="w-4 h-4" />
-              </a>
+              </Link>
               <a
                 href={WA_STORY_INQUIRY}
                 target="_blank"

@@ -64,3 +64,16 @@ The Next.js frontend application must implement the following key sections and c
 
 8. **Sticky Floating WhatsApp Button**:
    - Fixed bottom-right action widget for instant customer connection.
+
+---
+
+## 4. Phase 2 Roadmap — Admin Panel & Operations Evolution (ARY-P2)
+For the comprehensive architecture, database schemas, and sprint schedule of the administrative evolution, see [ADMIN_PANEL_ROADMAP.md](ADMIN_PANEL_ROADMAP.md).
+
+| Priority | Feature | Core Value | Target |
+|---|---|---|---|
+| **1 (Highest)** | **Dashboard Overview (`/admin`)** | Centralized morning command center: pending orders, low stock, visits, weekly revenue | Sprint 1 |
+| **2** | **CSV Export for Orders** | Accounting/tax spreadsheets and zero-cost disaster recovery backup | Sprint 1 |
+| **3** | **Multi-Admin Access** | Role-based invitations and seamless client handover protocol | Sprint 2 |
+| **4** | **Sales Insights & Analytics** | Real commercial intelligence: top sellers, peak order days, basket size | Sprint 3 |
+| **5** | **Self-Serve Content Editing** | Client self-editing for "Our Story" pillars & announcements | Sprint 3 |

@@ -98,7 +98,7 @@ export default function FeaturedCategoriesSection({
 
                 {/* Tamil Subtitle Badge */}
                 <div className="absolute bottom-3 left-3">
-                  <span className="text-xs font-sans font-semibold text-white/90 drop-shadow-sm">
+                  <span lang="ta" className="text-xs font-sans font-semibold text-white/90 drop-shadow-sm">
                     {item.tamilTitle}
                   </span>
                 </div>

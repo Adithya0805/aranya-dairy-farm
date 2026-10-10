@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   title: {
     absolute: 'Track Your Order | Aranya Organic Dairy Farm',
   },
+  alternates: {
+    canonical: '/track-order',
+  },
   description:
     'Track real-time delivery status for your Aranya Organic Dairy Farm order. Pure raw A2 milk and Vedic ghee dispatched daily from Shoolagiri direct to Hosur.',
   openGraph: {

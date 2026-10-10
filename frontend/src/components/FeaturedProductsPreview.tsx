@@ -165,14 +165,16 @@ export default function FeaturedProductsPreview({
 
                 {/* Details */}
                 <div className="space-y-1.5 mb-5 flex-1">
-                  <h3
-                    className="font-serif text-xl text-[#15321E] group-hover:text-[#E58A13] transition-colors cursor-pointer font-bold leading-snug"
-                    onClick={() => onSelectProduct?.(product)}
-                  >
-                    {product.name}
+                  <h3 className="font-serif text-xl text-[#15321E] font-bold leading-snug">
+                    <Link
+                      href={`/products/${product.id}`}
+                      className="hover:text-[#E58A13] transition-colors block"
+                    >
+                      {product.name}
+                    </Link>
                   </h3>
                   <p className="text-xs font-sans text-[#122E1B]/80 font-medium">
-                    {product.nameTamil}
+                    <span lang="ta">{product.nameTamil}</span>
                   </p>
                   <p className="text-xs text-[#8A7B6E] font-sans">
                     Unit: <span className="text-[#15321E] font-medium">{product.unit}</span>

@@ -40,6 +40,9 @@ export default function Hero({ onShopClick: _onShopClick }: HeroProps) {
               <span className="block italic font-light text-[#FAF7F2] drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
                 Dairy Farm
               </span>
+              <span className="sr-only">
+                {' '}— Pure A2 Cow Milk &amp; Vedic Bilona Ghee in Hosur &amp; Shoolagiri
+              </span>
             </h1>
           </div>
 

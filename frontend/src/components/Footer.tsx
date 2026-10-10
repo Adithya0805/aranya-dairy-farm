@@ -46,9 +46,9 @@ export default function Footer({ onOpenStory: _onOpenStory, onOpenContact: _onOp
 
           {/* Column 2: Navigation Links */}
           <div className="space-y-4">
-            <h4 className="text-xs uppercase font-bold tracking-widest text-[#E58A13]">
+            <h3 className="text-xs uppercase font-bold tracking-widest text-[#E58A13]">
               Quick Navigation
-            </h4>
+            </h3>
             <ul className="space-y-2.5 text-xs sm:text-sm text-[#D1DDD3]">
               <li>
                 <Link href="/products" className="hover:text-[#E58A13] hover:underline underline-offset-4 transition-colors">
@@ -56,8 +56,8 @@ export default function Footer({ onOpenStory: _onOpenStory, onOpenContact: _onOp
                 </Link>
               </li>
               <li>
-                <Link href="/products" className="hover:text-[#E58A13] hover:underline underline-offset-4 transition-colors">
-                  Featured Categories
+                <Link href="/products#category-filters" className="hover:text-[#E58A13] hover:underline underline-offset-4 transition-colors">
+                  Harvest Categories
                 </Link>
               </li>
               <li>
@@ -89,9 +89,9 @@ export default function Footer({ onOpenStory: _onOpenStory, onOpenContact: _onOp
 
           {/* Column 3: Categories & Contact Info */}
           <div className="space-y-4">
-            <h4 className="text-xs uppercase font-bold tracking-widest text-[#E58A13]">
+            <h3 className="text-xs uppercase font-bold tracking-widest text-[#E58A13]">
               Farm &amp; Contact
-            </h4>
+            </h3>
             <div className="space-y-3 text-xs sm:text-sm text-[#D1DDD3]">
               <div className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-[#E58A13] shrink-0 mt-0.5" />

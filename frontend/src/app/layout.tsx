@@ -12,6 +12,9 @@ import { FARM_DOMAIN } from "@/lib/contact";
 
 export const metadata: Metadata = {
   metadataBase: new URL(FARM_DOMAIN),
+  alternates: {
+    canonical: '/',
+  },
   title: {
     default: "Aranya Organic Dairy Farm | A2 Milk, Ghee & Grocery — Hosur",
     template: "%s | Aranya Organic Dairy Farm",
@@ -25,7 +28,20 @@ export const metadata: Metadata = {
     "Aranya Dairy Farm",
     "Pure A2 Cow Milk Hosur",
     "Vedic Bilona Ghee Shoolagiri",
+    "Desi Cow Milk Delivery Hosur",
+    "Organic Farm Provisions Hosur",
   ],
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   openGraph: {
     title: "Aranya Organic Dairy Farm | A2 Milk, Ghee & Grocery — Hosur",
     description:
@@ -79,6 +95,95 @@ export const viewport = {
   viewportFit: "cover",
 };
 
+const jsonLdSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${FARM_DOMAIN}/#website`,
+      "url": FARM_DOMAIN,
+      "name": "Aranya Organic Dairy Farm",
+      "description": "Pure raw A2 milk, Vedic Bilona ghee, and fresh organic provisions in Shoolagiri, Hosur.",
+      "publisher": {
+        "@id": `${FARM_DOMAIN}/#organization`
+      },
+      "inLanguage": ["en-IN", "ta-IN"]
+    },
+    {
+      "@type": ["DairyFarm", "LocalBusiness", "Organization"],
+      "@id": `${FARM_DOMAIN}/#organization`,
+      "name": "Aranya Organic Dairy Farm",
+      "legalName": "Aranya Organic Dairy Farm",
+      "url": FARM_DOMAIN,
+      "logo": {
+        "@type": "ImageObject",
+        "@id": `${FARM_DOMAIN}/#logo`,
+        "url": `${FARM_DOMAIN}/images/aranya-logo.png`,
+        "caption": "Aranya Organic Dairy Farm Logo"
+      },
+      "image": `${FARM_DOMAIN}/images/nature_hero_pasture.jpg`,
+      "description": "Pure raw A2 Gir cow milk, Vedic Bilona ghee, and natural farm provisions from free-grazing native cows in Shoolagiri. Delivered daily before 7:30 AM across Hosur.",
+      "email": "info@aranyaorganicdairyfarm.com",
+      "telephone": "+91-9944338612",
+      "foundingDate": "2017",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Shoolagiri, Bangalore-Chennai NH 44 Highway",
+        "addressLocality": "Shoolagiri, Hosur",
+        "addressRegion": "Tamil Nadu",
+        "postalCode": "635117",
+        "addressCountry": "IN"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 12.6657,
+        "longitude": 78.0125
+      },
+      "areaServed": [
+        {
+          "@type": "City",
+          "name": "Hosur"
+        },
+        {
+          "@type": "AdministrativeArea",
+          "name": "Shoolagiri"
+        },
+        {
+          "@type": "City",
+          "name": "Bengaluru"
+        }
+      ],
+      "priceRange": "₹₹",
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday"
+          ],
+          "opens": "05:30",
+          "closes": "20:00"
+        }
+      ],
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "3.6",
+        "reviewCount": "15",
+        "bestRating": "5",
+        "worstRating": "1"
+      },
+      "sameAs": [
+        "https://www.justdial.com/Hosur/Aranya-Organic-Dairy-Farm-Shoolagiri/9999P4344-4344-200625222032-D9B4_BZDET"
+      ]
+    }
+  ]
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -86,6 +191,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdSchema) }}
+        />
+      </head>
       <body className="antialiased">
         {/* CartProvider wraps the entire app so any component can access cart state */}
         <CartProvider>

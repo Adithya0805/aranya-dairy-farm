@@ -119,9 +119,9 @@ function ProductsContent() {
               <span className="text-[#E58A13] font-bold text-base sm:text-xl">/</span>
 
               <div className="inline-flex items-center gap-2">
-                <span className="font-serif text-xl sm:text-2xl lg:text-3xl font-bold text-[#15321E] tracking-tight">
-                  All Products
-                </span>
+                <h1 className="font-serif text-xl sm:text-2xl lg:text-3xl font-bold text-[#15321E] tracking-tight">
+                  All Farm Products
+                </h1>
                 {selectedCategory === 'All' && (
                   <span className="hidden md:inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-sans font-bold uppercase tracking-wider bg-[#122E1B]/5 text-[#15321E] border border-[#122E1B]/10">
                     {liveProducts.length > 0 ? `${liveProducts.length} Farm Items` : 'Fresh Farm Items'}
@@ -198,11 +198,11 @@ function ProductsContent() {
               <div className="space-y-3 max-w-3xl">
                 <span className="inline-flex items-center gap-1.5 text-xs font-sans uppercase font-bold tracking-widest text-[#E58A13] bg-[#E58A13]/15 px-3 py-1 rounded-full border border-[#E58A13]/30 backdrop-blur-md">
                   <Sparkles className="w-3.5 h-3.5 text-[#E58A13]" />
-                  <span>Farm Provisions Showcase • மளிகைப் பட்டியல்</span>
+                  <span>Farm Provisions Showcase • <span lang="ta">மளிகைப் பட்டியல்</span></span>
                 </span>
                 
                 <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-bold text-white tracking-tight leading-[1.15] drop-shadow-sm">
-                  All Farm Products
+                  Pure A2 Dairy &amp; Farm Provisions
                 </h2>
                 
                 <p className="text-sm sm:text-base text-[#D1DDD3] font-sans leading-relaxed max-w-2xl">

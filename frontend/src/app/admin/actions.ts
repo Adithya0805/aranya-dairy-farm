@@ -1120,4 +1120,169 @@ export async function reindexKnowledgeBaseAction(token?: string) {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// ADMIN DASHBOARD SUMMARY ACTIONS
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface AdminDashboardOrderSummary {
+  id: string;
+  order_code?: string | null;
+  items: Array<{ name: string; qty: number; price?: number | null }>;
+  total: number | null;
+  status: string;
+  whatsapp_message?: string | null;
+  created_at: string;
+}
+
+export interface AdminDashboardLowStockItem {
+  id: string;
+  name: string;
+  name_tamil?: string | null;
+  stock: number;
+  low_stock_threshold: number;
+  unit: string | null;
+}
+
+export interface AdminDashboardSummary {
+  pendingOrdersCount: number;
+  todayOrdersCount: number;
+  weeklyRevenue: number;
+  lowStockCount: number;
+  pendingVisitsCount: number;
+  recentOrders: AdminDashboardOrderSummary[];
+  recentVisits: AdminVisitRequest[];
+  lowStockProducts: AdminDashboardLowStockItem[];
+}
+
+/**
+ * Server Action: Fetches aggregated operational metrics for the Admin Home Dashboard.
+ * Queries orders, low-stock products, and farm visit requests in parallel.
+ */
+export async function getAdminDashboardSummaryAction(token?: string): Promise<{
+  success: boolean;
+  error?: string;
+  data?: AdminDashboardSummary;
+}> {
+  const auth = await verifyAdminUser(token);
+  if (!auth.authorized) {
+    return { success: false, error: auth.error || 'Unauthorized' };
+  }
+
+  try {
+    const admin = getAdminClient();
+    const now = Date.now();
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    const sevenDaysAgo = new Date(now - 7 * 24 * 60 * 60 * 1000).toISOString();
+
+    const [
+      pendingOrdersRes,
+      todayOrdersRes,
+      weeklyOrdersRes,
+      productsRes,
+      pendingVisitsRes,
+      recentOrdersRes,
+      recentVisitsRes,
+    ] = await Promise.all([
+      // 1. Pending orders count
+      admin
+        .from('orders')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'pending'),
+
+      // 2. Today's orders count
+      admin
+        .from('orders')
+        .select('id', { count: 'exact', head: true })
+        .gte('created_at', startOfToday.toISOString()),
+
+      // 3. Weekly revenue (orders created in last 7 days that are not cancelled)
+      admin
+        .from('orders')
+        .select('total, status')
+        .gte('created_at', sevenDaysAgo)
+        .neq('status', 'cancelled'),
+
+      // 4. Products with stock to calculate low-stock alerts
+      admin
+        .from('products')
+        .select('id, name, name_tamil, stock, low_stock_threshold, unit, available')
+        .eq('available', true),
+
+      // 5. Pending visit requests count
+      admin
+        .from('farm_visit_requests')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'pending'),
+
+      // 6. Recent 5 orders
+      admin
+        .from('orders')
+        .select('id, order_code, items, total, status, whatsapp_message, created_at')
+        .order('created_at', { ascending: false })
+        .limit(5),
+
+      // 7. Recent 5 visit requests
+      admin
+        .from('farm_visit_requests')
+        .select('id, name, phone, preferred_date, time_slot, num_visitors, notes, status, created_at')
+        .order('created_at', { ascending: false })
+        .limit(5),
+    ]);
+
+    // Compute weekly revenue
+    let weeklyRevenue = 0;
+    if (weeklyOrdersRes.data) {
+      for (const row of weeklyOrdersRes.data) {
+        if (typeof row.total === 'number' && !isNaN(row.total)) {
+          weeklyRevenue += row.total;
+        } else if (typeof row.total === 'string') {
+          const parsed = parseFloat(row.total);
+          if (!isNaN(parsed)) weeklyRevenue += parsed;
+        }
+      }
+    }
+
+    // Filter low stock products
+    const lowStockProducts: AdminDashboardLowStockItem[] = [];
+    if (productsRes.data) {
+      for (const p of productsRes.data) {
+        if (p.stock !== null && p.stock !== undefined) {
+          const threshold = p.low_stock_threshold ?? 5;
+          if (p.stock <= threshold) {
+            lowStockProducts.push({
+              id: p.id,
+              name: p.name,
+              name_tamil: p.name_tamil,
+              stock: p.stock,
+              low_stock_threshold: threshold,
+              unit: p.unit,
+            });
+          }
+        }
+      }
+    }
+    lowStockProducts.sort((a, b) => a.stock - b.stock);
+
+    return {
+      success: true,
+      data: {
+        pendingOrdersCount: pendingOrdersRes.count ?? 0,
+        todayOrdersCount: todayOrdersRes.count ?? 0,
+        weeklyRevenue: Math.round(weeklyRevenue),
+        lowStockCount: lowStockProducts.length,
+        pendingVisitsCount: pendingVisitsRes.count ?? 0,
+        recentOrders: (recentOrdersRes.data || []) as AdminDashboardOrderSummary[],
+        recentVisits: (recentVisitsRes.data || []) as AdminVisitRequest[],
+        lowStockProducts,
+      },
+    };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error('[DashboardSummary] Error querying summary metrics:', message);
+    return { success: false, error: message };
+  }
+}
+
+
 

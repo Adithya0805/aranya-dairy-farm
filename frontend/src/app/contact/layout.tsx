@@ -3,12 +3,15 @@ import { FARM_DOMAIN } from '@/lib/contact';
 
 export const metadata: Metadata = {
   title: {
-    absolute: 'Visit Our Farm & Contact Us | Aranya Organic Dairy Farm',
+    absolute: 'Book Farm Visit & Daily Milk Delivery Contact | Aranya Organic Dairy Farm',
+  },
+  alternates: {
+    canonical: '/contact',
   },
   description:
     'Book a family visit to Aranya Organic Dairy Farm in Shoolagiri or contact our team for daily fresh A2 milk and Vedic Bilona ghee deliveries across Hosur homes.',
   openGraph: {
-    title: 'Visit Our Farm & Contact Us | Aranya Organic Dairy Farm',
+    title: 'Book Farm Visit & Daily Milk Delivery Contact | Aranya Organic Dairy Farm',
     description:
       'Book a family visit to Aranya Organic Dairy Farm in Shoolagiri or contact our team for daily fresh A2 milk and Vedic Bilona ghee deliveries across Hosur homes.',
     url: `${FARM_DOMAIN}/contact`,
@@ -26,7 +29,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Visit Our Farm & Contact Us | Aranya Organic Dairy Farm',
+    title: 'Book Farm Visit & Daily Milk Delivery Contact | Aranya Organic Dairy Farm',
     description:
       'Book a family visit to Aranya Organic Dairy Farm in Shoolagiri or contact our team for daily fresh A2 milk and Vedic Bilona ghee deliveries across Hosur homes.',
     images: ['/images/og-image.jpg'],
@@ -38,5 +41,32 @@ export default function ContactLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: FARM_DOMAIN,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Contact & Farm Visit',
+        item: `${FARM_DOMAIN}/contact`,
+      },
+    ],
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      {children}
+    </>
+  );
 }

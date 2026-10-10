@@ -16,6 +16,7 @@ import {
   Copy,
   Package,
   Trash2,
+  Download,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import {
@@ -24,6 +25,7 @@ import {
   deleteOrderAction,
   deleteDeliveredOrdersAction,
 } from '@/app/admin/actions';
+import { exportOrdersToCSV } from '@/lib/csvExport';
 
 interface OrderItem {
   product_id?: string;
@@ -275,6 +277,16 @@ export default function AdminOrdersPage() {
               <span>Purge Delivered ({deliveredCount})</span>
             </button>
           )}
+
+          <button
+            onClick={() => exportOrdersToCSV(orders)}
+            disabled={orders.length === 0}
+            title="Download full order records as Excel-ready CSV spreadsheet"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md bg-[#FAF7F2] hover:bg-[#EFEAE2] text-[#1C241E] border border-[#1B4D2E]/20 text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer disabled:opacity-50"
+          >
+            <Download className="w-3.5 h-3.5 text-[#1B4D2E]" />
+            <span>Export CSV</span>
+          </button>
 
           <button
             onClick={() => setIsRunSheetOpen(true)}

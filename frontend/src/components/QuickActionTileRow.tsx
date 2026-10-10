@@ -22,6 +22,7 @@ export default function QuickActionTileRow({ onOpenFarmAI }: QuickActionTileRowP
       aria-label="Quick Action Navigation"
       className="relative z-20 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 -mt-6 sm:-mt-10 mb-6 sm:mb-12"
     >
+      <h2 className="sr-only">Quick Farm Services &amp; Navigation</h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
 
         {/* 1. Shop Products */}

@@ -205,6 +205,16 @@ p, span, button, input, select, textarea, a {
   transform: translateY(0);
 }
 
+/* Fallback for search engine crawlers, reduced-motion users, and print view */
+@media (prefers-reduced-motion: reduce), print {
+  .reveal-section,
+  .reveal-section .reveal-child {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
 /* Stagger delay utility classes for timeline / card choreography */
 .delay-0 { transition-delay: 0ms; animation-delay: 0ms; }
 .delay-100 { transition-delay: 100ms; animation-delay: 100ms; }

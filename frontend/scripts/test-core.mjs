@@ -420,5 +420,59 @@ test('UX States: Cookie banner, Thank You Page, 404 Page & Form Validation', () 
   );
 });
 
+// ----------------------------------------------------------------------------
+// 11. Admin Dashboard & CSV Export Integrity Tests
+// ----------------------------------------------------------------------------
+test('Admin Operations: Dashboard route, summary action & CSV Export', async () => {
+  // 1. Verify CSV Export helper exists and implements RFC 4180 + UTF-8 BOM
+  const csvContent = fs.readFileSync('src/lib/csvExport.ts', 'utf8');
+  assert.ok(
+    csvContent.includes('\\uFEFF'),
+    'CSV export must prepend UTF-8 Byte Order Mark (\\uFEFF) for Excel compatibility'
+  );
+  assert.ok(
+    csvContent.includes('Order Code') && csvContent.includes('Total Amount (INR)'),
+    'CSV export headers must include Order Code and Total Amount'
+  );
+  assert.ok(
+    csvContent.includes('replace(/"/g, \'""\')'),
+    'CSV export must escape double quotes per RFC 4180 specification'
+  );
+
+  // 2. Verify Admin Layout links to Dashboard
+  const adminLayout = fs.readFileSync('src/app/admin/layout.tsx', 'utf8');
+  assert.ok(
+    adminLayout.includes('href="/admin"') && adminLayout.includes('Dashboard'),
+    'Admin layout must provide a dedicated navigation link to /admin Dashboard'
+  );
+
+  // 3. Verify Admin Dashboard page renders KPIs
+  const dashboardPage = fs.readFileSync('src/app/admin/page.tsx', 'utf8');
+  assert.ok(
+    dashboardPage.includes('pendingOrdersCount'),
+    'Dashboard page must surface pendingOrdersCount'
+  );
+  assert.ok(
+    dashboardPage.includes('lowStockCount'),
+    'Dashboard page must surface lowStockCount'
+  );
+  assert.ok(
+    dashboardPage.includes('weeklyRevenue'),
+    'Dashboard page must surface weeklyRevenue'
+  );
+  assert.ok(
+    dashboardPage.includes('pendingVisitsCount'),
+    'Dashboard page must surface pendingVisitsCount'
+  );
+
+  // 4. Verify Admin Orders page includes Export CSV trigger
+  const ordersPage = fs.readFileSync('src/app/admin/orders/page.tsx', 'utf8');
+  assert.ok(
+    ordersPage.includes('exportOrdersToCSV'),
+    'Admin orders page must provide one-click CSV export'
+  );
+});
+
+
 
 

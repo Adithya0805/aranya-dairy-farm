@@ -435,7 +435,8 @@ Message: ${inquiryData.notes || 'Please provide details on daily deliveries and 
       </section>
 
       {/* 5. Split Section: Farm Location Details & Interactive Booking / Inquiry Form */}
-      <section id="book-visit" className="py-16 sm:py-24 bg-white border-b border-[#122E1B]/10 scroll-mt-20">
+      <section id="book-visit" className="relative py-16 sm:py-24 bg-white border-b border-[#122E1B]/10 scroll-mt-20">
+        <span id="visit" className="absolute -top-24 pointer-events-none" aria-hidden="true" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
             

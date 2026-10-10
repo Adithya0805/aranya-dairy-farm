@@ -1,6 +1,16 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, ShoppingBag, MessageSquare } from 'lucide-react';
 import { WHATSAPP_DISPLAY, WA_FARM_INQUIRY } from '@/lib/whatsapp';
+
+export const metadata: Metadata = {
+  title: 'Page Not Found (404) | Aranya Organic Dairy Farm',
+  description: 'The requested page could not be found on Aranya Organic Dairy Farm.',
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function NotFound() {
   return (

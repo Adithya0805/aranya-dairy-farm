@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { LogOut, Package, ShoppingCart, Calendar, ExternalLink } from 'lucide-react';
+import { LogOut, Package, ShoppingCart, Calendar, ExternalLink, LayoutDashboard } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -30,7 +30,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         setIsAuthenticated(true);
         setAdminEmail(session.user?.email || 'Admin');
         if (isLoginPage) {
-          router.replace('/admin/products');
+          router.replace('/admin');
         }
       }
     }
@@ -79,6 +79,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
+  const isDashboard = pathname === '/admin';
   const isProducts = pathname.startsWith('/admin/products');
   const isOrders = pathname.startsWith('/admin/orders');
   const isVisits = pathname.startsWith('/admin/visits');
@@ -112,8 +113,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {/* Desktop Navigation Links */}
             <nav className="hidden md:flex items-center gap-1">
               <Link
+                href="/admin"
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-md text-xs font-semibold uppercase tracking-wider transition-colors ${
+                  isDashboard
+                    ? 'bg-[#1B4D2E] text-white'
+                    : 'text-[#57655B] hover:bg-[#F2ECE7] hover:text-[#1C241E]'
+                }`}
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                <span>Dashboard</span>
+              </Link>
+
+              <Link
                 href="/admin/products"
-                className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-semibold uppercase tracking-wider transition-colors ${
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-md text-xs font-semibold uppercase tracking-wider transition-colors ${
                   isProducts
                     ? 'bg-[#1B4D2E] text-white'
                     : 'text-[#57655B] hover:bg-[#F2ECE7] hover:text-[#1C241E]'
@@ -125,7 +138,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
               <Link
                 href="/admin/orders"
-                className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-semibold uppercase tracking-wider transition-colors ${
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-md text-xs font-semibold uppercase tracking-wider transition-colors ${
                   isOrders
                     ? 'bg-[#1B4D2E] text-white'
                     : 'text-[#57655B] hover:bg-[#F2ECE7] hover:text-[#1C241E]'
@@ -137,7 +150,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
               <Link
                 href="/admin/visits"
-                className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-semibold uppercase tracking-wider transition-colors ${
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-md text-xs font-semibold uppercase tracking-wider transition-colors ${
                   isVisits
                     ? 'bg-[#1B4D2E] text-white'
                     : 'text-[#57655B] hover:bg-[#F2ECE7] hover:text-[#1C241E]'
@@ -183,10 +196,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
 
           {/* Mobile Navigation Tabs */}
-          <div className="md:hidden flex border-t border-[#1B4D2E]/10 py-2 gap-2">
+          <div className="md:hidden flex border-t border-[#1B4D2E]/10 py-2 gap-1.5">
+            <Link
+              href="/admin"
+              className={`flex-1 flex items-center justify-center gap-1 py-2 rounded text-[11px] font-bold uppercase tracking-wider transition-colors ${
+                isDashboard
+                  ? 'bg-[#1B4D2E] text-white'
+                  : 'bg-[#F2ECE7] text-[#1C241E]'
+              }`}
+            >
+              <LayoutDashboard className="w-3.5 h-3.5" />
+              <span>Home</span>
+            </Link>
+
             <Link
               href="/admin/products"
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded text-xs font-bold uppercase tracking-wider transition-colors ${
+              className={`flex-1 flex items-center justify-center gap-1 py-2 rounded text-[11px] font-bold uppercase tracking-wider transition-colors ${
                 isProducts
                   ? 'bg-[#1B4D2E] text-white'
                   : 'bg-[#F2ECE7] text-[#1C241E]'
@@ -198,7 +223,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
             <Link
               href="/admin/orders"
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded text-xs font-bold uppercase tracking-wider transition-colors ${
+              className={`flex-1 flex items-center justify-center gap-1 py-2 rounded text-[11px] font-bold uppercase tracking-wider transition-colors ${
                 isOrders
                   ? 'bg-[#1B4D2E] text-white'
                   : 'bg-[#F2ECE7] text-[#1C241E]'
@@ -210,7 +235,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
             <Link
               href="/admin/visits"
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded text-xs font-bold uppercase tracking-wider transition-colors ${
+              className={`flex-1 flex items-center justify-center gap-1 py-2 rounded text-[11px] font-bold uppercase tracking-wider transition-colors ${
                 isVisits
                   ? 'bg-[#1B4D2E] text-white'
                   : 'bg-[#F2ECE7] text-[#1C241E]'

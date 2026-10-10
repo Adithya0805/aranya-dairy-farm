@@ -449,3 +449,8 @@ export function getProductPriceLabel(product: Product): string {
 export function formatPrice(amount: number): string {
   return `₹${amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
 }
+
+/** Finds a product by its unique slug/identifier. */
+export function getProductById(id: string): Product | undefined {
+  return PRODUCTS.find((p) => p.id === id);
+}
